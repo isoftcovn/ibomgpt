@@ -1,0 +1,67 @@
+{
+    "add": "Add",
+    "alertChangeLanguage": "Do you want to change language?",
+
+    "clearAll": "Clear All",
+    "change": "Change",
+    "changePassword": "Change Password",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "confirm": "Confirm",
+
+    "done": "Done",
+
+    "email": "Email",
+    "edit": "Edit",
+    "editProfile": "Edit profile",
+    "english": "English",
+    "error": "Whoops!",
+
+    "female": "Female",
+    "from": "From",
+
+    "gender": "Gender",
+
+    "home": "Home",
+
+    "info": "Info",
+
+    "korean": "Korean",
+    "keyWithCount": "{{count}} item",
+    "keyWithCount_plural": "{{count}} items",
+
+    "login": "Login",
+    "location": "Location",
+    "logout": "Logout",
+    "languages": "Languages",
+    "loading": "Loading...",
+    "lostInternetConnection": "Your network connection is unstable.",
+    "listEmpty": "No data.",
+
+    "male": "Male",
+
+    "name": "Name",
+    "next": "Next",
+
+    "password": "Password",
+    "phoneNumber": "Phone number",
+    "pushNotification": "Push notification",
+
+    "required": "Required",
+
+    "signup": "Sign Up",
+    "submit": "Submit",
+    "scan": "Scan",
+    "search": "Search",
+    "status": "Status",
+    "success": "SUCCESS",
+
+    "used": "Used",
+
+    "warning": "Waring",
+
+    "404": "Content not found.",
+    "400": "Client error.",
+    "401": "Unauthorized",
+    "500": "Something went wrong."
+}

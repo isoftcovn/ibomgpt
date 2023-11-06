@@ -1,0 +1,119 @@
+{
+  "project_info": {
+    "project_number": "734056128553",
+    "firebase_url": "https://rntemplate-a2810.firebaseio.com",
+    "project_id": "rntemplate-a2810",
+    "storage_bucket": "rntemplate-a2810.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734056128553:android:ccb59ebd6d84ecba07fc38",
+        "android_client_info": {
+          "package_name": "com.hoangtran.rntemplate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734056128553-ml17fs3c7lggpdgqa1k6ht6hknov2cd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcz-sdFeYVbAya2Wuwyv305aTVKEzVFBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734056128553-ml17fs3c7lggpdgqa1k6ht6hknov2cd1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "734056128553-5kje0q3clehdd7sl2safcinn70cm05ne.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hoangtran.rntemplate.staging"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734056128553:android:00bb73394c1dd72607fc38",
+        "android_client_info": {
+          "package_name": "com.hoangtran.rntemplate.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734056128553-ml17fs3c7lggpdgqa1k6ht6hknov2cd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcz-sdFeYVbAya2Wuwyv305aTVKEzVFBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734056128553-ml17fs3c7lggpdgqa1k6ht6hknov2cd1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "734056128553-5kje0q3clehdd7sl2safcinn70cm05ne.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hoangtran.rntemplate.staging"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734056128553:android:896723997251fef607fc38",
+        "android_client_info": {
+          "package_name": "com.hoangtran.rntemplate.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734056128553-ml17fs3c7lggpdgqa1k6ht6hknov2cd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcz-sdFeYVbAya2Wuwyv305aTVKEzVFBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734056128553-ml17fs3c7lggpdgqa1k6ht6hknov2cd1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "734056128553-5kje0q3clehdd7sl2safcinn70cm05ne.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hoangtran.rntemplate.staging"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

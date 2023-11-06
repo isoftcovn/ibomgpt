@@ -1,0 +1,162 @@
+fastlane_version '2.133.0'
+
+if File.exist?('./.env')
+  open('./.env', 'r').readlines.each do |l|
+    kv = l.split('=')
+    ENV[kv[0]] = kv[1].chomp
+  end
+end
+
+before_all do
+  ensure_git_status_clean  
+end
+
+api_key = app_store_connect_api_key(
+    key_id: ENV["APPSTORECONNECT_KEYID"],
+    issuer_id: ENV["APPSTORECONNECT_ISSUERID"],
+    key_filepath: ENV["APPSTORECONNECT_KEYPATH"],
+    duration: 1200, # optional (maximum 1200)
+    in_house: false, # optional but may be required if using match/sigh
+  )
+
+platform :ios do
+   # iOS Lanes
+  desc 'Build the iOS application.'
+  private_lane :build do |options|
+    certificates(export_method: options[:export_method])
+    gym(scheme: options[:scheme], workspace: ENV["IOS_WORKSPACE"],
+          export_method: (options[:export_method] ? options[:export_method] : "app-store"))
+  end
+
+  desc 'Register devices for Adhoc'
+  lane :registerDevices do
+    if !ENV["REGISTER_DEVICE_FILE"].nil?
+      register_devices(
+          devices_file: ENV["REGISTER_DEVICE_FILE"], # You must pass in either `devices_file` or `devices`.
+      )
+    end 
+  end
+
+  desc "fetch and upload dSYM files to Firebase Crashlytics"
+  lane :refresh_dsyms_firebase do |options|
+    download_dsyms(app_identifier: ENV["APP_ID"])
+    upload_symbols_to_crashlytics(
+          binary_path: ENV["UPLOAD_SYMBOL_BINARY_PATH"],
+          gsp_path: ENV["GOOGLE_PLIST_PATH"]
+    )
+    clean_build_artifacts
+  end
+
+  desc "upload dSYM files to Firebase Crashlytics"
+  lane :upload_dsyms_firebase do |options|
+    upload_symbols_to_crashlytics(
+          binary_path: ENV["UPLOAD_SYMBOL_BINARY_PATH"],
+          dsym_path: ENV["DSYM_PATH"],
+          gsp_path: ENV["GOOGLE_PLIST_PATH"]
+    )
+    clean_build_artifacts
+  end
+
+  desc 'Ship to Testflight.'
+  lane :shipTF do |options|
+    build(scheme: ENV["IOS_SCHEME"])
+    uploadTF
+    upload_dsyms_firebase
+  end
+
+  desc 'Pilot.'
+  lane :uploadTF do |options|
+    changelog = get_changelog(options)
+    pilot(api_key: api_key,
+          uses_non_exempt_encryption: true,
+          skip_waiting_for_build_processing: true,          
+          changelog: changelog)
+  end
+
+  desc 'Ship to Firebase Distribution'
+    lane :shipAdHoc do
+      registerDevices
+      build(scheme: ENV["IOS_SCHEME"], export_method: 'ad-hoc')
+      firebaseDistributionIOS
+      upload_dsyms_firebase
+    end
+end
+
+platform :android do
+  # Android Lanes
+    desc 'Build the Android application.'
+    private_lane :build do |options|
+      gradle(task: 'clean', project_dir: 'android/')
+      gradle(task: 'assemble', flavor: options[:flavor], build_type: options[:build_type], project_dir: 'android/')
+    end
+
+    desc 'Ship to Firebase Distribution.'
+    lane :ship do
+      build(flavor: ENV["ANDROID_FLAVOR"], build_type: ENV['ANDROID_BUILD_TYPE'])
+      firebaseDistributionAndroid
+    end
+
+    desc 'Ship to Playstore Beta.'
+    lane :beta do
+      build(flavor: ENV["ANDROID_FLAVOR"], build_type: ENV['ANDROID_BUILD_TYPE'])
+      supply(track: 'beta', track_promote_to: 'beta')
+    end
+end
+
+desc 'Fetch certificates and provisioning profiles'
+lane :certificates do |options|
+  match(api_key: api_key,
+        type: options[:export_method] == "ad-hoc" ? "adhoc" : "appstore",
+        force_for_new_devices: options[:export_method] == "ad-hoc" ? true : false)
+end
+
+lane :genCertificates do
+  match(api_key: api_key, type: "development")
+  match(api_key: api_key, type: "appstore")
+  match(api_key: api_key, type: "adhoc", force_for_new_devices: true)
+end
+
+desc 'Upload APK to Firebase Distribution'
+lane :firebaseDistributionAndroid do |options|
+  changelog = get_changelog(options)
+  firebase_app_distribution(
+    app: ENV["FIREBASE_APP_ID_ANDROID"],
+    testers_file: ENV["TESTER_FILE"],
+    release_notes: changelog,
+    apk_path: ENV["APK_PATH"],
+    service_credentials_file: ENV['GOOGLE_APPLICATION_CREDENTIALS']
+  )
+end
+
+desc 'Upload IPA to Firebase Distribution'
+lane :firebaseDistributionIOS do |options|
+  changelog = get_changelog(options)
+  firebase_app_distribution(
+    app: ENV["FIREBASE_APP_ID_IOS"],
+    testers_file: ENV["TESTER_FILE"],
+    release_notes: changelog,
+    ipa_path: ENV["IPA_PATH"],
+    service_credentials_file: ENV['GOOGLE_APPLICATION_CREDENTIALS']
+  )
+end
+
+lane :get_changelog do |options|
+  from_commit = options[:from_revision]
+  to_commit = "HEAD"
+  commit_format = "* %s - [%aN]"
+  if from_commit.nil? || to_commit.nil?
+    changelog = changelog_from_git_commits(
+      commits_count: 20,
+      pretty: commit_format,
+      merge_commit_filtering: "exclude_merges"
+    )
+  else
+    changelog = changelog_from_git_commits(
+      between: [from_commit, to_commit],
+      pretty: commit_format,
+      merge_commit_filtering: "exclude_merges"
+    )
+    changelog = "Empty changelog..." if changelog.to_s.length == 0
+  end
+  "#{changelog}"
+end

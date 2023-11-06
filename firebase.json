@@ -1,0 +1,8 @@
+{
+    "$schema": "./node_modules/@react-native-firebase/app/firebase-schema.json",
+    "react-native": {
+        "crashlytics_auto_collection_enabled": true,
+        "analytics_auto_collection_enabled": true,
+        "messaging_ios_foreground_presentation_options": ["badge", "sound", "list", "banner"]
+    }
+  }

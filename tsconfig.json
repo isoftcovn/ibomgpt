@@ -1,0 +1,40 @@
+{
+    "extends": "@tsconfig/react-native/tsconfig.json",
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",        
+        "allowJs": true,
+        "jsx": "react-native",
+        "noEmit": true,
+        "isolatedModules": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@config/*": ["./app/config/*"],
+            "@assets/*": ["./app/assets/*"],
+            "@data/*": ["./app/data/*"],
+            "@domain/*": ["./app/domain/*"],
+            "@models/*": ["./app/models/*"],
+            "@components/*": ["./app/presentation/components/*"],
+            "@modules/*": ["./app/presentation/modules/*"],
+            "@localization/*": ["./app/presentation/localization/*"],
+            "@navigation/*": ["./app/presentation/navigation/*"],
+            "@redux/*": ["./app/presentation/redux/*"],
+            "@theme/*": ["./app/presentation/theme/*"],
+            "@shared/*": ["./app/shared/*"]
+        }
+    },    
+    "exclude": [
+        "node_modules",
+        "babel.config.js",
+        "metro.config.js",
+        "jest.config.js",
+        "jest.setup.js"
+    ]
+}

@@ -1,0 +1,28 @@
+if File.exist?('./.env')
+  open('./.env', 'r').readlines.each do |l|
+    kv = l.split('=')
+    ENV[kv[0]] = kv[1].chomp
+  end
+end
+
+git_url(ENV["CERTIFICATE_GIT_URL"])
+git_branch(ENV["CERTIFICATE_GIT_BRANCH"])
+
+storage_mode("git")
+
+type("development") # The default type, can be: appstore, adhoc, enterprise or development
+
+app_identifier([ENV["APP_ID"]])
+
+for_lane :shipAdHoc do
+  type("adhoc")
+end
+
+for_lane :shipTF do
+  type("appstore")
+end
+
+# For all available options run `fastlane match --help`
+# Remove the # in the beginning of the line to enable the other options
+
+# The docs are available on https://docs.fastlane.tools/actions/match

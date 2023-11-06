@@ -10,6 +10,7 @@
     "confirm": "Confirm",
 
     "done": "Done",
+    "dontHaveAccountYet": "Bạn chưa có tài khoản?",
 
     "email": "Email",
     "edit": "Edit",
@@ -25,14 +26,15 @@
     "home": "Home",
 
     "info": "Info",
+    "invalidEmail": "Email không hợp lệ",
 
     "korean": "Korean",
     "keyWithCount": "{{count}} cai",
     "keyWithCount_plural": "{{count}} cai",
 
-    "login": "Login",
+    "login": "Đăng nhập",
     "location": "Location",
-    "logout": "Logout",
+    "logout": "Đăng xuất",
     "languages": "Languages",
     "loading": "Loading...",
     "lostInternetConnection": "Your network connection is unstable.",
@@ -43,13 +45,14 @@
     "name": "Ten",
     "next": "Next",
 
-    "password": "Password",
+    "password": "Mật khẩu",
     "phoneNumber": "Phone number",
     "pushNotification": "Push notification",
+    "passwordTooShort": "Mật khẩu quá ngắn",
 
-    "required": "Required",
+    "required": "Không thể bỏ trống",
 
-    "signup": "Sign Up",
+    "signup": "Đăng ký",
     "submit": "Submit",
     "scan": "Scan",
     "search": "Search",

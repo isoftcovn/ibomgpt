@@ -1,5 +1,5 @@
-import { Platform, Dimensions as RNDimensions, StatusBar } from 'react-native';
-import IphoneXHelper from 'app/shared/helper/IPhoneXHelper';
+import { Platform, Dimensions as RNDimensions } from 'react-native';
+import { ms, s, vs } from 'react-native-size-matters';
 
 const width = RNDimensions.get('window').width;
 
@@ -26,12 +26,15 @@ if (width < Breakpoints.phone) {
 }
 
 export const Dimensions = {
-    ...IphoneXHelper,
+    // ...IphoneXHelper,
     breakpoints: Breakpoints,
     phoneType,
     navigationvBar: {
         height: Platform.OS === 'ios' ? 64 : 56,
     },
+    moderateScale: ms,
+    scale: s,
+    verticalScale: vs,
     sizeFor: (sizes: IBreakpoints) => {
         switch (phoneType) {
             case 'smallPhone': return sizes.smallPhone;
@@ -39,13 +42,13 @@ export const Dimensions = {
             case 'tablet': return sizes.tablet;
         }
     },
-    getStatusBarHeight: (safe: boolean) => {
-        return Platform.select({
-            ios: IphoneXHelper.ifIphoneX(safe ? 44 : 30, 20),
-            android: StatusBar.currentHeight,
-            default: 0,
-        });
-    },
+    // getStatusBarHeight: (safe: boolean) => {
+    //     return Platform.select({
+    //         ios: IphoneXHelper.ifIphoneX(safe ? 44 : 30, 20),
+    //         android: StatusBar.currentHeight,
+    //         default: 0,
+    //     });
+    // },
     screenWidth: () => RNDimensions.get('window').width,
     screenHeight: () => RNDimensions.get('window').height,
 };

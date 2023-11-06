@@ -1,5 +1,5 @@
 import { StorageGatewayFactory } from '@data/gateway/storage';
-import DataStore from '@data/datastore';
+import { DataStore } from '@data/sessionstore';
 import ApiGateway from 'app/data/gateway/api';
 import { AppResource } from 'app/data/gateway/api/resource';
 import { IUserRepository } from 'app/domain/user';
@@ -18,10 +18,10 @@ export class UserRepository implements IUserRepository {
     activateUserSession = async (): Promise<(string | undefined | null)[]> => {
         const storageGateway = StorageGatewayFactory.createWithSecureClient();
         const responses = await Promise.all([storageGateway.doGet(TokenType.User), storageGateway.doGet(TokenType.UserRefreshToken)]);
-        DataStore.accessToken = responses[0];
-        DataStore.refreshToken = responses[1];
+        DataStore.shared.accessToken = responses[0];
+        DataStore.shared.refreshToken = responses[1];
 
-        return [DataStore.accessToken, DataStore.refreshToken];
+        return [DataStore.shared.accessToken, DataStore.shared.refreshToken];
     };
 
     logoutUser = (): Promise<boolean> => {
@@ -38,20 +38,20 @@ export class UserRepository implements IUserRepository {
 
     removeSavedToken = async (): Promise<boolean> => {
         const storageGateway = StorageGatewayFactory.createWithSecureClient();
-        DataStore.accessToken = undefined;
-        DataStore.refreshToken = undefined;
+        DataStore.shared.accessToken = undefined;
+        DataStore.shared.refreshToken = undefined;
         await Promise.all([storageGateway.doDelete(TokenType.User), storageGateway.doDelete(TokenType.UserRefreshToken)]);
         return true;
     };
 
     getSavedUserToken = (): Array<string | undefined | null> => {
-        return [DataStore.accessToken, DataStore.refreshToken];
+        return [DataStore.shared.accessToken, DataStore.shared.refreshToken];
     };
 
     saveUserToken = (token: string, refreshToken?: string): Promise<boolean> => {
         const storageGateway = StorageGatewayFactory.createWithSecureClient();
-        DataStore.accessToken = token;
-        DataStore.refreshToken = refreshToken;
+        DataStore.shared.accessToken = token;
+        DataStore.shared.refreshToken = refreshToken;
         if (refreshToken) {
             storageGateway.doUpdate(TokenType.UserRefreshToken, refreshToken);
         }

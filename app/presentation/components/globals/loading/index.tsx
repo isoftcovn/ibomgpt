@@ -3,6 +3,7 @@ import { theme } from 'app/presentation/theme';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { getString } from 'app/presentation/localization';
+import { Dimensions } from '@theme/Dimensions';
 
 
 interface IProps {
@@ -57,11 +58,8 @@ class LoadingViewOnly extends React.PureComponent<IProps, IState> {
     };
 
     _renderLoading = () => {
-        const { loadingText } = this.props;
-        const _loadingText = loadingText ? loadingText : `${getString('loading')}`;
         return (
             <View style={styles.loadingContainer}>
-                <TextPrimary>{_loadingText}</TextPrimary>
                 <View style={styles.spinnerContainer}>
                     <ActivityIndicator animating={true} size="large" color="#fff" />
                 </View>
@@ -96,9 +94,8 @@ const styles = StyleSheet.create({
     },
 
     loadingContainer: {
-        padding: 12,
-        width: 90,
-        aspectRatio: 1,
+        width: Dimensions.moderateScale(90),
+        height: Dimensions.moderateScale(90),
         backgroundColor: '#000',
         borderRadius: 8,
         opacity: 0.8,

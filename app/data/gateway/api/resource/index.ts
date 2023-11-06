@@ -8,7 +8,7 @@ export interface IResource {
     Path: string;
 }
 
-export const getApiController = () => '';
+export const getApiController = () => '/';
 
 export const AppResource = {
     User,

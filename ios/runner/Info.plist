@@ -26,6 +26,23 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+    <key>NSExceptionDomains</key>
+    <dict>
+        <key>api.ibom.com.vn</key>
+        <dict>
+            <key>NSExceptionAllowsInsecureHTTPLoads</key>
+            <true/>
+            <key>NSIncludesSubdomains</key>
+            <true/>
+        </dict>
+        <key>qa.ibom.com.vn</key>
+        <dict>
+            <key>NSExceptionAllowsInsecureHTTPLoads</key>
+            <true/>
+            <key>NSIncludesSubdomains</key>
+            <true/>
+        </dict>
+    </dict>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>

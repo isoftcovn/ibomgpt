@@ -20,8 +20,18 @@ export default class DefaultInterceptor extends Interceptor {
     };
 
     responseFulfilled = (response: AxiosResponse) => {
-        // Should return AxiosResponse, only transform data in the response
-        return response;
+        const data = response.data;
+        if (data) {
+            const { error, error_msg, } = data;
+            // success
+            if (error === '000') {
+                return data;
+            } else {
+                return Promise.reject(new APIError(error_msg, 500, error, data));
+            }
+        }
+
+        return data;
     };
 
     responseReject = (error: AxiosError<any, any>) => {
@@ -29,18 +39,16 @@ export default class DefaultInterceptor extends Interceptor {
         let code = '';
         let message = '';
         let rawError;
-        if (error.response?.data?.error) {
+        if (error.response?.data) {
             status = error.response.status;
             console.info(error.response.status);
             console.info(error.response.data);
-            console.info(error.response.config);
 
-            const data = error.response.data.error;
-            const { statusCode, message: _message, code: _code } = data;
+            const data = error.response.data;
+            const { error: errorCode, error_msg, } = data;
             // server was received message, but response smt
-            status = !(status >= 200 && status < 300) ? status : statusCode;
-            code = _code;
-            message = _message || error?.response?.data?.errorMessage;
+            code = errorCode;
+            message = error_msg ?? '';
             rawError = data;
         } else {
             console.warn('smt went wrong: ', error);

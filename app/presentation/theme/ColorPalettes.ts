@@ -1,15 +1,6 @@
 export const colorPalettes = {
-    primary: {
-        '100': '#E1E9FF',
-        '200': '#AABCEB',
-        '300': '#597BD9',
-        '400': '#325DCD',
-        '500': '#1D48BA',
-        '600': '#0834A9',
-        '700': '#072D94',
-        '800': '#032176',
-        '900': '#051E62',
-    },
+    primary: '#0f75bc',
+    primaryVariant: '#0b578e',
     blueGray: {
         '100': '#EDF2F8',
         '200': '#E4EAF1',

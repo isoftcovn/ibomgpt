@@ -10,6 +10,7 @@
     "confirm": "Confirm",
 
     "done": "Done",
+    "dontHaveAccountYet": "Bạn chưa có tài khoản?",
 
     "email": "Email",
     "edit": "Edit",
@@ -25,6 +26,7 @@
     "home": "Home",
 
     "info": "Info",
+    "invalidEmail": "Email không hợp lệ",
 
     "korean": "Korean",
     "keyWithCount": "{{count}} item",
@@ -46,6 +48,7 @@
     "password": "Password",
     "phoneNumber": "Phone number",
     "pushNotification": "Push notification",
+    "passwordTooShort": "Mật khẩu quá ngắn",
 
     "required": "Required",
 

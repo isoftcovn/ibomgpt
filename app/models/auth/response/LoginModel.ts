@@ -1,16 +1,24 @@
 export default class LoginModel {
     token: string;
-    refreshToken?: string;
+    hostApi?: string;
+    userId: number;
+    fullname?: string;
+    username: string;
 
     constructor() {
         this.token = '';
+        this.username = '';
+        this.userId = 0;
     }
 
     static parseFromJson = (data: any): LoginModel => {
         const obj = new LoginModel();
-        const { accessToken, refreshToken } = data;
-        obj.token = accessToken;
-        obj.refreshToken = refreshToken;
+        const { token, user_id, hostApi, fullname, username } = data;
+        obj.token = token;
+        obj.hostApi = hostApi;
+        obj.userId = user_id;
+        obj.fullname = fullname;
+        obj.username = username;
         return obj;
     };
 

@@ -3,7 +3,7 @@ import { ApiType } from '../../type';
 
 const Login = (): IResource => ({
     Type: ApiType.Public,
-    Path: `${getApiController()}login`,
+    Path: `${getApiController()}auth.do`,
 });
 
 const Register = (): IResource => ({

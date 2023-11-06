@@ -4,7 +4,7 @@ import { getI18n, initReactI18next } from 'react-i18next';
 import en from 'app/presentation/localization/en/translation.json';
 import vi from 'app/presentation/localization/vi/translation.json';
 
-export const configureLocalization = (locale: string, fallback = 'en') => {
+export const configureLocalization = (locale: string, fallback = 'vi_VN') => {
     return i18n
         .use(initReactI18next)
         .init({
@@ -42,12 +42,12 @@ export const getString = (key: keyof typeof en, params?: any) => {
 
 export enum Languages {
     english = 'en',
-    korean = 'ko_KR'
+    vietnamese = 'vi_VN'
 }
 
 export const LANGUAGES = {
     ENGLISH: 'en',
-    KOREAN: 'ko_KR',
+    VIETNAMESE: 'vi_VN',
 };
 
 export const changeLanguage = (language: Languages): Promise<string> => {

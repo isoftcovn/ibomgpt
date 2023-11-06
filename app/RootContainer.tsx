@@ -14,6 +14,7 @@ import Config from 'react-native-config';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import RNShake from 'react-native-shake';
 import DeeplinkHandler from './presentation/managers/DeeplinkHandler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 interface Props {
 }
@@ -23,7 +24,7 @@ const RootContainer = React.memo((props: Props) => {
     const deeplinkUrl = useRef<string>();
 
     const _setPendingDeeplink = useCallback((url: string) => {
-        if (DeeplinkHandler.shouldIgnoreDeeplink(url)) {return;}
+        if (DeeplinkHandler.shouldIgnoreDeeplink(url)) { return; }
         deeplinkUrl.current = url;
     }, []);
 
@@ -195,25 +196,27 @@ const RootContainer = React.memo((props: Props) => {
 
     return (
         <GestureHandlerRootView style={styles.container}>
-            <NavigationContainer
-                ref={(ref: any) =>
-                    NavigationService.setTopLevelNavigator(ref)
-                }
-                onStateChange={onNavigationStateChange}
-            >
-                <StatusBar barStyle={Platform.select({
-                    android: 'light-content',
-                    ios: 'dark-content',
-                })} />
-                <RootStack />
-                <DropdownAlert />
-                <ViewConnectionStatus />
-                <LoadingIndicator
-                    ref={(ref: LoadingIndicator) =>
-                        LoadingManager.setLoadingRef(ref)
+            <SafeAreaProvider>
+                <NavigationContainer
+                    ref={(ref: any) =>
+                        NavigationService.setTopLevelNavigator(ref)
                     }
-                />
-            </NavigationContainer>
+                    onStateChange={onNavigationStateChange}
+                >
+                    <StatusBar barStyle={Platform.select({
+                        android: 'light-content',
+                        ios: 'dark-content',
+                    })} />
+                    <RootStack />
+                    <DropdownAlert />
+                    <ViewConnectionStatus />
+                    <LoadingIndicator
+                        ref={(ref: LoadingIndicator) =>
+                            LoadingManager.setLoadingRef(ref)
+                        }
+                    />
+                </NavigationContainer>
+            </SafeAreaProvider>
         </GestureHandlerRootView>
     );
 });

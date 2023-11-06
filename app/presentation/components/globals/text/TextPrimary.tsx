@@ -5,7 +5,7 @@ import { Text, TextProps } from 'react-native';
 interface IProps extends TextProps {
     children?: any | any[];
     variant?: keyof typeof theme.textVariants;
-    color?: keyof typeof theme.color;
+    color?: string;
 }
 
 const TextPrimary = React.memo((props: IProps) => {

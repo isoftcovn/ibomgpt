@@ -10,8 +10,8 @@ import { Alert, StyleSheet } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { getString } from '../../../localization';
-import { changeLanguageTypes } from '../../../redux/actions/general';
+import { getString } from '../../localization';
+import { changeLanguageTypes } from '../../redux/actions/general';
 
 interface IProps {
     navigation: StackNavigationProp<any, any>;

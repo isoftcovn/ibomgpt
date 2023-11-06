@@ -1,3 +1,4 @@
+import LoginRequestModel from '@models/auth/request/LoginRequestModel';
 import ApiGateway from 'app/data/gateway/api';
 import { AppResource } from 'app/data/gateway/api/resource';
 import { IAuthRepository } from 'app/domain/auth';
@@ -19,18 +20,16 @@ export class AuthRepository implements IAuthRepository {
         return new LoginModel();
     };
 
-    loginUserEmail = async (email: string, password: string): Promise<LoginModel> => {
-        const resource = AppResource.Auth.Register();
+    loginUserEmail = async (body: LoginRequestModel): Promise<LoginModel> => {
+        const resource = AppResource.Auth.Login();
         const apiGateway = new ApiGateway({
             method: 'POST',
             resource: resource,
-            body: {
-                email, password,
-            },
+            body
         });
 
-        await apiGateway.execute();
+        const response = await apiGateway.execute();
 
-        return new LoginModel();
+        return LoginModel.parseFromJson(response);
     };
 }

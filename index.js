@@ -11,7 +11,7 @@ import { configureLocalization } from './app/presentation/localization';
 import notifee, {EventType} from '@notifee/react-native';
 import NotificationHelper from '@shared/helper/NotificationHelper';
 
-configureLocalization('en');
+configureLocalization('vi_VN');
 
 notifee.onBackgroundEvent(async ({ type, detail }) => {
     const { notification, } = detail;

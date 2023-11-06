@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import SignInScreen from '@modules/customer/auth';
-import LanguageScreen from '@modules/customer/languages';
+import SignInScreen from '@modules/auth';
+import LanguageScreen from '@modules/languages';
 import { StartScreen } from '@modules/start';
 import React from 'react';
 import DeveloperConsole from '@modules/developerconsole';

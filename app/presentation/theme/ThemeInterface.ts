@@ -9,6 +9,7 @@ export interface ITheme {
     color: {
         colorPrimary: string,
         colorPrimaryVariant: string,
+        onPrimary: string,
 
         colorAccent: string,
 
@@ -17,6 +18,7 @@ export interface ITheme {
 
         backgroundColorPrimary: string,
         backgroundColorVariant: string,
+        onBackground: string,
 
         textColor: string,
         labelColor: string,

@@ -2,8 +2,7 @@
 export default class UserModel {
     id: number;
     email?: string;
-    firstName?: string;
-    lastName?: string;
+    fullname?: string;
 
     constructor() {
         this.id = 0;
@@ -11,12 +10,10 @@ export default class UserModel {
 
     static parseFromJson = (data: any): UserModel => {
         const obj = new UserModel();
-        const { first_name, last_name, email, id } = data;
+        const { email, id } = data;
 
         obj.id = id;
         obj.email = email;
-        obj.firstName = first_name;
-        obj.lastName = last_name;
 
         return obj;
     };

@@ -13,6 +13,7 @@ const GeneratedImages = {
     ic_eye_off: require('./images/resources/ic_eye_off.png'),
     ic_lock_open: require('./images/resources/ic_lock_open.png'),
     ic_shopping_bag: require('./images/resources/ic_shopping_bag.png'),
+    img_chatgpt: require('./images/resources/img_chatgpt.png'),
     korean: require('./images/resources/korean.png'),
     logo_ibom: require('./images/resources/logo_ibom.png'),
 };

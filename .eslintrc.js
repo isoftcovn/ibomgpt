@@ -15,7 +15,7 @@ module.exports = {
                 'allow': [
                     'tron',
                     'info',
-                    'warn', 
+                    'warn',
                     'error'
                 ]
             }
@@ -33,12 +33,13 @@ module.exports = {
         'quotes': ['error', 'single', {
             'allowTemplateLiterals': true
         }],
+        'no-return-assign': 'off',
         'import/default': 'off',
         'import/prefer-default-export': 'off',
         'class-methods-use-this': 'off',
         'no-unused-expressions': 'off',
         'no-unused-vars': 'off',
-        'import/namespace': 'off',     
+        'import/namespace': 'off',
         'import/no-unresolved': 'off',
         'import/no-named-as-default': 'off',
         'import/no-named-as-default-member': 'off',
@@ -52,7 +53,7 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/no-unused-vars': ['warn', { 'args': 'none' }],
         '@typescript-eslint/no-empty-interface': 'off',
-        
+
         // React
         'react/jsx-props-no-spreading': 'off',
         'react/jsx-filename-extension': [

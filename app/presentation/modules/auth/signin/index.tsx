@@ -18,12 +18,14 @@ import { Dimensions } from 'app/presentation/theme/Dimensions';
 import { Formik, FormikProps } from 'formik';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Image, Platform, StyleSheet, TextInput, TouchableOpacity, View, StatusBar } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'SignIn'>;
@@ -63,10 +65,14 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
         navigation.dispatch(MainUserNavigator);
     }, [navigation]);
 
+    const toSignup = useCallback(() => {
+        navigation.navigate('SignUpEmail');
+    }, [navigation]);
+
     const onSubmit = useCallback(async (values: ISignInFormData) => {
         try {
             LoadingManager.setLoading(true);
-            const userAgent = await DeviceInfo.getUserAgent();
+            const userAgent = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
             const deviceId = await DeviceInfo.getUniqueId();
             const usecase = new LoginEmailUseCase({
                 authRepository: new AuthRepository(),
@@ -91,7 +97,9 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom + theme.spacing.small,
         }]}
+        showsVerticalScrollIndicator={false}
     >
+        <StatusBar barStyle={'dark-content'} />
         <Formik<ISignInFormData>
             validateOnBlur={false}
             validateOnChange
@@ -111,7 +119,11 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                         <Input
                             getRef={ref => emailInput.current = ref}
                             placeholder={t('email') ?? ''}
-                            iconSource={GeneratedImages.ic_account}
+                            leftIcon={<FontAwesomeIcon
+                                name="envelope-o"
+                                size={theme.fontSize.fontSizeLarge}
+                                color={theme.color.textColor}
+                            />}
                             errorMessage={touched.email ? errors.email : undefined}
                             keyboardType={'email-address'}
                             textContentType={'emailAddress'}
@@ -124,7 +136,11 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                         <Input
                             getRef={ref => passwordInput.current = ref}
                             placeholder={t('password') ?? ''}
-                            iconSource={GeneratedImages.ic_lock_open}
+                            leftIcon={<FontAwesome5Icon
+                                name="key"
+                                size={theme.fontSize.fontSizeLarge}
+                                color={theme.color.textColor}
+                            />}
                             secureTextEntry={secureText}
                             textContentType={'password'}
                             returnKeyType={'done'}
@@ -139,10 +155,10 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                                     setSecureText(prevState => !prevState);
                                 }}
                             >
-                                <Image
-                                    style={styles.inputRightIcon}
-                                    resizeMode={'contain'}
-                                    source={secureText ? GeneratedImages.ic_eye_off : GeneratedImages.ic_eye}
+                                <FontAwesome5Icon
+                                    name={secureText ? 'eye-slash' : 'eye'}
+                                    size={theme.fontSize.fontSizeLarge}
+                                    color={theme.color.textColor}
                                 />
                             </TouchableOpacity>}
                         />
@@ -159,7 +175,9 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                             <TextPrimary style={{
                                 fontWeight: '400',
                             }} variant="body2">{t('dontHaveAccountYet')}</TextPrimary>
-                            <TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={toSignup}
+                            >
                                 <TextPrimary
                                     variant="body2"
                                     color={theme.color.colorPrimaryVariant}
@@ -170,12 +188,15 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                             </TouchableOpacity>
                         </Box>
                     </View>
-                    <Box style={{
-                        alignSelf: 'center',
-                        width: Dimensions.moderateScale(250),
-                        height: Dimensions.moderateScale(150),
-                        backgroundColor: theme.color.colorPrimary,
-                    }} />
+                    <Image
+                        style={{
+                            alignSelf: 'center',
+                            width: Dimensions.moderateScale(250),
+                            height: Dimensions.moderateScale(250) / 1.4,
+                        }}
+                        resizeMode={'contain'}
+                        source={GeneratedImages.img_chatgpt}
+                    />
                 </View>;
             }}
         </Formik>
@@ -199,11 +220,11 @@ const styles = StyleSheet.create({
         marginRight: theme.spacing.medium,
     },
     logo: {
-        width: Dimensions.moderateScale(228),
-        height: Dimensions.moderateScale(120),
+        width: Dimensions.moderateScale(200),
+        height: Dimensions.moderateScale(100),
         alignSelf: 'center',
-        marginTop: Dimensions.verticalScale(50),
-        marginBottom: Dimensions.verticalScale(50),
+        marginTop: Dimensions.verticalScale(45),
+        marginBottom: Dimensions.verticalScale(45),
     },
     inputRightIcon: {
         width: Dimensions.moderateScale(20),

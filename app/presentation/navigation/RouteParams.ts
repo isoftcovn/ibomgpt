@@ -1,6 +1,7 @@
 export type AppStackParamList = {
     SplashScreen: undefined,
     SignIn: undefined,
+    SignUpEmail: undefined,
     Languages: undefined,
     AppTab: undefined,
     HomeTab: undefined,

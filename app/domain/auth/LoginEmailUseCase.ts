@@ -30,7 +30,7 @@ export class LoginEmailUseCase implements IUseCase<UserModel> {
         user.id = response.userId;
         user.email = response.username;
         user.fullname = response.fullname;
-        // await this.userRepository.saveUserToken(response.token);
+        await this.userRepository.saveUserCreds(this.body.username, this.body.password);
         return user;
     };
 }

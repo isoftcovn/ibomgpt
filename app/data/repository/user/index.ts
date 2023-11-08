@@ -7,10 +7,33 @@ import LoginModel from 'app/models/auth/response/LoginModel';
 import UploadFileRequestModel from 'app/models/general/request/UploadFileRequestModel';
 import UpdateProfileRequestModel from 'app/models/user/request/UpdateProfileRequestModel';
 import UserModel from 'app/models/user/response/UserModel';
-import { TokenType } from 'app/shared/constants';
+import { TokenType, User } from 'app/shared/constants';
 import { Platform } from 'react-native';
 
 export class UserRepository implements IUserRepository {
+    getUserCreds = async (): Promise<string[] | null | undefined> => {
+        const storageGateway = StorageGatewayFactory.createWithSecureClient();
+        const response = await storageGateway.doGetJson(User.UserCreds);
+        if (response) {
+            const {username, password} = response;
+            if (username && password) {
+                return [username, password];
+            }
+        }
+
+        return undefined;
+    };
+
+    saveUserCreds = async (username: string, password: string): Promise<boolean> => {
+        const storageGateway = StorageGatewayFactory.createWithSecureClient();
+        const obj = {
+            username,
+            password
+        };
+        await storageGateway.doUpdateJson(User.UserCreds, obj);
+        return true;
+    };
+
     refreshToken = (): Promise<LoginModel> => {
         return Promise.resolve(new LoginModel());
     };

@@ -2,10 +2,9 @@ import LoginModel from 'app/models/auth/response/LoginModel';
 import { IAuthRepository } from '.';
 import { IUseCase } from '../index';
 import { IUserRepository } from '../user';
+import Utilities from '@shared/helper/utilities';
 
-export class SignupEmailUseCase implements IUseCase<LoginModel> {
-    email: string;
-    password: string;
+export class SignupEmailUseCase implements IUseCase<boolean> {
     userRepository: IUserRepository;
     authRepository: IAuthRepository;
 
@@ -13,24 +12,17 @@ export class SignupEmailUseCase implements IUseCase<LoginModel> {
         {
             authRepository,
             userRepository,
-            email,
-            password,
         }: {
             authRepository: IAuthRepository,
             userRepository: IUserRepository,
-            email: string,
-            password: string
         }
     ) {
-        this.email = email;
-        this.password = password;
         this.authRepository = authRepository;
         this.userRepository = userRepository;
     }
 
-    execute = async (): Promise<LoginModel> => {
-        const response = await this.authRepository.registerUser(this.email, this.password);
-        await this.userRepository.saveUserToken(response.token, response.refreshToken);
-        return response;
+    execute = async (): Promise<boolean> => {
+        await Utilities.delay(2000);
+        return true;
     };
 }

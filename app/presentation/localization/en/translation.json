@@ -1,6 +1,7 @@
 {
     "add": "Add",
     "alertChangeLanguage": "Do you want to change language?",
+    "alreadyHaveAccount": "Bạn đã có tài khoản?",
 
     "clearAll": "Clear All",
     "change": "Change",
@@ -8,6 +9,7 @@
     "cancel": "Cancel",
     "clear": "Clear",
     "confirm": "Confirm",
+    "confirmPassword": "Xác nhận mật khẩu",
 
     "done": "Done",
     "dontHaveAccountYet": "Bạn chưa có tài khoản?",
@@ -49,6 +51,7 @@
     "phoneNumber": "Phone number",
     "pushNotification": "Push notification",
     "passwordTooShort": "Mật khẩu quá ngắn",
+    "passwordMustMatch": "Xác nhận mật khẩu không trùng khớp",
 
     "required": "Required",
 
@@ -58,6 +61,7 @@
     "search": "Search",
     "status": "Status",
     "success": "SUCCESS",
+    "signupSuccessfully": "Đăng ký thành công",
 
     "used": "Used",
 

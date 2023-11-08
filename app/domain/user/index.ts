@@ -13,5 +13,7 @@ export interface IUserRepository {
     getSavedUserToken: () => Array<string | undefined | null>;
     activateUserSession: () => Promise<(string | undefined | null)[]>;
     saveUserToken: (token: string, refreshToken?: string) => Promise<boolean>;
+    saveUserCreds: (username: string, password: string) => Promise<boolean>;
+    getUserCreds: () => Promise<string[] | undefined | null>;
     refreshToken: () => Promise<LoginModel>;
 }

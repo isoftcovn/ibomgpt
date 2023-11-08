@@ -47,7 +47,10 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.small,
         flex: 1,
     },
-    input: theme.textVariants.body1,
+    input: {
+        ...theme.textVariants.body1,
+        marginLeft: theme.spacing.small,
+    },
     inputContainer: {
         backgroundColor: theme.color.inputBackgroundColor,
         paddingHorizontal: theme.spacing.medium,

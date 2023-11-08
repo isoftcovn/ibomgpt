@@ -1,5 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import SignInScreen from '@modules/auth';
+import SignInScreen from '@modules/auth/signin';
 import LanguageScreen from '@modules/languages';
 import { StartScreen } from '@modules/start';
 import React from 'react';
@@ -7,6 +7,8 @@ import DeveloperConsole from '@modules/developerconsole';
 import NetworkDebugger from '@modules/developerconsole/debugger/NetworkDebugger';
 import { AppStackParamList } from './RouteParams';
 import AppTab from './routes/AppTab';
+import { SignUpEmailScreen } from '@modules/auth/signup';
+import { createDefaultStackNavigationOptions } from './config/header';
 
 
 
@@ -18,9 +20,11 @@ interface IProps {
 
 // Only use one Stack for further auto testing. React Navigation deeply nested view on ios
 export const RootStack = (props: IProps) => {
+    const defaultOptions = createDefaultStackNavigationOptions();
     return <Stack.Navigator
         initialRouteName={'SplashScreen'}
         screenOptions={{
+            ...defaultOptions,
             presentation: 'card',
             headerMode: 'screen',
             animationTypeForReplace: 'pop',
@@ -31,11 +35,10 @@ export const RootStack = (props: IProps) => {
         }} />
         <Stack.Screen name="AppTab" component={AppTab} options={{ headerShown: false }} />
         <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Languages" component={LanguageScreen} />
         <Stack.Group
-            screenOptions={{
-                headerTintColor: '#000000',
-            }}
+            screenOptions={defaultOptions}
         >
             <Stack.Screen name="DeveloperConsole" component={DeveloperConsole} />
             <Stack.Screen name="NetworkDebugger" component={NetworkDebugger} />

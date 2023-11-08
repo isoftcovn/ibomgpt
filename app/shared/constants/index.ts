@@ -99,6 +99,7 @@ export const User = {
     Key: 'KeyUser',
     Auth: 'AuthToken',
     RememberLogin: 'RememberLoginKey',
+    UserCreds: 'UserCreds',
 };
 
 export const TokenType = {

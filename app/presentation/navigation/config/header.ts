@@ -10,10 +10,18 @@ export const createDefaultStackNavigationOptions = (): StackNavigationOptions =>
         headerBackTitleStyle: {
             ...theme.textVariants.header,
         },
+        headerBackTitleVisible: false,
         headerTintColor: theme.color.navigationTintColor,
         headerStyle: {
             backgroundColor: theme.color.navigationBackgroundColor,
         },
+        headerLeftContainerStyle: {
+            paddingLeft: theme.spacing.small
+        },
+        headerRightContainerStyle: {
+            paddingRight: theme.spacing.small
+        },
+        headerBackAllowFontScaling: false,
         presentation: 'card',
         headerMode: 'screen',
         animationTypeForReplace: 'pop',

@@ -6,7 +6,14 @@ export class DataStore {
     apiHost?: string | null;
     userAgent?: string | null;
     deviceUUID?: string | null;
+    username?: string | null;
 
+    private constructor() { }
 
-    private constructor() {}
+    clearUserData = () => {
+        this.accessToken = undefined;
+        this.refreshToken = undefined;
+        this.apiHost = undefined;
+        this.username = undefined;
+    }
 }

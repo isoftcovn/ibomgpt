@@ -7,6 +7,9 @@ import FirebaseInterceptor from './interceptors/FirebaseInterceptor';
 import Interceptor from './interceptors/interceptor';
 import { IResource } from './resource';
 import { ApiType } from './type';
+import { DataStore } from '@data/sessionstore';
+import AuthenticationInterceptor from './interceptors/AuthenticationInterceptor';
+import { UserRepository } from '@data/repository/user';
 
 export type HTTPMethod = 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -71,7 +74,7 @@ class ApiGateway {
             headers: this.headers
                 ? this.headers
                 : {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
             url: this.resource.Path,
             method: this.method,
@@ -99,6 +102,12 @@ class ApiGateway {
     };
 
     private _addDefaultInterceptors = () => {
+        const authenticationInterceptor = new AuthenticationInterceptor(this.resource, new UserRepository());
+        this._instanceAxios.interceptors.request.use(
+            authenticationInterceptor.requestFulfilled,
+            authenticationInterceptor.requestReject
+        );
+
         this._instanceAxios.interceptors.request.use(
             FirebaseInterceptor.request,
         );
@@ -140,7 +149,7 @@ class ApiGateway {
         if (resourceType === ApiType.Public) {
             return Config.API_URL;
         }
-        return Config.API_URL;
+        return DataStore.shared.apiHost ?? Config.API_URL;
     };
 
     execute = (): Promise<any> =>

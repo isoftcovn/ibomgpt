@@ -19,6 +19,7 @@
     "editProfile": "Edit profile",
     "english": "English",
     "error": "Whoops!",
+    "emptyConversationName": "(trống)",
 
     "female": "Female",
     "from": "From",
@@ -43,6 +44,7 @@
     "listEmpty": "No data.",
 
     "male": "Male",
+    "message": "Tin nhắn",
 
     "name": "Tên",
     "next": "Next",
@@ -52,6 +54,7 @@
     "pushNotification": "Push notification",
     "passwordTooShort": "Mật khẩu quá ngắn",
     "passwordMustMatch": "Xác nhận mật khẩu không trùng khớp",
+    "personal": "Cá nhân",
 
     "required": "Không thể bỏ trống",
 
@@ -62,6 +65,7 @@
     "status": "Status",
     "success": "SUCCESS",
     "signupSuccessfully": "Đăng ký thành công",
+    "searchConversation": "Tìm kiến trao đổi",
 
     "used": "Used",
 

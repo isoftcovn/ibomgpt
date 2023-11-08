@@ -15,6 +15,7 @@ export enum SortDirections {
 
 export const PageSize = {
     Default: 20,
+    ChatList: 10,
 };
 
 export const Gender = {

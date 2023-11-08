@@ -15,7 +15,7 @@ export class UserRepository implements IUserRepository {
         const storageGateway = StorageGatewayFactory.createWithSecureClient();
         const response = await storageGateway.doGetJson(User.UserCreds);
         if (response) {
-            const {username, password} = response;
+            const { username, password } = response;
             if (username && password) {
                 return [username, password];
             }
@@ -61,9 +61,12 @@ export class UserRepository implements IUserRepository {
 
     removeSavedToken = async (): Promise<boolean> => {
         const storageGateway = StorageGatewayFactory.createWithSecureClient();
-        DataStore.shared.accessToken = undefined;
-        DataStore.shared.refreshToken = undefined;
-        await Promise.all([storageGateway.doDelete(TokenType.User), storageGateway.doDelete(TokenType.UserRefreshToken)]);
+        DataStore.shared.clearUserData();
+        await Promise.all([
+            storageGateway.doDelete(TokenType.User),
+            storageGateway.doDelete(TokenType.UserRefreshToken),
+            storageGateway.doDelete(User.UserCreds)
+        ]);
         return true;
     };
 

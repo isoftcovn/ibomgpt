@@ -143,7 +143,7 @@ const color = {
 
     inputBackgroundColor: colorPalettes.blueGray['100'],
 
-    colorSeparator: colorPalettes.greyScale['500'],
+    colorSeparator: colorPalettes.greyScale['300'],
 
     buttonBackgroundColor: colorPalettes.primaryVariant,
     buttonBorderColor: colorPalettes.greyScale['300'],

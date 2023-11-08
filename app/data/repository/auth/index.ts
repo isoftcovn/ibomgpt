@@ -31,9 +31,6 @@ export class AuthRepository implements IAuthRepository {
             method: 'POST',
             resource: resource,
             body: formData,
-            headers: {
-                'content-type': 'multipart/form-data'
-            },
         });
 
         const response = await apiGateway.execute();

@@ -4,6 +4,7 @@ import { AxiosError, InternalAxiosRequestConfig, AxiosHeaders, AxiosResponse } f
 import qs from 'query-string';
 import { IResource } from '../resource';
 import Interceptor from './interceptor';
+import { DataStore } from '@data/sessionstore';
 
 export default class AuthenticationInterceptor extends Interceptor {
 
@@ -27,10 +28,11 @@ export default class AuthenticationInterceptor extends Interceptor {
 
     requestFulfilled = (config: InternalAxiosRequestConfig) => {
         let authHeader;
+        let username = DataStore.shared.username;
         const token = this.getTokenFromType(this.resource.Type);
 
         if (token) {
-            authHeader = `Bearer ${token}`;
+            authHeader = token;
         }
 
         if (!config.headers) {
@@ -44,7 +46,8 @@ export default class AuthenticationInterceptor extends Interceptor {
 
         if (this.resource.Type !== 'public') {
             if (authHeader) {
-                config.headers.Authorization = authHeader;
+                config.headers.token = authHeader;
+                config.headers.username = username;
             } else {
                 // Add default token of axios for unit test
                 // config.headers.Authorization = axios.defaults.headers['Authorization'];

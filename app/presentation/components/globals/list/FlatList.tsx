@@ -1,6 +1,6 @@
 import { theme } from 'app/presentation/theme';
 import React from 'react';
-import { ActivityIndicator, FlatList, FlatListProps, StyleSheet } from 'react-native';
+import { ActivityIndicator, FlatList, FlatListProps, StyleSheet, View } from 'react-native';
 import styled from 'styled-components';
 import { getString } from 'app/presentation/localization';
 import TextPrimary from '../text/TextPrimary';
@@ -49,7 +49,7 @@ export default class MyFlatList extends React.PureComponent<Props, State> {
 
     render() {
         const { separatorType, isLoading } = this.props;
-        const separator = separatorType === 'space' ? Separator : LineSeparator;
+        const separator = separatorType === 'space' ? Separator : <View style={styles.lineSeparator} />;
         if (isLoading) {
             return (
                 <ViewCenter>
@@ -78,6 +78,10 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.large,
         backgroundColor: theme.color.backgroundColorPrimary,
     },
+    lineSeparator: {
+        height: 1,
+        backgroundColor: theme.color.colorSeparator,
+    }
 });
 
 const EmptyContainer = styled.View`
@@ -93,12 +97,6 @@ const Label = styled(TextPrimary)`
 
 const Separator = styled.View`
     marginTop: ${theme.spacing.large}px;    
-`;
-
-const LineSeparator = styled.View`
-    height: 1;
-    width: 100%;
-    backgroundColor: ${theme.color.colorSeparator};
 `;
 
 const ViewCenter = styled.View`

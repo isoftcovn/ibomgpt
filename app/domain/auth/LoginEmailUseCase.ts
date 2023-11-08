@@ -1,9 +1,9 @@
-import LoginModel from 'app/models/auth/response/LoginModel';
+import { DataStore } from '@data/sessionstore';
+import LoginRequestModel from '@models/auth/request/LoginRequestModel';
+import UserModel from '@models/user/response/UserModel';
 import { IAuthRepository } from '.';
 import { IUseCase } from '../index';
 import { IUserRepository } from '../user';
-import LoginRequestModel from '@models/auth/request/LoginRequestModel';
-import UserModel from '@models/user/response/UserModel';
 
 export class LoginEmailUseCase implements IUseCase<UserModel> {
     body: LoginRequestModel;
@@ -30,7 +30,10 @@ export class LoginEmailUseCase implements IUseCase<UserModel> {
         user.id = response.userId;
         user.email = response.username;
         user.fullname = response.fullname;
+        await this.userRepository.saveUserToken(response.token);
         await this.userRepository.saveUserCreds(this.body.username, this.body.password);
+        DataStore.shared.apiHost = response.hostApi;
+        DataStore.shared.username = this.body.username;
         return user;
     };
 }

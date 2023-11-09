@@ -26,7 +26,7 @@ export const ChatListItem = React.memo((props: IProps) => {
     }, [t, data.name]);
 
     const avatarTitle = useMemo(() => {
-        return name.replaceAll(/[\[\]\(\)]+/im, '').charAt(0).toUpperCase();
+        return name.charAt(0).toUpperCase();
     }, [name]);
 
     const lastCommentSentDate = useMemo(() => {

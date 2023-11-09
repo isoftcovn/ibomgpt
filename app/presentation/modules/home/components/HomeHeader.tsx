@@ -42,7 +42,7 @@ export const HomeHeader = React.memo((props: IProps) => {
                     underlineColorAndroid={'transparent'}
                     placeholder={t('searchConversation') ?? ''}
                     placeholderTextColor={theme.color.labelColor}
-                    returnKeyType="done"
+                    returnKeyType="search"
                     onChangeText={onChangeText}
                 />
             </View>

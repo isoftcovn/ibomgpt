@@ -10,9 +10,11 @@
     "clear": "Clear",
     "confirm": "Confirm",
     "confirmPassword": "Xác nhận mật khẩu",
+    "content": "Nội dung",
  
     "done": "Done",
     "dontHaveAccountYet": "Bạn chưa có tài khoản?",
+    "detail": "Chi tiết",
 
     "email": "Email",
     "edit": "Edit",
@@ -66,6 +68,7 @@
     "success": "SUCCESS",
     "signupSuccessfully": "Đăng ký thành công",
     "searchConversation": "Tìm kiến trao đổi",
+    "send": "Gửi",
 
     "used": "Used",
 

@@ -9,6 +9,7 @@ import { AppStackParamList } from './RouteParams';
 import AppTab from './routes/AppTab';
 import { SignUpEmailScreen } from '@modules/auth/signup';
 import { createDefaultStackNavigationOptions } from './config/header';
+import { ConversationScreen } from '@modules/conversation';
 
 
 
@@ -37,6 +38,7 @@ export const RootStack = (props: IProps) => {
         <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Languages" component={LanguageScreen} />
+        <Stack.Screen name="Conversation" component={ConversationScreen} />
         <Stack.Group
             screenOptions={defaultOptions}
         >

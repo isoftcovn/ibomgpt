@@ -1,41 +1,44 @@
+import { MyFlatList } from '@components/index';
+import { ChatRepository } from '@data/repository/chat';
+import { GetChatListUseCase } from '@domain/chat/GetChatListUseCase';
+import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
+import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Dimensions } from '@theme/Dimensions';
+import ListingHelper from '@shared/helper/ListingHelper';
+import { ListState } from 'app/presentation/models/general';
 import { theme } from 'app/presentation/theme';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { InteractionManager, ListRenderItemInfo, StyleSheet, View } from 'react-native';
-import { HomeHeader } from './components/HomeHeader';
-import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
-import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
-import { ListState } from 'app/presentation/models/general';
-import { GetChatListUseCase } from '@domain/chat/GetChatListUseCase';
-import { ChatRepository } from '@data/repository/chat';
-import Utilities from '@shared/helper/utilities';
-import ListingHelper from '@shared/helper/ListingHelper';
-import { MyFlatList } from '@components/index';
+import { BehaviorSubject, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
+import { HomeHeader } from './components/HomeHeader';
+import { AppStackParamList } from '@navigation/RouteParams';
 
 interface IProps {
-    navigation: StackNavigationProp<any, any>;
-    route: RouteProp<any, any>;
+    navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
+    route: RouteProp<AppStackParamList, 'HomeTab'>;
 }
 
 const HomeScreen = (props: IProps) => {
     const { navigation, route } = props;
-    const [searchTerm, setSearchTerm] = useState('');
+    const searchTermRef = useRef<BehaviorSubject<string>>(new BehaviorSubject(''));
     const [listState, setListState] = useState<ListState>(ListState.initial);
     const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
     const chatListRequest = useRef<ChatListRequestModel>(new ChatListRequestModel());
     const canLoadMore = useRef<boolean>(false);
 
     const onChangeText = useCallback((text: string) => {
-        setSearchTerm(text);
+        searchTermRef.current.next(text);
     }, []);
 
-    const loadData = useCallback(async (refreshing: boolean = false) => {
+    const loadData = useCallback(async (refreshing: boolean = false, searchTerm: string = '') => {
         try {
             setListState(refreshing ? ListState.refreshing : ListState.loading);
             chatListRequest.current = new ChatListRequestModel();
+            if (searchTerm && searchTerm.length > 0) {
+                chatListRequest.current.keysearch = searchTerm;
+            }
             const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
             const items = await usecase.execute();
             setConversations(items);
@@ -74,7 +77,11 @@ const HomeScreen = (props: IProps) => {
     }, [listState, conversations]);
 
     const onItemPress = useCallback((data: ChatItemResponse) => {
-        // TODO: Navigate to chat screen
+        navigation.navigate('Conversation', {
+            objectId: data.objectId,
+            objectInstanceId: data.objectInstanceId,
+            name: data.name,
+        });
     }, [navigation]);
 
     const renderItem = useCallback((info: ListRenderItemInfo<ChatItemResponse>) => {
@@ -89,6 +96,18 @@ const HomeScreen = (props: IProps) => {
         InteractionManager.runAfterInteractions(() => {
             loadData();
         });
+    }, [loadData]);
+
+    useEffect(() => {
+        const subscription = searchTermRef.current.pipe(skip(1), debounceTime(500))
+            .subscribe(searchTerm => {
+                console.info('Debounce search term: ', searchTerm);
+                loadData(false, searchTerm);
+            });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, [loadData]);
 
     return <View style={styles.container}

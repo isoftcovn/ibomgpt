@@ -10,6 +10,10 @@ import App from './app/App';
 import { configureLocalization } from './app/presentation/localization';
 import notifee, {EventType} from '@notifee/react-native';
 import NotificationHelper from '@shared/helper/NotificationHelper';
+import dayjs from 'dayjs';
+
+var customParseFormat = require('dayjs/plugin/customParseFormat');
+dayjs.extend(customParseFormat);
 
 configureLocalization('vi_VN');
 

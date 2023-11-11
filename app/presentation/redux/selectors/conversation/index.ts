@@ -20,3 +20,20 @@ export const selectMessagesByKey = createSelector(
         return groupMessages?.[key] ?? [];
     }
 );
+
+export const selectMessagesCanLoadMoreByKey = createSelector(
+    [
+        (state: any): Record<string, boolean> | undefined => selectMessagesState(state).canLoadMore,
+        (state: any, key: string): string => key,
+    ],
+    (canLoadMore, key): boolean => {
+        return canLoadMore?.[key] ?? true;
+    }
+);
+
+export const selectMessagesFetchingState = createSelector(
+    (state: any): any => selectMessagesState(state),
+    (state): boolean => {
+        return state.isFetching;
+    }
+);

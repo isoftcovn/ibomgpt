@@ -12,7 +12,7 @@ export default abstract class Interceptor {
 
     abstract requestReject(error: any): any;
 
-    abstract responseFulfilled(response: AxiosResponse): AxiosResponse;
+    abstract responseFulfilled(response: AxiosResponse): AxiosResponse | Promise<any>;
 
     abstract responseReject(error: any): Promise<any>;
 }

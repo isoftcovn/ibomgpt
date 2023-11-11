@@ -1,6 +1,7 @@
 export interface IActionParams {
     sectionId?: string;
     isAppend?: boolean;
+    isPrepend?: boolean;
     canLoadMore?: boolean;
     refresh?: boolean;
 

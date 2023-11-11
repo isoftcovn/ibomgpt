@@ -43,7 +43,7 @@ export class ChatMessageResponse {
 
     static parseFromJson = (data: any): ChatMessageResponse => {
         const { created_by, comment_content, comment_id, user_created_name, updated_date_view,
-            object_id, created_date_view, object_instance_id, fileList } = data;
+            object_id, created_date_view, object_instance_id, fileList, avatar } = data;
         const obj = new ChatMessageResponse();
         obj.id = comment_id ?? 0;
         obj.senderId = created_by ?? 0;
@@ -53,6 +53,7 @@ export class ChatMessageResponse {
         obj.objectId = object_id ?? 0;
         obj.objectInstanceId = object_instance_id ?? 0;
         obj.content = comment_content;
+        obj.avatar = avatar;
         if (fileList && Array.isArray(fileList)) {
             obj.fileList = fileList.map((item: any) => ChatMessageFileResponse.parseFromJson(item));
         }

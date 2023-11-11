@@ -3,7 +3,6 @@ import ApiGateway from 'app/data/gateway/api';
 import { AppResource } from 'app/data/gateway/api/resource';
 import { IAuthRepository } from 'app/domain/auth';
 import LoginModel from 'app/models/auth/response/LoginModel';
-import DeviceInfo from 'react-native-device-info';
 
 export class AuthRepository implements IAuthRepository {
     registerUser = async (email: string, password: string): Promise<LoginModel> => {

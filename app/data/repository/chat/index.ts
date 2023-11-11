@@ -25,7 +25,7 @@ export class ChatRepository implements IChatRepository {
         return itemList.map(item => ChatMessageResponse.parseFromJson(item));
     };
 
-    getChatList = async (body: ChatListRequestModel): Promise<ChatItemResponse[]> => {
+    getChatList = async (body: ChatListRequestModel): Promise<{items: ChatItemResponse[], avatar?: string}> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {
@@ -40,7 +40,10 @@ export class ChatRepository implements IChatRepository {
         const response = await apiGateway.execute();
         const itemList: any[] = response.itemList ?? [];
 
-        return itemList.map(item => ChatItemResponse.parseFromJson(item));
+        return {
+            items: itemList.map(item => ChatItemResponse.parseFromJson(item)),
+            avatar: response.avatar,
+        };
     };
 
 }

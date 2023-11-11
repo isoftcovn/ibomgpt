@@ -25,13 +25,13 @@ export default class DefaultInterceptor extends Interceptor {
             const { error, error_msg, } = data;
             // success
             if (error === '000') {
-                return data;
+                return response;
             } else {
                 return Promise.reject(new APIError(error_msg, 500, error, data));
             }
         }
 
-        return data;
+        return response;
     };
 
     responseReject = (error: AxiosError<any, any>) => {

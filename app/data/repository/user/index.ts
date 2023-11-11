@@ -1,5 +1,6 @@
 import { StorageGatewayFactory } from '@data/gateway/storage';
 import { DataStore } from '@data/sessionstore';
+import { APIError } from '@models/error/APIError';
 import ApiGateway from 'app/data/gateway/api';
 import { AppResource } from 'app/data/gateway/api/resource';
 import { IUserRepository } from 'app/domain/user';
@@ -9,6 +10,8 @@ import UpdateProfileRequestModel from 'app/models/user/request/UpdateProfileRequ
 import UserModel from 'app/models/user/response/UserModel';
 import { TokenType, User } from 'app/shared/constants';
 import { Platform } from 'react-native';
+import { AuthRepository } from '../auth';
+import DeviceInfo from 'react-native-device-info';
 
 export class UserRepository implements IUserRepository {
     getUserCreds = async (): Promise<string[] | null | undefined> => {
@@ -34,8 +37,20 @@ export class UserRepository implements IUserRepository {
         return true;
     };
 
-    refreshToken = (): Promise<LoginModel> => {
-        return Promise.resolve(new LoginModel());
+    refreshToken = async (): Promise<LoginModel> => {
+        const userCreds = await this.getUserCreds();
+        if (userCreds) {
+            const uid = await DeviceInfo.getUniqueId();
+            const [username, password] = userCreds;
+            const repo = new AuthRepository();
+            return repo.loginUserEmail({
+                username,
+                password,
+                useragent: Platform.OS === 'ios' ? 'IOS' : 'ANDROID',
+                uid,
+            });
+        }
+        return Promise.reject(new APIError('Refresh token is invalid', 400, '', undefined));
     };
 
     activateUserSession = async (): Promise<(string | undefined | null)[]> => {

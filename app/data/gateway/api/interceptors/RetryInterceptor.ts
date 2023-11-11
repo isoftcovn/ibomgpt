@@ -3,10 +3,22 @@ import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRe
 import { IResource } from '../resource';
 import Interceptor from './interceptor';
 
+let maxRetries = 3;
+let retryCount = 0;
+
 type RefreshTokenCallback = (token: string, refreshToken?: string) => void
 
 let isRefreshing = false;
 let refreshSubscribers: RefreshTokenCallback[] = [];
+
+// 000		OK
+// 001		User is not available
+// 002		Password is wrong
+// 003		Company is not available
+// 009		System error
+// 011		Could not defined OS
+// 012		Device ID is not available
+// 013		Request method is wrong
 
 export default class RetryInterceptor extends Interceptor {
     axiosInstance: AxiosInstance;
@@ -26,7 +38,17 @@ export default class RetryInterceptor extends Interceptor {
         return Promise.reject(error);
     };
 
-    responseFulfilled = (response: AxiosResponse) => {
+    responseFulfilled = (response: AxiosResponse): AxiosResponse<any, any> | Promise<any> => {
+        const data = response.data;
+        if (data) {
+            const { error, error_msg } = data;
+
+            if (error === '001') {
+                const axiosError = new AxiosError(error_msg, error, response.config, response.request, response);
+                return this.responseReject(axiosError);
+            }
+        }
+
         return response;
     };
 
@@ -34,15 +56,22 @@ export default class RetryInterceptor extends Interceptor {
         let status = 0;
         if (error.response) {
             status = error.response.status;
+            const errorCode = (error.response.data as any)?.error;
+
             const originalRequest = error.config;
-            if (!originalRequest) {return Promise.reject(error);}
-            if (status === 401) {
+            if (!originalRequest) { return Promise.reject(error); }
+            if (status === 401 || errorCode === '001') {
+                if (retryCount >= maxRetries) {
+                    return Promise.reject(error);
+                }
                 if (!isRefreshing) {
                     isRefreshing = true;
+                    retryCount++;
                     this.customerRepo.refreshToken()
                         .then(response => {
                             isRefreshing = false;
-                            onRefreshed(response.token, response.refreshToken);
+                            retryCount = 0;
+                            onRefreshed(response.token);
                         });
                 }
 
@@ -52,7 +81,7 @@ export default class RetryInterceptor extends Interceptor {
                         if (!originalRequest.headers) {
                             originalRequest.headers = new AxiosHeaders();
                         }
-                        originalRequest.headers.Authorization = 'Bearer ' + token;
+                        originalRequest.headers.token = token;
                         await this.customerRepo.saveUserToken(token, refreshToken);
 
                         resolve(this.axiosInstance.request(originalRequest));

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import qs from 'query-string';
 import Config from 'react-native-config';
 import 'react-native-get-random-values';
@@ -10,6 +10,7 @@ import { ApiType } from './type';
 import { DataStore } from '@data/sessionstore';
 import AuthenticationInterceptor from './interceptors/AuthenticationInterceptor';
 import { UserRepository } from '@data/repository/user';
+import RetryInterceptor from './interceptors/RetryInterceptor';
 
 export type HTTPMethod = 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -108,6 +109,13 @@ class ApiGateway {
             authenticationInterceptor.requestReject
         );
 
+        const retryInterceptor = new RetryInterceptor(this.resource, this._instanceAxios, new UserRepository());
+
+        this._instanceAxios.interceptors.response.use(
+            retryInterceptor.responseFulfilled,
+            retryInterceptor.responseReject
+        );
+
         this._instanceAxios.interceptors.request.use(
             FirebaseInterceptor.request,
         );
@@ -152,8 +160,10 @@ class ApiGateway {
         return DataStore.shared.apiHost ?? Config.API_URL;
     };
 
+    _responseTransform = (response: AxiosResponse<any>) => response.data;
+
     execute = (): Promise<any> =>
-        this._instanceAxios.request(this.requestConfig);
+        this._instanceAxios.request(this.requestConfig).then(this._responseTransform);
 }
 
 export default ApiGateway;

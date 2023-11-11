@@ -3,7 +3,7 @@ import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { IChatRepository } from '.';
 import { IUseCase } from '../index';
 
-export class GetChatListUseCase implements IUseCase<ChatItemResponse[]> {
+export class GetChatListUseCase implements IUseCase<{items: ChatItemResponse[], avatar?: string}> {
     chatRepository: IChatRepository;
     body: ChatListRequestModel;
 
@@ -12,5 +12,5 @@ export class GetChatListUseCase implements IUseCase<ChatItemResponse[]> {
         this.body = body;
     }
 
-    execute = (): Promise<ChatItemResponse[]> => this.chatRepository.getChatList(this.body);
+    execute = (): Promise<{items: ChatItemResponse[], avatar?: string}> => this.chatRepository.getChatList(this.body);
 }

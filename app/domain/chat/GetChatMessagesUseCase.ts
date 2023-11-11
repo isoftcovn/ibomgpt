@@ -15,9 +15,9 @@ export class GetChatMessagesUseCase implements IUseCase<IAppChatMessage[]> {
 
     execute = async (): Promise<IAppChatMessage[]> => {
         const messages = await this.chatRepository.getChatMessages(this.body);
-        const appMessages: IAppChatMessage[] = [];
+        let appMessages: IAppChatMessage[] = [];
         for (const message of messages) {
-            appMessages.concat(MessageHelper.shared.convertMessageResponseToChatMessage(message));
+            appMessages = appMessages.concat(MessageHelper.shared.convertMessageResponseToChatMessage(message));
         }
         return appMessages;
     };

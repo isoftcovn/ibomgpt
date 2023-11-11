@@ -21,6 +21,7 @@ export class MessageHelper {
                 user: {
                     _id: data.senderId,
                     avatar: data.avatar,
+                    name: data.senderName,
                 },
             });
             if (data.fileList.length > 0) {
@@ -34,6 +35,7 @@ export class MessageHelper {
                         user: {
                             _id: data.senderId,
                             avatar: data.avatar,
+                            name: data.senderName,
                         },
                     };
                     switch (fileType) {
@@ -55,6 +57,6 @@ export class MessageHelper {
                 }
             }
         }
-        return messages;
+        return messages.reverse();
     };
 }

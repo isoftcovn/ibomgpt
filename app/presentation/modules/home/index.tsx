@@ -14,6 +14,10 @@ import { BehaviorSubject, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
 import { HomeHeader } from './components/HomeHeader';
 import { AppStackParamList } from '@navigation/RouteParams';
+import UserModel from '@models/user/response/UserModel';
+import { selectProfile } from '@redux/selectors/user';
+import { useDispatch, useSelector } from 'react-redux';
+import { getProfileActionTypes } from '@redux/actions/user';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -22,9 +26,12 @@ interface IProps {
 
 const HomeScreen = (props: IProps) => {
     const { navigation, route } = props;
+    const dispatch = useDispatch();
     const searchTermRef = useRef<BehaviorSubject<string>>(new BehaviorSubject(''));
+    const didMountRef = useRef(false);
     const [listState, setListState] = useState<ListState>(ListState.initial);
     const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
+    const user: UserModel | undefined = useSelector(selectProfile).data;
     const chatListRequest = useRef<ChatListRequestModel>(new ChatListRequestModel());
     const canLoadMore = useRef<boolean>(false);
 
@@ -40,15 +47,22 @@ const HomeScreen = (props: IProps) => {
                 chatListRequest.current.keysearch = searchTerm;
             }
             const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
-            const items = await usecase.execute();
-            setConversations(items);
-            canLoadMore.current = items.length >= chatListRequest.current.limit;
+            const response = await usecase.execute();
+            setConversations(response.items);
+            canLoadMore.current = response.items.length >= chatListRequest.current.limit;
+
+            if (response.avatar && user) {
+                dispatch(getProfileActionTypes.successAction({
+                    ...user,
+                    avatar: response.avatar
+                }));
+            }
         } catch (error) {
             console.info('Load conversations error: ', error);
         } finally {
             setListState(ListState.done);
         }
-    }, []);
+    }, [user, dispatch]);
 
     const loadMoreData = useCallback(async () => {
         if (!canLoadMore.current) {
@@ -61,7 +75,8 @@ const HomeScreen = (props: IProps) => {
             setListState(ListState.loadingMore);
             chatListRequest.current.page = ListingHelper.shared.getNextPageBasedOnDataLength(conversations.length, chatListRequest.current.limit) ?? chatListRequest.current.page + 1;
             const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
-            const items = await usecase.execute();
+            const response = await usecase.execute();
+            const items = response.items;
             setConversations(prevState => {
                 return [
                     ...prevState,
@@ -93,9 +108,12 @@ const HomeScreen = (props: IProps) => {
 
     // Did mount
     useEffect(() => {
-        InteractionManager.runAfterInteractions(() => {
-            loadData();
-        });
+        if (!didMountRef.current) {
+            InteractionManager.runAfterInteractions(() => {
+                loadData();
+            });
+            didMountRef.current = true;
+        }
     }, [loadData]);
 
     useEffect(() => {

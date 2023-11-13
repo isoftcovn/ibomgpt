@@ -1,11 +1,12 @@
 import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
-import { getMessagesActionTypes } from '@redux/actions/conversation';
+import { getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
+import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -23,6 +24,23 @@ export const getMessagesEpic = (action$: any, state$: any) =>
                     obs.complete();
                 }).catch(error => {
                     obs.next(getMessagesActionTypes.failedAction({ error }));
+                    obs.complete();
+                });
+            })
+        )
+    );
+
+export const sendMessagesEpic = (action$: any, state$: any) =>
+    action$.pipe(
+        ofType(sendMessagesActionTypes.start),
+        mergeMap((action: IAction<SubmitMessageRequestModel>) =>
+            new Observable(obs => {
+                const chatRepo = new ChatRepository();
+                chatRepo.sendChatMessages(action.payload!).then(response => {
+                    obs.next(sendMessagesActionTypes.successAction());
+                    obs.complete();
+                }).catch(error => {
+                    obs.next(sendMessagesActionTypes.failedAction({ error }));
                     obs.complete();
                 });
             })

@@ -6,15 +6,16 @@ import { getMessagesActionTypes } from '@redux/actions/conversation';
 import { selectMessagesByKey, selectMessagesCanLoadMoreByKey, selectMessagesFetchingState } from '@redux/selectors/conversation';
 import { selectProfile } from '@redux/selectors/user';
 import { theme } from 'app/presentation/theme';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InteractionManager, StyleSheet, View } from 'react-native';
+import { InteractionManager, StyleSheet, TextInput, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
 import { usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
-import { MyAvatar, MyBubble, MyMessage, MyTextMessage } from './components/MessageComponents';
+import { MyAvatar, MyBubble, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
+import { useSendTextMessage } from './hooks/SubmitMessageHooks';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -24,10 +25,12 @@ interface IProps {
 export const ConversationScreen = (props: IProps) => {
     const { navigation, route } = props;
     const insets = useSafeAreaInsets();
+    const messageContentRef = useRef<string>();
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { assets, openPicker } = usePickMediaAssets();
     const { files, openDocumentsPicker } = usePickDocuments();
+    const { sendTextMessage } = useSendTextMessage();
 
     const objectId = useMemo(() => {
         return route.params.objectId;
@@ -86,10 +89,15 @@ export const ConversationScreen = (props: IProps) => {
     }, [openPicker, openDocumentsPicker]);
 
     const onSend = useCallback((sentMessages: IMessage[] = []) => {
+        sendTextMessage(sentMessages, objectInstanceId, objectId).then(() => {
+            console.log('Messages sent.');
+        }).catch(error => {
+            console.error('Sent message error: ', error);
+        });
         // setMessages(previousMessages =>
         //     GiftedChat.append(previousMessages, messages),
         // )
-    }, []);
+    }, [sendTextMessage, objectId, objectInstanceId]);
 
     console.log('picked assets: ', assets);
     console.log('picked documents: ', files);
@@ -114,6 +122,7 @@ export const ConversationScreen = (props: IProps) => {
             messagesContainerStyle={{
                 paddingBottom: theme.spacing.huge,
             }}
+            onInputTextChanged={text => messageContentRef.current = text}
             renderInputToolbar={MyInputToolbar}
             renderSend={MySend}
             renderComposer={renderComposer}
@@ -121,6 +130,7 @@ export const ConversationScreen = (props: IProps) => {
             renderBubble={MyBubble}
             renderMessage={MyMessage}
             renderMessageText={MyTextMessage}
+            renderSystemMessage={MySystemMessage}
         />
         <View
             style={{

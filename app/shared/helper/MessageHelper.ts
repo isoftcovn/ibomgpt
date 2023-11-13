@@ -2,6 +2,9 @@ import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import dayjs from 'dayjs';
 import { FileHelper, FileType } from './FileHelper';
+import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import UserModel from '@models/user/response/UserModel';
+import { v4 } from 'uuid';
 
 export class MessageHelper {
     static shared = new MessageHelper();
@@ -57,6 +60,63 @@ export class MessageHelper {
                 }
             }
         }
+        return messages.reverse();
+    };
+
+    generateMessageLocalId = (): string => {
+        return `local_message_${v4()}`;
+    };
+
+    convertSentMessageToChatMessage = (request: SubmitMessageRequestModel, user: UserModel): IAppChatMessage[] => {
+        const messages: IAppChatMessage[] = [];
+        const parentMessage: IAppChatMessage = {
+            _id: this.generateMessageLocalId(),
+            createdAt: new Date(),
+            text: request.comment_content,
+            user: {
+                _id: user.id,
+                avatar: user.avatar,
+                name: user.fullname,
+            },
+        }
+        messages.push(parentMessage);
+
+        if ((request.FileUpload?.length ?? 0) > 0) {
+            for (const fileItem of request.FileUpload!) {
+                const extension = fileItem.uri.split('.').pop();
+                if (extension) {
+                    const fileType = FileHelper.shared.getFileTypeFromExtensions(extension);
+                    const fileUrl = fileItem.uri;
+                    const chatMessage: IAppChatMessage = {
+                        _id: `media-${parentMessage._id}-${fileItem.name}`,
+                        text: '',
+                        createdAt: new Date(),
+                        user: {
+                            _id: user.id,
+                            avatar: user.avatar,
+                            name: user.fullname,
+                        },
+                    };
+                    switch (fileType) {
+                        case FileType.image:
+                            chatMessage.image = fileUrl;
+                            break;
+                        case FileType.audio:
+                            chatMessage.audio = fileUrl;
+                            break;
+                        case FileType.video:
+                            chatMessage.video = fileUrl;
+                            break;
+                        default:
+                            chatMessage.fileUrl = fileUrl;
+                            chatMessage.fileType = fileType;
+                            break;
+                    }
+                    messages.push(chatMessage);
+                }
+            }
+        }
+
         return messages.reverse();
     };
 }

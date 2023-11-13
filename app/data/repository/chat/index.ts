@@ -3,10 +3,27 @@ import { AppResource } from '@data/gateway/api/resource';
 import { IChatRepository } from '@domain/chat';
 import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
+import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 
 export class ChatRepository implements IChatRepository {
+    sendChatMessages = async (body: SubmitMessageRequestModel): Promise<boolean> => {
+        const resource = AppResource.Chat.ChatList();
+        const formData = new FormData();
+        Object.entries(body).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        const apiGateway = new ApiGateway({
+            method: 'POST',
+            resource: resource,
+            body: formData,
+        });
+
+        await apiGateway.execute();
+        return true;
+    };
+
     getChatMessages = async (body: ChatMessagesRequestModel): Promise<ChatMessageResponse[]> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
@@ -25,7 +42,7 @@ export class ChatRepository implements IChatRepository {
         return itemList.map(item => ChatMessageResponse.parseFromJson(item));
     };
 
-    getChatList = async (body: ChatListRequestModel): Promise<{items: ChatItemResponse[], avatar?: string}> => {
+    getChatList = async (body: ChatListRequestModel): Promise<{ items: ChatItemResponse[], avatar?: string }> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {

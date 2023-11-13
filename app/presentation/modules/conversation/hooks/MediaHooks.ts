@@ -2,6 +2,7 @@ import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { openPicker as openLibPicker } from '@baronha/react-native-multiple-image-picker';
 import { pick, DocumentPickerResponse } from 'react-native-document-picker';
 import { useCallback, useState } from 'react';
+import { FileHelper } from '@shared/helper/FileHelper';
 
 export interface IPickerAsset {
     uri: string;
@@ -39,6 +40,7 @@ export const usePickMediaAssets = (): IPickMediaResult => {
                 uri: item.path,
                 path: item.path,
                 size: item.size,
+                mime: item.mime,
             }));
             const resizePromises = images.map(item => {
                 return ImageResizer.createResizedImage(
@@ -50,11 +52,12 @@ export const usePickMediaAssets = (): IPickMediaResult => {
                 );
             });
             const resizedImages = await Promise.all(resizePromises);
-            const results: IPickerAsset[] = resizedImages.map(item => ({
+            const results: IPickerAsset[] = resizedImages.map((item, index) => ({
                 name: item.name,
                 uri: item.uri,
                 path: item.path,
                 size: item.size,
+                mime: images[index]?.mime,
             }));
 
             setAssets(results.concat(videos));

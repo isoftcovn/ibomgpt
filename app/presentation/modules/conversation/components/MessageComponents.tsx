@@ -2,7 +2,10 @@ import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Avatar, AvatarProps, Bubble, BubbleProps, Message, MessageProps, MessageText, MessageTextProps, Time, TimeProps } from 'react-native-gifted-chat';
+import {
+    Avatar, AvatarProps, Bubble, BubbleProps, Message, MessageProps, MessageText, MessageTextProps, Time, TimeProps,
+    SystemMessage, SystemMessageProps
+} from 'react-native-gifted-chat';
 
 export const MyAvatar = (props: AvatarProps<IAppChatMessage>) => {
     return <Avatar
@@ -64,6 +67,13 @@ export const MyTextMessage = (props: MessageTextProps<IAppChatMessage>) => (
     />
 );
 
+export const MySystemMessage = (props: SystemMessageProps<IAppChatMessage>) => {
+    return <SystemMessage
+        {...props}
+        textStyle={styles.left.systemMessage}
+    />;
+}
+
 const styles = {
     left: StyleSheet.create({
         avatarContainer: {
@@ -98,6 +108,10 @@ const styles = {
         messageContainer: {
             marginBottom: theme.spacing.tiny,
         },
+        systemMessage: {
+            ...theme.textVariants.label1,
+            color: theme.color.labelColor,
+        }
     }),
     right: StyleSheet.create({
         avatarContainer: {

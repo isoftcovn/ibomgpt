@@ -75,11 +75,14 @@ export default function (state = initialState, action: IAction<any>) {
                 if (isAppend) {
                     returnData = currentData.concat(data);
                     console.info('Append to dataset');
+                } else if (isPrepend) {
+                    returnData = [...data, ...currentData];
                 } else {
                     // Mean that in redux already has data before. then user comebacks to this screen, API is called to sync latest chat
                     // In order not to lose all previous data, we only deduplicate new data with old data.
                     if (currentData.length > 0) {
-                        returnData = deduplicateListDataFromStart(currentData, data);
+                        returnData = removeAllLocalMessageInTheRange(currentData, data.length);
+                        returnData = deduplicateListDataFromStart(returnData, data);
                         console.info('Deduplicate messages');
                     } else {
                         returnData = data;
@@ -101,6 +104,18 @@ export default function (state = initialState, action: IAction<any>) {
 
     return initialState;
 }
+
+const removeAllLocalMessageInTheRange = (currentData: IAppChatMessage[], length: number): IAppChatMessage[] => {
+    // Current cache data has the same size with new incoming data --> replace all
+    console.info(`Removing all local message for: Current length: ${currentData.length}.. length: ${length}`);
+    if (currentData.length <= length) {
+        return currentData.filter(item => !item._id.toString().startsWith('local_message'));
+    } else {
+        const slideLength = Math.min(length, currentData.length);
+        const removedLocalDataMessages = currentData.slice(0, slideLength).filter(item => !item._id.toString().startsWith('local_message'));
+        return [...removedLocalDataMessages, ...currentData.slice(slideLength)];
+    }
+};
 
 const deduplicateListDataFromStart = (currentData: IAppChatMessage[], newData: IAppChatMessage[]): IAppChatMessage[] => {
     const result: IAppChatMessage[] = [];

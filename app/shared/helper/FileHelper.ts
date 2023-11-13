@@ -13,7 +13,7 @@ export class FileHelper {
 
     getContentTypeFromExtension = (extension: string): string => {
         const refinedExtension = extension.trim().replaceAll('.', '');
-        return mime.types[refinedExtension] ?? 'unknown';
+        return mime.types[refinedExtension] ?? '';
     };
 
     getFileTypeFromExtensions = (extension: string): FileType => {

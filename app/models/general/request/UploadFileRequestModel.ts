@@ -1,16 +1,16 @@
-export default class UploadFileRequestModel {
+export class UploadFileRequestModel {
     /**
      * File uri
      */
-    image: string;
+    uri: string;
     name: string;
     /**
      * Mime of file
      */
     type: string;
 
-    constructor(imageUri: string, name: string, type: string) {
-        this.image = imageUri;
+    constructor(uri: string, name: string, type: string) {
+        this.uri = uri;
         this.name = name;
         this.type = type;
     }

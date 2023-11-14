@@ -1,18 +1,14 @@
-import { Box } from '@components/globals/view/Box';
+import { Dimensions } from '@theme/Dimensions';
 import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import React, { useState, useCallback, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import {
-    Avatar, AvatarProps, Bubble, BubbleProps, Message, MessageProps, MessageText, MessageTextProps, Time, TimeProps,
-    SystemMessage, SystemMessageProps
+    Avatar, AvatarProps, Bubble, BubbleProps, Message, MessageProps, MessageText, MessageTextProps,
+    SystemMessage, SystemMessageProps,
+    Time, TimeProps
 } from 'react-native-gifted-chat';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Dimensions } from '@theme/Dimensions';
-import { TextPrimary } from '@components/index';
-import { FileHelper, FileType } from '@shared/helper/FileHelper';
-import ReactNativeBlobUtil from 'react-native-blob-util';
-import { useOnMessagePressed } from '../hooks/MediaHooks';
+import { FileMessage } from './FileMessage';
 
 export const MyAvatar = (props: AvatarProps<IAppChatMessage>) => {
     return <Avatar
@@ -80,62 +76,6 @@ export const MySystemMessage = (props: SystemMessageProps<IAppChatMessage>) => {
         textStyle={styles.left.systemMessage}
     />;
 };
-
-export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
-    const { currentMessage } = props;
-    const [downloaded, setDownloaded] = useState(false);
-    const [isSupportedOpenFile, setIsSupportedOpenFile] = useState(true);
-
-    const checkFileExists = useCallback((fileName: string) => {
-        const filePath = FileHelper.shared.getFilePath(fileName);
-        ReactNativeBlobUtil.fs.exists(filePath).then(existed => {
-            console.log('filePath: ', filePath, existed);
-            if (existed) {
-                setDownloaded(true);
-            }
-        }).catch(error => {
-            console.log('Check file exists error: ', error);
-        });
-    }, []);
-
-    useEffect(() => {
-        const fileUrl = currentMessage?.fileUrl ?? '';
-        const fileType = currentMessage?.fileType;
-        const fileName = fileUrl.split('/').pop() ?? '';
-        const _isSupportedOpenFile = fileType !== FileType.others;
-        checkFileExists(fileName);
-        setIsSupportedOpenFile(_isSupportedOpenFile);
-    }, [currentMessage, checkFileExists]);
-
-    if (currentMessage) {
-        const fileUrl = currentMessage.fileUrl ?? '';
-        const fileName = fileUrl.split('/').pop() ?? '';
-        return <View
-            style={styles.left.fileContainer}
-        >
-            <Ionicons
-                name={'document-outline'}
-                size={Dimensions.moderateScale(16)}
-                color={theme.color.textColor}
-            />
-            <Box marginLeft={theme.spacing.small} />
-            <TextPrimary
-                style={styles.left.fileNameMessage}
-                numberOfLines={1}
-            >{fileName}</TextPrimary>
-            {!isSupportedOpenFile && <>
-                <Box marginLeft={theme.spacing.small} />
-                <Ionicons
-                    name={downloaded ? 'checkmark-circle-outline' : 'cloud-download-outline'}
-                    size={Dimensions.moderateScale(18)}
-                    color={downloaded ? theme.color.success : theme.color.textColor}
-                />
-            </>}
-        </View>;
-    }
-
-    return null;
-});
 
 export const MyCustomMessage = (props: BubbleProps<IAppChatMessage>) => {
     const { currentMessage } = props;

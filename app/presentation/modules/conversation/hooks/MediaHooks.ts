@@ -7,6 +7,7 @@ import { useCallback } from 'react';
 import { DocumentPickerResponse, pick } from 'react-native-document-picker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+import { DownloadManager } from '@shared/managers/DownloadManager';
 
 export interface IPickerAsset {
     uri: string;
@@ -92,11 +93,22 @@ export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackPara
             const fileUrl = message.fileUrl ?? '';
             const fileName = fileUrl.split('/').pop();
             if (fileUrl && fileName) {
+                const filePath = `${appFolderPath}/${fileName}`;
+                const existed = await ReactNativeBlobUtil.fs.exists(filePath);
+                if (existed) { return; }
+                DownloadManager.shared.downloadNotificationSubject.next({
+                    status: 'processing',
+                    url: fileUrl,
+                });
                 await ReactNativeBlobUtil
                     .config({
-                        path: `${appFolderPath}/${fileName}`,
+                        path: filePath,
                     })
                     .fetch('GET', fileUrl);
+                DownloadManager.shared.downloadNotificationSubject.next({
+                    status: 'done',
+                    url: fileUrl,
+                });
             }
         } catch (error) {
             console.warn('download file error: ', error);

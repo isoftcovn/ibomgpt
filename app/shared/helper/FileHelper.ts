@@ -1,4 +1,7 @@
 import mime from 'mime-types';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+
+const dirs = ReactNativeBlobUtil.fs.dirs;
 
 export enum FileType {
     image,
@@ -31,5 +34,23 @@ export class FileHelper {
             return FileType.pdf;
         }
         return FileType.others;
+    };
+
+    getAppFolderPath = (): string => {
+        return `${dirs.DocumentDir}/Downloads`;
+    };
+
+    getFilePath = (fileName: string): string => {
+        return `${this.getAppFolderPath()}/${fileName}`;
+    };
+
+    createAppFolderIfNeeded = async (): Promise<string> => {
+        const appFolderPath = this.getAppFolderPath();
+        const folderExisted = await ReactNativeBlobUtil.fs.exists(appFolderPath);
+        if (!folderExisted) {
+            await ReactNativeBlobUtil.fs.mkdir(appFolderPath);
+        }
+
+        return appFolderPath;
     };
 }

@@ -3,9 +3,12 @@ import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageReq
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { useCallback } from 'react';
 import { IPickerAsset } from './MediaHooks';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getMessagesActionTypes } from '@redux/actions/conversation';
 import { MessageHelper } from '@shared/helper/MessageHelper';
+import UserModel from '@models/user/response/UserModel';
+import { FileHelper } from '@shared/helper/FileHelper';
+import { selectProfile } from '@redux/selectors/user';
 
 export const useSendTextMessage = () => {
     const dispatch = useDispatch();
@@ -32,7 +35,10 @@ export const useSendTextMessage = () => {
 };
 
 export const useSendMediaMessage = () => {
+    const dispatch = useDispatch();
+    const user: UserModel | undefined = useSelector(selectProfile).data;
     const sendMediaMessage = useCallback(async (assets: IPickerAsset[], objectInstanceId: number, objectId: number) => {
+        if (!user) { return; }
         const chatRepo = new ChatRepository();
         const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'submit', '');
         request.FileUpload = assets.map(item => ({
@@ -40,8 +46,38 @@ export const useSendMediaMessage = () => {
             type: item.mime ?? '',
             uri: item.uri,
         }));
+        const messages: IAppChatMessage[] = assets.map(item => {
+            const message: IAppChatMessage = {
+                _id: MessageHelper.shared.generateMessageLocalId(),
+                user: {
+                    _id: user.id,
+                    avatar: user.avatar,
+                    name: user.fullname,
+                },
+                text: '',
+                createdAt: new Date(),
+            };
+            const mime = item.mime ?? '';
+            if (mime.startsWith('image')) {
+                message.image = item.uri;
+            } else if (mime.startsWith('video')) {
+                message.video = item.uri;
+            } else if (mime.startsWith('audio')) {
+                message.audio = item.uri;
+            } else {
+                const extension = item.uri.split('.').pop() ?? '';
+                message.fileType = FileHelper.shared.getFileTypeFromExtensions(extension);
+                message.fileUrl = item.uri;
+            }
+
+            return message;
+        });
+        dispatch(getMessagesActionTypes.successAction(messages, {
+            isPrepend: true,
+            sectionId: `${objectId}-${objectInstanceId}`,
+        }));
         await chatRepo.sendChatMessages(request);
-    }, []);
+    }, [dispatch, user]);
 
     return {
         sendMediaMessage

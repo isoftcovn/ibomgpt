@@ -12,8 +12,21 @@ export class ChatRepository implements IChatRepository {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {
-            formData.append(key, value);
+            if (key !== 'FileUpload') {
+                formData.append(key, value);
+            }
         });
+        if (body.FileUpload) {
+            body.FileUpload!.forEach(file => {
+                console.log('Sent file: ', file);
+                formData.append('FileUpload', {
+                    name: file.name,
+                    type: file.type,
+                    uri: file.uri,
+                });
+            });
+        }
+
         const apiGateway = new ApiGateway({
             method: 'POST',
             resource: resource,

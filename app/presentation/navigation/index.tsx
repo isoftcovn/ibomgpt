@@ -10,8 +10,10 @@ import AppTab from './routes/AppTab';
 import { SignUpEmailScreen } from '@modules/auth/signup';
 import { createDefaultStackNavigationOptions } from './config/header';
 import { ConversationScreen } from '@modules/conversation';
-
-
+import { PdfViewer } from '@modules/pdfviewer';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Dimensions } from '@theme/Dimensions';
+import { View } from 'react-native';
 
 const Stack = createStackNavigator<AppStackParamList>();
 
@@ -39,6 +41,21 @@ export const RootStack = (props: IProps) => {
         <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Languages" component={LanguageScreen} />
         <Stack.Screen name="Conversation" component={ConversationScreen} />
+        <Stack.Screen name="PdfViewer" component={PdfViewer} options={{
+            presentation: 'modal',
+            headerShown: true,
+            title: '',
+            // eslint-disable-next-line react/no-unstable-nested-components, @typescript-eslint/no-shadow
+            headerBackImage: (props) => <View style={{
+                padding: 4
+            }}>
+                <Ionicons
+                    name={'close'}
+                    color={props.tintColor}
+                    size={Dimensions.moderateScale(24)}
+                />
+            </View>
+        }} />
         <Stack.Group
             screenOptions={defaultOptions}
         >

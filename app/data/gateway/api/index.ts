@@ -84,6 +84,7 @@ class ApiGateway {
                 encode: params => qs.stringify(params, { arrayFormat: 'none' }),
             },
             data: this.body,
+            transformRequest: formData => formData,
         };
         if (this.onSendProgress) {
             this.requestConfig.onUploadProgress = ({

@@ -1,8 +1,12 @@
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { openPicker as openLibPicker } from '@baronha/react-native-multiple-image-picker';
-import { pick, DocumentPickerResponse } from 'react-native-document-picker';
-import { useCallback, useState } from 'react';
-import { FileHelper } from '@shared/helper/FileHelper';
+import { AppStackParamList } from '@navigation/RouteParams';
+import { FileHelper, FileType } from '@shared/helper/FileHelper';
+import { IAppChatMessage } from 'app/presentation/models/chat';
+import { useCallback } from 'react';
+import { DocumentPickerResponse, pick } from 'react-native-document-picker';
+import { StackNavigationProp } from '@react-navigation/stack';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 export interface IPickerAsset {
     uri: string;
@@ -13,18 +17,14 @@ export interface IPickerAsset {
 }
 
 interface IPickMediaResult {
-    assets: IPickerAsset[]
-    openPicker: () => void;
+    openPicker: () => Promise<IPickerAsset[]>;
 }
 
 interface IPickDocumentsResult {
-    files: DocumentPickerResponse[];
-    openDocumentsPicker: () => void;
+    openDocumentsPicker: () => Promise<DocumentPickerResponse[]>;
 }
 
 export const usePickMediaAssets = (): IPickMediaResult => {
-    const [assets, setAssets] = useState<IPickerAsset[]>([]);
-
     const openPicker = useCallback(async () => {
         try {
             const responses = await openLibPicker({
@@ -60,32 +60,73 @@ export const usePickMediaAssets = (): IPickMediaResult => {
                 mime: images[index]?.mime,
             }));
 
-            setAssets(results.concat(videos));
+            return results.concat(videos);
         } catch (error) {
             console.warn('Picker assets error: ', error);
         }
+
+        return [];
     }, []);
 
     return {
-        assets,
         openPicker
     };
 };
 
 export const usePickDocuments = (): IPickDocumentsResult => {
-    const [files, setFiles] = useState<DocumentPickerResponse[]>([]);
-
     const openDocumentsPicker = useCallback(() => {
-        pick({
+        return pick({
             allowMultiSelection: true
-        }).then(setFiles)
-            .catch(error => {
-                console.warn('Pick document error: ', error);
-            });
+        });
     }, []);
 
     return {
-        files,
         openDocumentsPicker,
+    };
+};
+
+export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackParamList, 'Conversation'>) => {
+    const downloadFile = useCallback(async (message: IAppChatMessage) => {
+        try {
+            const appFolderPath = await FileHelper.shared.createAppFolderIfNeeded();
+            const fileUrl = message.fileUrl ?? '';
+            const fileName = fileUrl.split('/').pop();
+            if (fileUrl && fileName) {
+                await ReactNativeBlobUtil
+                    .config({
+                        path: `${appFolderPath}/${fileName}`,
+                    })
+                    .fetch('GET', fileUrl);
+            }
+        } catch (error) {
+            console.warn('download file error: ', error);
+        }
+    }, []);
+
+    const onFileMessagePressed = useCallback((message: IAppChatMessage) => {
+        const fileType = message.fileType;
+        if (!fileType) { return; }
+        switch (fileType) {
+            case FileType.pdf:
+                navigation.navigate('PdfViewer', {
+                    url: message.fileUrl ?? ''
+                });
+                break;
+            default:
+                downloadFile(message);
+                break;
+        }
+    }, [navigation, downloadFile]);
+
+    const onMessagePressed = useCallback((message: IAppChatMessage) => {
+        const isFileMessage = (message.fileUrl?.length ?? 0) > 0;
+        if (isFileMessage) {
+            onFileMessagePressed(message);
+            return;
+        }
+    }, [onFileMessagePressed]);
+
+    return {
+        onMessagePressed
     };
 };

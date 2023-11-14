@@ -13,10 +13,10 @@ export class MessageHelper {
 
     convertMessageResponseToChatMessage = (data: ChatMessageResponse): IAppChatMessage[] => {
         const messages: IAppChatMessage[] = [];
+        const dateFormat = 'DD/MM/YYYY h:mmA';
+        const createdDateDisplay = data.sentDateDisplay.trim().split(' ').filter(item => item.trim().length > 0).join(' ').toUpperCase();
+        const createdDate = dayjs(createdDateDisplay, dateFormat);
         if (data.content && data.content.trim().length > 0) {
-            const dateFormat = 'DD/MM/YYYY h:mmA';
-            const createdDateDisplay = data.sentDateDisplay.trim().split(' ').filter(item => item.trim().length > 0).join(' ').toUpperCase();
-            const createdDate = dayjs(createdDateDisplay, dateFormat);
             messages.push({
                 _id: data.id,
                 text: data.content ?? '',
@@ -27,37 +27,37 @@ export class MessageHelper {
                     name: data.senderName,
                 },
             });
-            if (data.fileList.length > 0) {
-                for (let fileItem of data.fileList) {
-                    const fileType = FileHelper.shared.getFileTypeFromExtensions(fileItem.extension ?? 'others');
-                    const fileUrl = fileItem.fileUrl;
-                    const chatMessage: IAppChatMessage = {
-                        _id: `media-${data.id}-${fileItem.id}`,
-                        text: '',
-                        createdAt: createdDate.toDate(),
-                        user: {
-                            _id: data.senderId,
-                            avatar: data.avatar,
-                            name: data.senderName,
-                        },
-                    };
-                    switch (fileType) {
-                        case FileType.image:
-                            chatMessage.image = fileUrl;
-                            break;
-                        case FileType.audio:
-                            chatMessage.audio = fileUrl;
-                            break;
-                        case FileType.video:
-                            chatMessage.video = fileUrl;
-                            break;
-                        default:
-                            chatMessage.fileUrl = fileUrl;
-                            chatMessage.fileType = fileType;
-                            break;
-                    }
-                    messages.push(chatMessage);
+        }
+        if (data.fileList.length > 0) {
+            for (let fileItem of data.fileList) {
+                const fileType = FileHelper.shared.getFileTypeFromExtensions(fileItem.extension ?? 'others');
+                const fileUrl = fileItem.fileUrl;
+                const chatMessage: IAppChatMessage = {
+                    _id: `media-${data.id}-${fileItem.id}`,
+                    text: '',
+                    createdAt: createdDate.toDate(),
+                    user: {
+                        _id: data.senderId,
+                        avatar: data.avatar,
+                        name: data.senderName,
+                    },
+                };
+                switch (fileType) {
+                    case FileType.image:
+                        chatMessage.image = fileUrl;
+                        break;
+                    case FileType.audio:
+                        chatMessage.audio = fileUrl;
+                        break;
+                    case FileType.video:
+                        chatMessage.video = fileUrl;
+                        break;
+                    default:
+                        chatMessage.fileUrl = fileUrl;
+                        chatMessage.fileType = fileType;
+                        break;
                 }
+                messages.push(chatMessage);
             }
         }
         return messages.reverse();
@@ -78,7 +78,7 @@ export class MessageHelper {
                 avatar: user.avatar,
                 name: user.fullname,
             },
-        }
+        };
         messages.push(parentMessage);
 
         if ((request.FileUpload?.length ?? 0) > 0) {
@@ -119,4 +119,5 @@ export class MessageHelper {
 
         return messages.reverse();
     };
+
 }

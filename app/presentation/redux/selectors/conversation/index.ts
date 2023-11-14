@@ -21,6 +21,17 @@ export const selectMessagesByKey = createSelector(
     }
 );
 
+export const selectLatestMessageByKey = createSelector(
+    [
+        (state: any): Record<string, IAppChatMessage[]> | undefined => selectMessagesState(state).data,
+        (state: any, key: string): string => key,
+    ],
+    (groupMessages, key): IAppChatMessage | undefined => {
+        const messages = groupMessages?.[key] ?? [];
+        return messages[0];
+    }
+);
+
 export const selectMessagesCanLoadMoreByKey = createSelector(
     [
         (state: any): Record<string, boolean> | undefined => selectMessagesState(state).canLoadMore,

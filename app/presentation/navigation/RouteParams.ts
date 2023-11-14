@@ -10,6 +10,9 @@ export type AppStackParamList = {
         objectInstanceId: number,
         name?: string,
     },
+    PdfViewer: {
+        url: string
+    },
     DeveloperConsole: undefined,
     NetworkDebugger: undefined,
 }

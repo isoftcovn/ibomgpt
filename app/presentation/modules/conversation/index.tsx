@@ -13,9 +13,9 @@ import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
-import { usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
-import { MyAvatar, MyBubble, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
-import { useSendTextMessage } from './hooks/SubmitMessageHooks';
+import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
+import { MyAvatar, MyBubble, MyCustomMessage, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
+import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -28,9 +28,11 @@ export const ConversationScreen = (props: IProps) => {
     const messageContentRef = useRef<string>();
     const { t } = useTranslation();
     const dispatch = useDispatch();
-    const { assets, openPicker } = usePickMediaAssets();
-    const { files, openDocumentsPicker } = usePickDocuments();
+    const { openPicker } = usePickMediaAssets();
+    const { openDocumentsPicker } = usePickDocuments();
     const { sendTextMessage } = useSendTextMessage();
+    const { sendMediaMessage } = useSendMediaMessage();
+    const { onMessagePressed } = useOnMessagePressed(navigation);
 
     const objectId = useMemo(() => {
         return route.params.objectId;
@@ -63,6 +65,34 @@ export const ConversationScreen = (props: IProps) => {
         });
     }, [dispatch, objectId, objectInstanceId]);
 
+    const onSelectMediaPressed = useCallback(async () => {
+        try {
+            const assets = await openPicker();
+            if (assets.length === 0) { return; }
+            await sendMediaMessage(assets, objectInstanceId, objectId);
+            console.info('Media Messages sent.');
+        } catch (error) {
+            console.error('onSelectMediaPressed error: ', error);
+        }
+    }, [openPicker, sendMediaMessage, objectInstanceId, objectId]);
+
+    const onSelectFilePressed = useCallback(async () => {
+        try {
+            const files = await openDocumentsPicker();
+            if (files.length === 0) { return; }
+            const convertedAssets: IPickerAsset[] = files.map(item => ({
+                name: item.name ?? '',
+                uri: item.uri,
+                mime: item.type ?? '',
+                path: item.uri,
+            }));
+            await sendMediaMessage(convertedAssets, objectInstanceId, objectId);
+            console.info('File Messages sent.');
+        } catch (error) {
+            console.error('onSelectFilePressed error: ', error);
+        }
+    }, [openDocumentsPicker, sendMediaMessage, objectInstanceId, objectId]);
+
     const loadEalierMessages = useCallback(() => {
         if (isFetching || !canLoadMore) {
             return;
@@ -82,25 +112,19 @@ export const ConversationScreen = (props: IProps) => {
     const renderComposer = useCallback((props: IMyComposerProps) => {
         return <MyComposer
             {...props}
-            onSelectMediaPressed={openPicker}
-            onSelectFilePressed={openDocumentsPicker}
+            onSelectMediaPressed={onSelectMediaPressed}
+            onSelectFilePressed={onSelectFilePressed}
         />;
 
-    }, [openPicker, openDocumentsPicker]);
+    }, [onSelectMediaPressed, onSelectFilePressed]);
 
     const onSend = useCallback((sentMessages: IMessage[] = []) => {
         sendTextMessage(sentMessages, objectInstanceId, objectId).then(() => {
-            console.log('Messages sent.');
+            console.info('Text Messages sent.');
         }).catch(error => {
-            console.error('Sent message error: ', error);
+            console.error('Sent text message error: ', error);
         });
-        // setMessages(previousMessages =>
-        //     GiftedChat.append(previousMessages, messages),
-        // )
     }, [sendTextMessage, objectId, objectInstanceId]);
-
-    console.log('picked assets: ', assets);
-    console.log('picked documents: ', files);
 
     return <View style={[styles.container]}>
         <GiftedChat
@@ -122,6 +146,9 @@ export const ConversationScreen = (props: IProps) => {
             messagesContainerStyle={{
                 paddingBottom: theme.spacing.huge,
             }}
+            onPress={(context, message) => {
+                onMessagePressed(message);
+            }}
             onInputTextChanged={text => messageContentRef.current = text}
             renderInputToolbar={MyInputToolbar}
             renderSend={MySend}
@@ -131,6 +158,7 @@ export const ConversationScreen = (props: IProps) => {
             renderMessage={MyMessage}
             renderMessageText={MyTextMessage}
             renderSystemMessage={MySystemMessage}
+            renderCustomView={MyCustomMessage}
         />
         <View
             style={{

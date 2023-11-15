@@ -1,19 +1,19 @@
 import { Box } from '@components/globals/view/Box';
 import { TextPrimary } from '@components/index';
 import { FileHelper, FileType } from '@shared/helper/FileHelper';
-import { DownloadManager } from '@shared/managers/DownloadManager';
+import { DownloadManager, DownloadNotificationStatus } from '@shared/managers/DownloadManager';
 import { Dimensions } from '@theme/Dimensions';
 import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { BubbleProps } from 'react-native-gifted-chat';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
     const { currentMessage } = props;
-    const [downloaded, setDownloaded] = useState(false);
+    const [downloadStatus, setDownloadStatus] = useState<DownloadNotificationStatus>('notStarted');
     const [isSupportedOpenFile, setIsSupportedOpenFile] = useState(true);
     const fileUrl = useMemo(() => currentMessage?.fileUrl ?? '', [currentMessage]);
 
@@ -21,7 +21,7 @@ export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
         const filePath = FileHelper.shared.getFilePath(fileName);
         ReactNativeBlobUtil.fs.exists(filePath).then(existed => {
             if (existed) {
-                setDownloaded(true);
+                setDownloadStatus('done');
             }
         }).catch(error => {
             console.warn('Check file exists error: ', error);
@@ -38,8 +38,8 @@ export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
 
     useEffect(() => {
         const subscription = DownloadManager.shared.downloadNotificationSubject.subscribe(value => {
-            if (fileUrl === value.url && value.status === 'done') {
-                setDownloaded(true);
+            if (fileUrl === value.url) {
+                setDownloadStatus(value.status);
             }
         });
 
@@ -47,6 +47,31 @@ export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
             subscription.unsubscribe();
         }
     }, [fileUrl]);
+
+    const downloadIcon = useMemo(() => {
+        switch (downloadStatus) {
+            case 'notStarted':
+            case 'failed':
+                return <Ionicons
+                    name={'cloud-download-outline'}
+                    size={Dimensions.moderateScale(18)}
+                    color={theme.color.textColor}
+                />;
+            case 'processing':
+                return <ActivityIndicator
+                    size={'small'}
+                    color={theme.color.textColor}
+                />;
+            case 'done':
+                return <Ionicons
+                    name={'cloud-done-outline'}
+                    size={Dimensions.moderateScale(18)}
+                    color={theme.color.success}
+                />;
+
+        }
+        return null;
+    }, [downloadStatus]);
 
     if (currentMessage) {
         const fileName = fileUrl.split('/').pop() ?? '';
@@ -65,11 +90,7 @@ export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
             >{fileName}</TextPrimary>
             {!isSupportedOpenFile && <>
                 <Box marginLeft={theme.spacing.small} />
-                <Ionicons
-                    name={downloaded ? 'checkmark-circle-outline' : 'cloud-download-outline'}
-                    size={Dimensions.moderateScale(18)}
-                    color={downloaded ? theme.color.success : theme.color.textColor}
-                />
+                {downloadIcon}
             </>}
         </View>;
     }

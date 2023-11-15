@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 
-export type DownloadNotificationStatus = 'processing' | 'done' | 'failed';
+export type DownloadNotificationStatus = 'notStarted' | 'processing' | 'done' | 'failed';
 
 export interface IDownloadNotification {
     status: DownloadNotificationStatus;

@@ -1,3 +1,4 @@
+import { VideoPlayerModal } from '@components/globals/modal/VideoPlayerModal';
 import UserModel from '@models/user/response/UserModel';
 import { AppStackParamList } from '@navigation/RouteParams';
 import { RouteProp } from '@react-navigation/native';
@@ -8,13 +9,14 @@ import { selectProfile } from '@redux/selectors/user';
 import { theme } from 'app/presentation/theme';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InteractionManager, StyleSheet, TextInput, View } from 'react-native';
+import { InteractionManager, StyleSheet, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
-import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { MyAvatar, MyBubble, MyCustomMessage, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
+import { MyVideoMessage } from './components/VideoMessage';
+import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
 
 interface IProps {
@@ -32,7 +34,7 @@ export const ConversationScreen = (props: IProps) => {
     const { openDocumentsPicker } = usePickDocuments();
     const { sendTextMessage } = useSendTextMessage();
     const { sendMediaMessage } = useSendMediaMessage();
-    const { onMessagePressed } = useOnMessagePressed(navigation);
+    const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri } = useOnMessagePressed(navigation);
 
     const objectId = useMemo(() => {
         return route.params.objectId;
@@ -157,6 +159,7 @@ export const ConversationScreen = (props: IProps) => {
             renderBubble={MyBubble}
             renderMessage={MyMessage}
             renderMessageText={MyTextMessage}
+            renderMessageVideo={MyVideoMessage}
             renderSystemMessage={MySystemMessage}
             renderCustomView={MyCustomMessage}
         />
@@ -165,6 +168,11 @@ export const ConversationScreen = (props: IProps) => {
                 backgroundColor: '#fff',
                 paddingBottom: insets.bottom,
             }}
+        />
+        <VideoPlayerModal
+            videoUri={videoUri ?? ''}
+            visible={isVideoModalVisible}
+            onBack={() => setVideoModalVisible(false)}
         />
     </View>;
 };

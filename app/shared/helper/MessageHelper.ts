@@ -45,6 +45,7 @@ export class MessageHelper {
                 switch (fileType) {
                     case FileType.image:
                         chatMessage.image = fileUrl;
+                        // chatMessage.audio = 'https://download.samplelib.com/mp3/sample-15s.mp3';
                         break;
                     case FileType.audio:
                         chatMessage.audio = fileUrl;

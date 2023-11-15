@@ -3,7 +3,7 @@ import { openPicker as openLibPicker } from '@baronha/react-native-multiple-imag
 import { AppStackParamList } from '@navigation/RouteParams';
 import { FileHelper, FileType } from '@shared/helper/FileHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { DocumentPickerResponse, pick } from 'react-native-document-picker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -87,6 +87,9 @@ export const usePickDocuments = (): IPickDocumentsResult => {
 };
 
 export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackParamList, 'Conversation'>) => {
+    const [isVideoModalVisible, setVideoModalVisible] = useState(false);
+    const [videoUri, setVideoUri] = useState<string>();
+
     const downloadFile = useCallback(async (message: IAppChatMessage) => {
         try {
             const appFolderPath = await FileHelper.shared.createAppFolderIfNeeded();
@@ -130,15 +133,27 @@ export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackPara
         }
     }, [navigation, downloadFile]);
 
+    const onVideoMessagePressed = useCallback((message: IAppChatMessage) => {
+        setVideoUri(message.video ?? '');
+        setVideoModalVisible(true);
+    }, []);
+
     const onMessagePressed = useCallback((message: IAppChatMessage) => {
         const isFileMessage = (message.fileUrl?.length ?? 0) > 0;
         if (isFileMessage) {
             onFileMessagePressed(message);
             return;
         }
-    }, [onFileMessagePressed]);
+        if (message.video) {
+            onVideoMessagePressed(message);
+            return;
+        }
+    }, [onFileMessagePressed, onVideoMessagePressed]);
 
     return {
-        onMessagePressed
+        onMessagePressed,
+        isVideoModalVisible,
+        videoUri,
+        setVideoModalVisible,
     };
 };

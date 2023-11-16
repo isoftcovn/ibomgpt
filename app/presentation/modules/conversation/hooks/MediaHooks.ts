@@ -88,7 +88,9 @@ export const usePickDocuments = (): IPickDocumentsResult => {
 
 export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackParamList, 'Conversation'>) => {
     const [isVideoModalVisible, setVideoModalVisible] = useState(false);
+    const [isAudioModalVisible, setAudioModalVisible] = useState(false);
     const [videoUri, setVideoUri] = useState<string>();
+    const [audioUri, setAudioUri] = useState<string>();
 
     const downloadFile = useCallback(async (message: IAppChatMessage) => {
         try {
@@ -138,6 +140,11 @@ export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackPara
         setVideoModalVisible(true);
     }, []);
 
+    const onAudioMessagePressed = useCallback((message: IAppChatMessage) => {
+        setAudioUri(message.audio ?? '');
+        setAudioModalVisible(true);
+    }, []);
+
     const onMessagePressed = useCallback((message: IAppChatMessage) => {
         const isFileMessage = (message.fileUrl?.length ?? 0) > 0;
         if (isFileMessage) {
@@ -148,12 +155,19 @@ export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackPara
             onVideoMessagePressed(message);
             return;
         }
-    }, [onFileMessagePressed, onVideoMessagePressed]);
+        if (message.audio) {
+            onAudioMessagePressed(message);
+            return;
+        }
+    }, [onFileMessagePressed, onVideoMessagePressed, onAudioMessagePressed]);
 
     return {
         onMessagePressed,
         isVideoModalVisible,
         videoUri,
+        audioUri,
+        isAudioModalVisible,
         setVideoModalVisible,
+        setAudioModalVisible,
     };
 };

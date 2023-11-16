@@ -18,6 +18,8 @@ import { MyAvatar, MyBubble, MyCustomMessage, MyMessage, MySystemMessage, MyText
 import { MyVideoMessage } from './components/VideoMessage';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
+import { AudioPlayerModal } from '@components/globals/modal/AudioPlayerModal';
+import { MyAudioMessage } from './components/AudioMessage';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -34,7 +36,8 @@ export const ConversationScreen = (props: IProps) => {
     const { openDocumentsPicker } = usePickDocuments();
     const { sendTextMessage } = useSendTextMessage();
     const { sendMediaMessage } = useSendMediaMessage();
-    const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri } = useOnMessagePressed(navigation);
+    const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri,
+        audioUri, isAudioModalVisible, setAudioModalVisible } = useOnMessagePressed(navigation);
 
     const objectId = useMemo(() => {
         return route.params.objectId;
@@ -160,6 +163,7 @@ export const ConversationScreen = (props: IProps) => {
             renderMessage={MyMessage}
             renderMessageText={MyTextMessage}
             renderMessageVideo={MyVideoMessage}
+            renderMessageAudio={MyAudioMessage}
             renderSystemMessage={MySystemMessage}
             renderCustomView={MyCustomMessage}
         />
@@ -174,6 +178,10 @@ export const ConversationScreen = (props: IProps) => {
             visible={isVideoModalVisible}
             onBack={() => setVideoModalVisible(false)}
         />
+        {isAudioModalVisible && <AudioPlayerModal
+            audioUrl={audioUri ?? ''}
+            onClose={() => setAudioModalVisible(false)}
+        />}
     </View>;
 };
 

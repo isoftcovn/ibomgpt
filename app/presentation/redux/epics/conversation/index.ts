@@ -30,23 +30,6 @@ export const getMessagesEpic = (action$: any, state$: any) =>
         )
     );
 
-export const sendMessagesEpic = (action$: any, state$: any) =>
-    action$.pipe(
-        ofType(sendMessagesActionTypes.start),
-        mergeMap((action: IAction<SubmitMessageRequestModel>) =>
-            new Observable(obs => {
-                const chatRepo = new ChatRepository();
-                chatRepo.sendChatMessages(action.payload!).then(response => {
-                    obs.next(sendMessagesActionTypes.successAction());
-                    obs.complete();
-                }).catch(error => {
-                    obs.next(sendMessagesActionTypes.failedAction({ error }));
-                    obs.complete();
-                });
-            })
-        )
-    );
-
 export const conversationEpic = combineEpics(
     getMessagesEpic,
 );

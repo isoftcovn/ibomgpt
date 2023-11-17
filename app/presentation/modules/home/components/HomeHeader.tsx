@@ -70,6 +70,8 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         marginLeft: theme.spacing.small,
+        padding: 0,
+        flex: 1,
         ...theme.textVariants.body2,
     }
 });

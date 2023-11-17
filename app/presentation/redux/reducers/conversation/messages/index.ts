@@ -1,4 +1,4 @@
-import { getMessagesActionTypes, getMessagesType } from '@redux/actions/conversation';
+import { getMessagesActionTypes, getMessagesType, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
 import { logoutActionTypes } from '../../../actions/auth';
 import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
@@ -74,9 +74,11 @@ export default function (state = initialState, action: IAction<any>) {
             if (data.length > 0) {
                 if (isAppend) {
                     returnData = currentData.concat(data);
+                    returnData = deduplicateListData(returnData);
                     console.info('Append to dataset');
                 } else if (isPrepend) {
                     returnData = [...data, ...currentData];
+                    returnData = deduplicateListData(returnData);
                 } else {
                     // Mean that in redux already has data before. then user comebacks to this screen, API is called to sync latest chat
                     // In order not to lose all previous data, we only deduplicate new data with old data.
@@ -95,10 +97,20 @@ export default function (state = initialState, action: IAction<any>) {
                 draft.data[sectionId] = returnData;
             }
 
-            draft.canLoadMore = {
-                ...draft.canLoadMore,
-                [sectionId]: data.length > 0,
-            };
+            if (isAppend) {
+                draft.canLoadMore = {
+                    ...draft.canLoadMore,
+                    [sectionId]: data.length > 0,
+                };
+            }
+        });
+    }
+    if (actionType === sendMessagesActionTypes.start) {
+        const data: IAppChatMessage[] = action.payload ?? [];
+        return produce(state, draft => {
+            const sectionId = action.params?.sectionId ?? 'default';
+            let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
+            draft.data[sectionId] = [...data, ...currentData];
         });
     }
 
@@ -120,6 +132,21 @@ const removeAllLocalMessageInTheRange = (currentData: IAppChatMessage[], length:
 const deduplicateListDataFromStart = (currentData: IAppChatMessage[], newData: IAppChatMessage[]): IAppChatMessage[] => {
     const result: IAppChatMessage[] = [];
     const allData = [...newData, ...currentData];
+    const allDataMap: Record<string, IAppChatMessage> = {};
+    for (const item of allData) {
+        // Check to keep new data as new data will be at the beginning of array
+        if (!allDataMap[`${item._id}`]) {
+            allDataMap[`${item._id}`] = item;
+            result.push(item);
+        }
+    }
+
+    return result;
+};
+
+const deduplicateListData = (data: IAppChatMessage[]): IAppChatMessage[] => {
+    const result: IAppChatMessage[] = [];
+    const allData = [...data];
     const allDataMap: Record<string, IAppChatMessage> = {};
     for (const item of allData) {
         // Check to keep new data as new data will be at the beginning of array

@@ -4,7 +4,7 @@ import { IAppChatMessage } from 'app/presentation/models/chat';
 import { useCallback } from 'react';
 import { IPickerAsset } from './MediaHooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMessagesActionTypes } from '@redux/actions/conversation';
+import { getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import UserModel from '@models/user/response/UserModel';
 import { FileHelper } from '@shared/helper/FileHelper';
@@ -22,8 +22,7 @@ export const useSendTextMessage = () => {
                 item._id = MessageHelper.shared.generateMessageLocalId();
             }
         }
-        dispatch(getMessagesActionTypes.successAction(messages, {
-            isPrepend: true,
+        dispatch(sendMessagesActionTypes.startAction(messages, {
             sectionId: `${objectId}-${objectInstanceId}`,
         }));
         await Promise.all(requestModels.map(request => chatRepo.sendChatMessages(request)));
@@ -72,8 +71,7 @@ export const useSendMediaMessage = () => {
 
             return message;
         });
-        dispatch(getMessagesActionTypes.successAction(messages, {
-            isPrepend: true,
+        dispatch(sendMessagesActionTypes.startAction(messages, {
             sectionId: `${objectId}-${objectInstanceId}`,
         }));
         await chatRepo.sendChatMessages(request);

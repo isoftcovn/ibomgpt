@@ -34,6 +34,7 @@ export class MessageHelper {
                 const fileUrl = fileItem.fileUrl;
                 const chatMessage: IAppChatMessage = {
                     _id: `media-${data.id}-${fileItem.id}`,
+                    parentMessageId: data.id,
                     text: '',
                     createdAt: createdDate.toDate(),
                     user: {
@@ -46,6 +47,7 @@ export class MessageHelper {
                     case FileType.image:
                         chatMessage.image = fileUrl;
                         // chatMessage.audio = 'https://download.samplelib.com/mp3/sample-15s.mp3';
+                        // chatMessage.video = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
                         break;
                     case FileType.audio:
                         chatMessage.audio = fileUrl;
@@ -90,6 +92,7 @@ export class MessageHelper {
                     const fileUrl = fileItem.uri;
                     const chatMessage: IAppChatMessage = {
                         _id: `media-${parentMessage._id}-${fileItem.name}`,
+                        parentMessageId: parentMessage._id,
                         text: '',
                         createdAt: new Date(),
                         user: {

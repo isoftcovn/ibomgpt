@@ -1,3 +1,4 @@
+import { AudioPlayerModal } from '@components/globals/modal/AudioPlayerModal';
 import { VideoPlayerModal } from '@components/globals/modal/VideoPlayerModal';
 import UserModel from '@models/user/response/UserModel';
 import { AppStackParamList } from '@navigation/RouteParams';
@@ -13,13 +14,13 @@ import { InteractionManager, StyleSheet, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import { MyAudioMessage } from './components/AudioMessage';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
 import { MyAvatar, MyBubble, MyCustomMessage, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
 import { MyVideoMessage } from './components/VideoMessage';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
-import { AudioPlayerModal } from '@components/globals/modal/AudioPlayerModal';
-import { MyAudioMessage } from './components/AudioMessage';
+import { useOnMessageLongPress } from './hooks/CommonHooks';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -30,6 +31,7 @@ export const ConversationScreen = (props: IProps) => {
     const { navigation, route } = props;
     const insets = useSafeAreaInsets();
     const messageContentRef = useRef<string>();
+    const didmountRef = useRef(false);
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { openPicker } = usePickMediaAssets();
@@ -38,16 +40,11 @@ export const ConversationScreen = (props: IProps) => {
     const { sendMediaMessage } = useSendMediaMessage();
     const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri,
         audioUri, isAudioModalVisible, setAudioModalVisible } = useOnMessagePressed(navigation);
+    const { onMessageLongPress } = useOnMessageLongPress();
 
-    const objectId = useMemo(() => {
-        return route.params.objectId;
-    }, [route.params]);
-    const objectInstanceId = useMemo(() => {
-        return route.params.objectInstanceId;
-    }, [route.params]);
-    const key = useMemo(() => {
-        return `${objectId}-${objectInstanceId}`;
-    }, [objectId, objectInstanceId]);
+    const objectId = useMemo(() => { return route.params.objectId; }, [route.params]);
+    const objectInstanceId = useMemo(() => { return route.params.objectInstanceId; }, [route.params]);
+    const key = useMemo(() => { return `${objectId}-${objectInstanceId}`; }, [objectId, objectInstanceId]);
     const user: UserModel | undefined = useSelector(selectProfile).data;
     const messages = useSelector(state => selectMessagesByKey(state, key));
     const canLoadMore = useSelector(state => selectMessagesCanLoadMoreByKey(state, key));
@@ -61,13 +58,16 @@ export const ConversationScreen = (props: IProps) => {
     }, [route.params, navigation, t]);
 
     useEffect(() => {
-        InteractionManager.runAfterInteractions(() => {
-            dispatch(getMessagesActionTypes.startAction({
-                object_id: objectId,
-                object_instance_id: objectInstanceId,
-                is_older: 0,
-            }));
-        });
+        if (!didmountRef.current) {
+            InteractionManager.runAfterInteractions(() => {
+                dispatch(getMessagesActionTypes.startAction({
+                    object_id: objectId,
+                    object_instance_id: objectInstanceId,
+                    is_older: 0,
+                }));
+            });
+            didmountRef.current = true;
+        }
     }, [dispatch, objectId, objectInstanceId]);
 
     const onSelectMediaPressed = useCallback(async () => {
@@ -143,7 +143,7 @@ export const ConversationScreen = (props: IProps) => {
             renderAvatarOnTop
             renderUsernameOnMessage
             showAvatarForEveryMessage={false}
-            bottomOffset={26}
+            // bottomOffset={50}
             listViewProps={{
                 onEndReached: loadEalierMessages,
                 onEndReachedThreshold: 0.6,
@@ -154,6 +154,8 @@ export const ConversationScreen = (props: IProps) => {
             onPress={(context, message) => {
                 onMessagePressed(message);
             }}
+            onLongPress={onMessageLongPress}
+            keyboardShouldPersistTaps={'never'}
             onInputTextChanged={text => messageContentRef.current = text}
             renderInputToolbar={MyInputToolbar}
             renderSend={MySend}

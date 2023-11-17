@@ -2,7 +2,7 @@ import { Dimensions } from '@theme/Dimensions';
 import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import { MessageVideoProps } from 'react-native-gifted-chat';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -65,7 +65,10 @@ const styles = {
             ...StyleSheet.absoluteFillObject,
             justifyContent: 'center',
             alignItems: 'center',
-            opacity: 0.7
+            opacity: Platform.select({
+                ios: 0.7,
+                android: 1
+            }),
         }
     }),
     right: StyleSheet.create({

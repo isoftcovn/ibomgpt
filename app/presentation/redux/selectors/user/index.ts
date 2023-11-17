@@ -1,3 +1,5 @@
+import UserModel from '@models/user/response/UserModel';
+import { IReducer } from '@redux/index';
 import { createSelector } from 'reselect';
 export const selectUserState = createSelector(
     (state: any) => state.user,
@@ -7,6 +9,11 @@ export const selectUserState = createSelector(
 export const selectProfile = createSelector(
     (state: any) => selectUserState(state),
     user => user.profile
+);
+
+export const selectUserId = createSelector(
+    (state: any) => selectProfile(state),
+    (profile: IReducer<UserModel | undefined>) => profile?.data?.id
 );
 
 export const selectUpdateProfile = createSelector(

@@ -1,14 +1,14 @@
 import { ChatRepository } from '@data/repository/chat';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import UserModel from '@models/user/response/UserModel';
+import { sendMessagesActionTypes } from '@redux/actions/conversation';
+import { selectProfile } from '@redux/selectors/user';
+import { FileHelper } from '@shared/helper/FileHelper';
+import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { useCallback } from 'react';
-import { IPickerAsset } from './MediaHooks';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
-import { MessageHelper } from '@shared/helper/MessageHelper';
-import UserModel from '@models/user/response/UserModel';
-import { FileHelper } from '@shared/helper/FileHelper';
-import { selectProfile } from '@redux/selectors/user';
+import { IPickerAsset } from './MediaHooks';
 
 export const useSendTextMessage = () => {
     const dispatch = useDispatch();
@@ -25,7 +25,7 @@ export const useSendTextMessage = () => {
         dispatch(sendMessagesActionTypes.startAction(messages, {
             sectionId: `${objectId}-${objectInstanceId}`,
         }));
-        await Promise.all(requestModels.map(request => chatRepo.sendChatMessages(request)));
+        await Promise.all(requestModels.map(request => chatRepo.submitChatMessages(request)));
     }, [dispatch]);
 
     return {
@@ -39,11 +39,22 @@ export const useSendMediaMessage = () => {
     const sendMediaMessage = useCallback(async (assets: IPickerAsset[], objectInstanceId: number, objectId: number) => {
         if (!user) { return; }
         const chatRepo = new ChatRepository();
-        const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'submit', '');
-        request.FileUpload = assets.map(item => ({
-            name: item.name,
-            type: item.mime ?? '',
-            uri: item.uri,
+        // const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'submit', '');
+        // request.FileUpload = assets.map(item => ({
+        //     name: item.name,
+        //     type: item.mime ?? '',
+        //     uri: item.uri,
+        // }));
+        const requests: SubmitMessageRequestModel[] = assets.map(item => ({
+            object_id: objectId,
+            object_instance_id: objectInstanceId,
+            mode: 'submit',
+            comment_content: '',
+            FileUpload: [{
+                name: item.name,
+                type: item.mime ?? '',
+                uri: item.uri,
+            }]
         }));
         const messages: IAppChatMessage[] = assets.map(item => {
             const message: IAppChatMessage = {
@@ -74,7 +85,15 @@ export const useSendMediaMessage = () => {
         dispatch(sendMessagesActionTypes.startAction(messages, {
             sectionId: `${objectId}-${objectInstanceId}`,
         }));
-        await chatRepo.sendChatMessages(request);
+        for (const request of requests) {
+            chatRepo.submitChatMessages(request).then(() => {
+                console.info('Sent media message done: ', request.FileUpload?.[0]?.name);
+            }).catch(error => {
+                console.info('Sent media message error: ', request.FileUpload?.[0]?.name);
+                console.info(error);
+            });
+        }
+        // await chatRepo.submitChatMessages(request);
     }, [dispatch, user]);
 
     return {

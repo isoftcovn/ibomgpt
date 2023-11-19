@@ -1,9 +1,10 @@
-import { getMessagesActionTypes, getMessagesType, sendMessagesActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, getMessagesType, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
 import { logoutActionTypes } from '../../../actions/auth';
 import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
 import produce from 'immer';
 import { IAppChatMessage } from 'app/presentation/models/chat';
+import { MessageHelper } from '@shared/helper/MessageHelper';
 
 const reducerHandler = new BaseSectionListReducer<any, any>(getMessagesType);
 
@@ -113,8 +114,28 @@ export default function (state = initialState, action: IAction<any>) {
             draft.data[sectionId] = [...data, ...currentData];
         });
     }
+    if (actionType === deleteMessageActionTypes.start) {
+        const { messageId, objectId, objectInstanceId } = action.payload! as IDeleteMessagePayload;
+        return produce(state, draft => {
+            const sectionId = `${objectId}-${objectInstanceId}`;
+            let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
+            const realMessageId = MessageHelper.shared.extractRealMessageId(messageId);
+            const deletedIds = currentData.filter(item => parseInt(`${item._id}`, 10) === realMessageId ||
+                (item.parentMessageId && item.parentMessageId == realMessageId)).map(item => item._id);
+            if (deletedIds.length > 0) {
+                currentData = [...currentData];
+                for (const id of deletedIds) {
+                    const index = currentData.findIndex(item => item._id === id);
+                    if (index !== -1) {
+                        currentData.splice(index, 1);
+                    }
+                }
+            }
+            draft.data[sectionId] = currentData;
+        });
+    }
 
-    return initialState;
+    return state;
 }
 
 const removeAllLocalMessageInTheRange = (currentData: IAppChatMessage[], length: number): IAppChatMessage[] => {

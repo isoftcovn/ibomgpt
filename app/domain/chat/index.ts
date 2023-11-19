@@ -7,5 +7,5 @@ import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 export interface IChatRepository {
     getChatList: (body: ChatListRequestModel) => Promise<{items: ChatItemResponse[], avatar?: string}>;
     getChatMessages: (body: ChatMessagesRequestModel) => Promise<ChatMessageResponse[]>;
-    sendChatMessages: (body: SubmitMessageRequestModel) => Promise<boolean>;
+    submitChatMessages: (body: SubmitMessageRequestModel) => Promise<boolean>;
 }

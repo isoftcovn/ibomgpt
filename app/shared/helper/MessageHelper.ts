@@ -124,4 +124,14 @@ export class MessageHelper {
         return messages.reverse();
     };
 
+    extractRealMessageId = (messageId: string): number => {
+        let requestMessageId: number;
+        if (messageId.startsWith('media')) {
+            requestMessageId = parseInt(messageId.split('-')[1], 10);
+        } else {
+            requestMessageId = parseInt(messageId, 10);
+        }
+
+        return requestMessageId;
+    }
 }

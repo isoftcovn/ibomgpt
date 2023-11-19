@@ -7,20 +7,23 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getMessagesActionTypes } from '@redux/actions/conversation';
 import { selectMessagesByKey, selectMessagesCanLoadMoreByKey, selectMessagesFetchingState } from '@redux/selectors/conversation';
 import { selectProfile } from '@redux/selectors/user';
+import { IAppChatMessage } from 'app/presentation/models/chat';
 import { theme } from 'app/presentation/theme';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InteractionManager, StyleSheet, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { MyAudioMessage } from './components/AudioMessage';
+import { RenderImageMessage } from './components/ImageMessage';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
 import { MyAvatar, MyBubble, MyCustomMessage, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
 import { MyVideoMessage } from './components/VideoMessage';
+import { ConversationContext, ConversationInputContext } from './context/ConversationContext';
+import { useOnMessageLongPress } from './hooks/CommonHooks';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
-import { useOnMessageLongPress } from './hooks/CommonHooks';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -28,6 +31,31 @@ interface IProps {
 }
 
 export const ConversationScreen = (props: IProps) => {
+    const [editMessage, setEditMessage] = useState<IAppChatMessage>();
+    const [text, setText] = useState('');
+
+    const enterEditMode = useCallback((message?: IAppChatMessage) => {
+        setEditMessage(message);
+    }, []);
+
+    const contextValue = useMemo(() => ({
+        setEditMessage: enterEditMode,
+        editMessage
+    }), [enterEditMode, editMessage]);
+
+    const inputContextValue = useMemo(() => ({
+        setText,
+        text
+    }), [text]);
+
+    return <ConversationContext.Provider value={contextValue}>
+        <ConversationInputContext.Provider value={inputContextValue}>
+            <ConversationContent {...props} />
+        </ConversationInputContext.Provider>
+    </ConversationContext.Provider>;
+}
+
+const ConversationContent = React.memo((props: IProps) => {
     const { navigation, route } = props;
     const insets = useSafeAreaInsets();
     const messageContentRef = useRef<string>();
@@ -40,7 +68,6 @@ export const ConversationScreen = (props: IProps) => {
     const { sendMediaMessage } = useSendMediaMessage();
     const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri,
         audioUri, isAudioModalVisible, setAudioModalVisible } = useOnMessagePressed(navigation);
-    const { onMessageLongPress } = useOnMessageLongPress();
 
     const objectId = useMemo(() => { return route.params.objectId; }, [route.params]);
     const objectInstanceId = useMemo(() => { return route.params.objectInstanceId; }, [route.params]);
@@ -49,6 +76,9 @@ export const ConversationScreen = (props: IProps) => {
     const messages = useSelector(state => selectMessagesByKey(state, key));
     const canLoadMore = useSelector(state => selectMessagesCanLoadMoreByKey(state, key));
     const isFetching = useSelector(selectMessagesFetchingState);
+    const { onMessageLongPress } = useOnMessageLongPress(objectId, objectInstanceId);
+
+    console.log('rerender');
 
     useEffect(() => {
         const name = route.params?.name ?? '';
@@ -148,6 +178,9 @@ export const ConversationScreen = (props: IProps) => {
                 onEndReached: loadEalierMessages,
                 onEndReachedThreshold: 0.6,
             }}
+            lightboxProps={{
+                onLongPress: undefined
+            }}
             messagesContainerStyle={{
                 paddingBottom: theme.spacing.huge,
             }}
@@ -166,6 +199,7 @@ export const ConversationScreen = (props: IProps) => {
             renderMessageText={MyTextMessage}
             renderMessageVideo={MyVideoMessage}
             renderMessageAudio={MyAudioMessage}
+            renderMessageImage={RenderImageMessage}
             renderSystemMessage={MySystemMessage}
             renderCustomView={MyCustomMessage}
         />
@@ -185,7 +219,7 @@ export const ConversationScreen = (props: IProps) => {
             onClose={() => setAudioModalVisible(false)}
         />}
     </View>;
-};
+});
 
 const styles = StyleSheet.create({
     container: {

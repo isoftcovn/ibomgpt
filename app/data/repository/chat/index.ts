@@ -8,7 +8,7 @@ import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 
 export class ChatRepository implements IChatRepository {
-    sendChatMessages = async (body: SubmitMessageRequestModel): Promise<boolean> => {
+    submitChatMessages = async (body: SubmitMessageRequestModel): Promise<boolean> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {

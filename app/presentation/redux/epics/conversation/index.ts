@@ -1,12 +1,13 @@
 import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
-import { getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import { MessageHelper } from '@shared/helper/MessageHelper';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -30,7 +31,30 @@ export const getMessagesEpic = (action$: any, state$: any) =>
         )
     );
 
+export const deleteMessageEpic = (action$: any, state$: any) =>
+    action$.pipe(
+        ofType(deleteMessageActionTypes.start),
+        mergeMap((action: IAction<IDeleteMessagePayload>) =>
+            new Observable(obs => {
+                const { messageId, objectId, objectInstanceId } = action.payload!;
+                const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'delete', '');
+                request.comment_id = MessageHelper.shared.extractRealMessageId(messageId);
+                const chatRepo = new ChatRepository();
+                chatRepo.submitChatMessages(request)
+                    .then(() => {
+                        obs.next(deleteMessageActionTypes.successAction());
+                        obs.complete();
+                    })
+                    .catch(error => {
+                        obs.next(deleteMessageActionTypes.failedAction({ error }));
+                        obs.complete();
+                    });
+            })
+        )
+    );
+
 export const conversationEpic = combineEpics(
     getMessagesEpic,
+    deleteMessageEpic,
 );
 

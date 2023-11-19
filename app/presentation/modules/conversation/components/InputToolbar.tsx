@@ -2,11 +2,12 @@ import { Box } from '@components/globals/view/Box';
 import { Dimensions } from '@theme/Dimensions';
 import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import React from 'react';
-import { Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { InputToolbar, Actions, Composer, Send, InputToolbarProps, SendProps, ComposerProps, ActionsProps } from 'react-native-gifted-chat';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useContext, useEffect, useMemo } from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Composer, ComposerProps, InputToolbar, InputToolbarProps, Send, SendProps } from 'react-native-gifted-chat';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useInputText, useIsInEditMode } from '../hooks/CommonHooks';
+import { ConversationContext } from '../context/ConversationContext';
 
 export interface IMyComposerProps extends ComposerProps {
     onSelectFilePressed: () => void;
@@ -21,9 +22,39 @@ export const MyInputToolbar = (props: InputToolbarProps<IAppChatMessage>) => {
 };
 
 export const MySend = (props: SendProps<IAppChatMessage>) => {
+    const { text, setText } = useInputText();
+    const { editMessage, isInEditMode } = useIsInEditMode();
+    const { setEditMessage } = useContext(ConversationContext);
+
+    const isEditMessageChanged = useMemo(() => {
+        if (editMessage) {
+            return text !== editMessage.text;
+        }
+        return false;
+    }, [editMessage, text]);
+
+    console.log('isEditMessageChanged: ', isEditMessageChanged);
+
+    if (isInEditMode && !isEditMessageChanged) {
+        return <TouchableOpacity
+            style={styles.sendContainer}
+            onPress={() => {
+                setEditMessage(undefined);
+                setText('');
+            }}
+        >
+            <Ionicons
+                name="close-outline"
+                size={Dimensions.moderateScale(24)}
+                color={theme.color.textColor}
+            />
+        </TouchableOpacity>;
+    }
+
     return <Send
         {...props}
-        disabled={!props.text}
+        disabled={!text}
+        text={text}
         containerStyle={styles.sendContainer}
     >
         <Ionicons
@@ -34,39 +65,70 @@ export const MySend = (props: SendProps<IAppChatMessage>) => {
     </Send>;
 };
 
+const MyInput = React.memo((props: IMyComposerProps) => {
+    const { setText, text } = useInputText();
+    const { editMessage, isInEditMode } = useIsInEditMode();
+
+    console.log('isInEditMode: ', isInEditMode, editMessage);
+
+    useEffect(() => {
+        if (editMessage && editMessage.text) {
+            setText(editMessage.text);
+        }
+    }, [editMessage, setText]);
+
+    return <Composer
+        {...props}
+        textInputStyle={styles.textInput}
+        onTextChanged={setText}
+        text={text}
+    />;
+});
+
 export const MyComposer = (props: IMyComposerProps) => {
-    const {onSelectFilePressed, onSelectMediaPressed} = props;
+    const { onSelectFilePressed, onSelectMediaPressed } = props;
+    const { text } = useInputText();
+    const { editMessage, isInEditMode } = useIsInEditMode();
+
+    const isEditMessageChanged = useMemo(() => {
+        if (editMessage) {
+            return text !== editMessage.text;
+        }
+        return false;
+    }, [editMessage, text]);
+
     return <Box
         style={styles.composerContainer}
         direction="row"
         alignItems="center"
     >
-        <Composer
+        <MyInput
             {...props}
-            textInputStyle={styles.textInput}
         />
-        <TouchableOpacity
-            style={styles.composerActionContainer}
-            activeOpacity={0.8}
-            onPress={onSelectFilePressed}
-        >
-            <Ionicons
-                name="attach"
-                size={Dimensions.moderateScale(24)}
-                color={theme.color.labelColor}
-            />
-        </TouchableOpacity>
-        <TouchableOpacity
-            style={styles.composerActionContainer}
-            activeOpacity={0.8}
-            onPress={onSelectMediaPressed}
-        >
-            <Ionicons
-                name="images-outline"
-                size={Dimensions.moderateScale(24)}
-                color={theme.color.labelColor}
-            />
-        </TouchableOpacity>
+        {isInEditMode && !isEditMessageChanged ? null : <>
+            <TouchableOpacity
+                style={styles.composerActionContainer}
+                activeOpacity={0.8}
+                onPress={onSelectFilePressed}
+            >
+                <Ionicons
+                    name="attach"
+                    size={Dimensions.moderateScale(24)}
+                    color={theme.color.labelColor}
+                />
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.composerActionContainer}
+                activeOpacity={0.8}
+                onPress={onSelectMediaPressed}
+            >
+                <Ionicons
+                    name="images-outline"
+                    size={Dimensions.moderateScale(24)}
+                    color={theme.color.labelColor}
+                />
+            </TouchableOpacity>
+        </>}
     </Box>;
 };
 

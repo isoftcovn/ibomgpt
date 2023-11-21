@@ -2,6 +2,7 @@
     "add": "Them",
     "alertChangeLanguage": "Do you want to change language?",
     "alreadyHaveAccount": "Bạn đã có tài khoản?",
+    "aboutUs": "Về iBOM",
 
     "clearAll": "Clear All",
     "change": "Change",
@@ -31,6 +32,7 @@
     "gender": "Gender",
 
     "home": "Home",
+    "helpCenter": "Trung tâm trợ giúp",
 
     "info": "Info",
     "invalidEmail": "Email không hợp lệ",
@@ -42,6 +44,7 @@
     "login": "Đăng nhập",
     "location": "Location",
     "logout": "Đăng xuất",
+    "logoutConfirmation": "Bạn có chắc mình muốn đăng xuất không?",
     "languages": "Languages",
     "loading": "Loading...",
     "lostInternetConnection": "Your network connection is unstable.",
@@ -49,6 +52,7 @@
 
     "male": "Male",
     "message": "Tin nhắn",
+    "myAccount": "Tài khoản",
 
     "name": "Tên",
     "next": "Next",

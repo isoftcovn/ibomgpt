@@ -1,13 +1,14 @@
 import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
-import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import { MessageHelper } from '@shared/helper/MessageHelper';
+import { IAppChatMessage } from 'app/presentation/models/chat';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(

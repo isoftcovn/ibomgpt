@@ -1,4 +1,4 @@
-import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, getMessagesType, sendMessagesActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, IEditMessagesPayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
 import { logoutActionTypes } from '../../../actions/auth';
 import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
@@ -129,6 +129,20 @@ export default function (state = initialState, action: IAction<any>) {
                     if (index !== -1) {
                         currentData.splice(index, 1);
                     }
+                }
+            }
+            draft.data[sectionId] = currentData;
+        });
+    }
+    if (actionType === editMessagesActionTypes.start) {
+        const { messages, objectId, objectInstanceId } = action.payload! as IEditMessagesPayload;
+        return produce(state, draft => {
+            const sectionId = `${objectId}-${objectInstanceId}`;
+            let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
+            for (const editMessagge of messages) {
+                const message = currentData.find(item => editMessagge._id === item._id);
+                if (message) {
+                    message.text = editMessagge.text;
                 }
             }
             draft.data[sectionId] = currentData;

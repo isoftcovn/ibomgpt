@@ -1,32 +1,46 @@
 import { ChatRepository } from '@data/repository/chat';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import UserModel from '@models/user/response/UserModel';
-import { sendMessagesActionTypes } from '@redux/actions/conversation';
+import { editMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
 import { selectProfile } from '@redux/selectors/user';
 import { FileHelper } from '@shared/helper/FileHelper';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IPickerAsset } from './MediaHooks';
+import { ConversationContext } from '../context/ConversationContext';
 
 export const useSendTextMessage = () => {
     const dispatch = useDispatch();
+    const { editMessage } = useContext(ConversationContext);
     const sendTextMessage = useCallback(async (messages: IAppChatMessage[], objectInstanceId: number, objectId: number) => {
         const chatRepo = new ChatRepository();
         const requestModels: SubmitMessageRequestModel[] = [];
+        const isEdit = !!editMessage;
         for (const item of messages) {
             if (item.text.length > 0) {
                 const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'submit', item.text);
+                if (isEdit) {
+                    request.comment_id = parseInt(`${editMessage!._id}`, 10);
+                }
                 requestModels.push(request);
-                item._id = MessageHelper.shared.generateMessageLocalId();
+                item._id = isEdit ? parseInt(`${editMessage!._id}`, 10) : MessageHelper.shared.generateMessageLocalId();
             }
         }
-        dispatch(sendMessagesActionTypes.startAction(messages, {
-            sectionId: `${objectId}-${objectInstanceId}`,
-        }));
+        if (isEdit) {
+            dispatch(editMessagesActionTypes.startAction({
+                objectId,
+                objectInstanceId,
+                messages,
+            }));
+        } else {
+            dispatch(sendMessagesActionTypes.startAction(messages, {
+                sectionId: `${objectId}-${objectInstanceId}`,
+            }));
+        }
         await Promise.all(requestModels.map(request => chatRepo.submitChatMessages(request)));
-    }, [dispatch]);
+    }, [dispatch, editMessage]);
 
     return {
         sendTextMessage

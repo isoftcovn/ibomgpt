@@ -9,9 +9,9 @@ import { selectMessagesByKey, selectMessagesCanLoadMoreByKey, selectMessagesFetc
 import { selectProfile } from '@redux/selectors/user';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { theme } from 'app/presentation/theme';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InteractionManager, StyleSheet, View } from 'react-native';
+import { InteractionManager, Platform, StyleSheet, TextInput, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,6 +33,7 @@ interface IProps {
 export const ConversationScreen = (props: IProps) => {
     const [editMessage, setEditMessage] = useState<IAppChatMessage>();
     const [text, setText] = useState('');
+    const textInputRef = createRef<TextInput>();
 
     const enterEditMode = useCallback((message?: IAppChatMessage) => {
         setEditMessage(message);
@@ -40,12 +41,13 @@ export const ConversationScreen = (props: IProps) => {
 
     const contextValue = useMemo(() => ({
         setEditMessage: enterEditMode,
-        editMessage
-    }), [enterEditMode, editMessage]);
+        editMessage,
+        textInputRef
+    }), [enterEditMode, editMessage, textInputRef]);
 
     const inputContextValue = useMemo(() => ({
         setText,
-        text
+        text,
     }), [text]);
 
     return <ConversationContext.Provider value={contextValue}>
@@ -60,6 +62,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const insets = useSafeAreaInsets();
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
+    const { textInputRef, editMessage } = useContext(ConversationContext);
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const { openPicker } = usePickMediaAssets();
@@ -78,7 +81,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const isFetching = useSelector(selectMessagesFetchingState);
     const { onMessageLongPress } = useOnMessageLongPress(objectId, objectInstanceId);
 
-    console.log('rerender');
+    console.log('rerender chat main');
 
     useEffect(() => {
         const name = route.params?.name ?? '';
@@ -99,6 +102,12 @@ const ConversationContent = React.memo((props: IProps) => {
             didmountRef.current = true;
         }
     }, [dispatch, objectId, objectInstanceId]);
+
+    useEffect(() => {
+        if (editMessage) {
+            textInputRef.current?.focus();
+        }
+    }, [editMessage, textInputRef]);
 
     const onSelectMediaPressed = useCallback(async () => {
         try {
@@ -163,6 +172,7 @@ const ConversationContent = React.memo((props: IProps) => {
 
     return <View style={[styles.container]}>
         <GiftedChat
+            textInputRef={textInputRef}
             messages={messages}
             onSend={onSend}
             user={{
@@ -173,7 +183,10 @@ const ConversationContent = React.memo((props: IProps) => {
             renderAvatarOnTop
             renderUsernameOnMessage
             showAvatarForEveryMessage={false}
-            // bottomOffset={50}
+            bottomOffset={Platform.select({
+                ios: 20,
+                android: undefined
+            })}
             listViewProps={{
                 onEndReached: loadEalierMessages,
                 onEndReachedThreshold: 0.6,

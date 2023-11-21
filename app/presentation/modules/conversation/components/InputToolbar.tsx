@@ -33,8 +33,6 @@ export const MySend = (props: SendProps<IAppChatMessage>) => {
         return false;
     }, [editMessage, text]);
 
-    console.log('isEditMessageChanged: ', isEditMessageChanged);
-
     if (isInEditMode && !isEditMessageChanged) {
         return <TouchableOpacity
             style={styles.sendContainer}
@@ -67,9 +65,7 @@ export const MySend = (props: SendProps<IAppChatMessage>) => {
 
 const MyInput = React.memo((props: IMyComposerProps) => {
     const { setText, text } = useInputText();
-    const { editMessage, isInEditMode } = useIsInEditMode();
-
-    console.log('isInEditMode: ', isInEditMode, editMessage);
+    const { editMessage } = useIsInEditMode();
 
     useEffect(() => {
         if (editMessage && editMessage.text) {

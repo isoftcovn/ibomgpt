@@ -26,6 +26,7 @@ import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { OneSignal } from 'react-native-onesignal';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'SignIn'>;
@@ -59,6 +60,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
 
     useEffect(() => {
         DeviceEventEmitter.emit('credentialsReadyForUnauth');
+        OneSignal.logout();
     }, []);
 
     const toHome = useCallback(() => {

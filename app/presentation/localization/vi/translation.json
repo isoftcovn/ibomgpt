@@ -18,6 +18,8 @@
     "dontHaveAccountYet": "Bạn chưa có tài khoản?",
     "detail": "Chi tiết",
     "delete": "Xoá",
+    "deleteAccount": "Xoá tài khoản",
+    "deleteAccountConfirmation": "Bạn có chắc là bạn muốn xoá tài khoản này không?",
 
     "email": "Email",
     "edit": "Chỉnh sửa",

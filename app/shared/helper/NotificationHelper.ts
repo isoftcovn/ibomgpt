@@ -1,6 +1,6 @@
-import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import DefaultNotificationHandler, { INotificationHandler } from 'app/shared/helper/NotificationHandler';
-import Notifee from '@notifee/react-native';
+import Notifee, { AuthorizationStatus } from '@notifee/react-native';
+import { NotificationWillDisplayEvent, OneSignal } from 'react-native-onesignal';
 import { NOTIFICATION_CHANNEL } from '../constants';
 
 export interface IPermissionCallback {
@@ -20,6 +20,12 @@ class NotificationHelper {
         this.createDefaultChannel();
     }
 
+    hasPermission = async () => {
+        const settings = await Notifee.getNotificationSettings();
+        return settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+            settings.authorizationStatus === AuthorizationStatus.PROVISIONAL;
+    };
+
     createDefaultChannel = async () => {
         const exists = await Notifee.isChannelCreated(NOTIFICATION_CHANNEL);
         if (exists) {
@@ -34,19 +40,23 @@ class NotificationHelper {
 
     askPermissionAndRegisterDeviceToken = async (permissionCallback: IPermissionCallback, deviceTokenCallBack: IDeviceTokenCallback) => {
         try {
-            const granted = await messaging().requestPermission();
+            const settings = await Notifee.requestPermission({
+                alert: true,
+                badge: true,
+                sound: true,
+            });
             const enabled =
-                granted === messaging.AuthorizationStatus.AUTHORIZED ||
-                granted === messaging.AuthorizationStatus.PROVISIONAL;
+                settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+                settings.authorizationStatus === AuthorizationStatus.PROVISIONAL;
             if (permissionCallback) {
                 permissionCallback.onPermission(enabled);
             }
 
             if (enabled) {
-                const fcmToken = await messaging().getToken();
-                if (fcmToken && deviceTokenCallBack) {
+                const pushToken = OneSignal.User.pushSubscription.getPushSubscriptionToken();
+                if (pushToken && deviceTokenCallBack) {
                     // user has a device token
-                    deviceTokenCallBack.onDeviceTokenReceived(fcmToken);
+                    deviceTokenCallBack.onDeviceTokenReceived(pushToken);
                 }
             }
         } catch (error) {
@@ -56,35 +66,40 @@ class NotificationHelper {
         }
     };
 
-    registerUserTopic = async (userId: string) => {
-        const granted = await messaging().hasPermission();
-        if (granted) {
-            messaging().subscribeToTopic(userId).then(() => {
-                console.info('subscribe to topic: ', userId);
-            }).catch(error => {
-                console.warn('subscribe topic error: ', error);
-            });
-        }
-    };
+    // registerUserTopic = async (userId: string) => {
+    //     const settings = await Notifee.getNotificationSettings();
+    //     const granted =
+    //         settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+    //         settings.authorizationStatus === AuthorizationStatus.PROVISIONAL;
+    //     if (granted) {
+    //         messaging().subscribeToTopic(userId).then(() => {
+    //             console.info('subscribe to topic: ', userId);
+    //         }).catch(error => {
+    //             console.warn('subscribe topic error: ', error);
+    //         });
+    //     }
+    // };
 
-    unregisterUserTopic = (userId: string) => {
-        messaging().unsubscribeFromTopic(userId).then(() => console.info('unsubscribe topic: ', userId)).catch(console.warn);
+    // unregisterUserTopic = (userId: string) => {
+    //     messaging().unsubscribeFromTopic(userId).then(() => console.info('unsubscribe topic: ', userId)).catch(console.warn);
+    // };
+
+    onForegroundWillDisplay = (event: NotificationWillDisplayEvent) => {
+        this.notificationHandler.onMessage(event);
     };
 
     listenOnNotification = async (notificationHandler: INotificationHandler) => {
         try {
-            const granted = await messaging().hasPermission();
+            const granted = await this.hasPermission();
             if (granted) {
                 // user has permissions
-                if (this.onMessageListener) {
-                    this.onMessageListener.remove();
-                }
-
-                this.onMessageListener = messaging().onMessage((notification: FirebaseMessagingTypes.RemoteMessage) => {
-                    // Process your notification as required
-                    console.info('receive remote notification: ', notification);
-                    notificationHandler.onMessage(notification);
-                });
+                OneSignal.Notifications.removeEventListener('foregroundWillDisplay', this.onForegroundWillDisplay);
+                OneSignal.Notifications.addEventListener('foregroundWillDisplay', this.onForegroundWillDisplay);
+                // this.onMessageListener = messaging().onMessage((notification: FirebaseMessagingTypes.RemoteMessage) => {
+                //     // Process your notification as required
+                //     console.info('receive remote notification: ', notification);
+                //     notificationHandler.onMessage(notification);
+                // });
             }
         } catch (error) {
 

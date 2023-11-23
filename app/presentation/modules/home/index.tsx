@@ -18,6 +18,7 @@ import UserModel from '@models/user/response/UserModel';
 import { selectProfile } from '@redux/selectors/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProfileActionTypes } from '@redux/actions/user';
+import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -25,7 +26,7 @@ interface IProps {
 }
 
 const HomeScreen = (props: IProps) => {
-    const { navigation, route } = props;
+    const { navigation } = props;
     const dispatch = useDispatch();
     const searchTermRef = useRef<BehaviorSubject<string>>(new BehaviorSubject(''));
     const didMountRef = useRef(false);
@@ -34,6 +35,12 @@ const HomeScreen = (props: IProps) => {
     const user: UserModel | undefined = useSelector(selectProfile).data;
     const chatListRequest = useRef<ChatListRequestModel>(new ChatListRequestModel());
     const canLoadMore = useRef<boolean>(false);
+
+    useEffect(() => {
+        if (user) {
+            AnalyticsHelper.setUser(user);
+        }
+    }, [user]);
 
     const onChangeText = useCallback((text: string) => {
         searchTermRef.current.next(text);

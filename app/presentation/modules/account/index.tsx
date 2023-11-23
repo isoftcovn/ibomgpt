@@ -1,5 +1,5 @@
 import { Box } from '@components/globals/view/Box';
-import { TextButton, TextPrimary } from '@components/index';
+import { TextPrimary } from '@components/index';
 import { UserRepository } from '@data/repository/user';
 import LogoutUseCase from '@domain/user/LogoutUseCase';
 import UserModel from '@models/user/response/UserModel';
@@ -7,15 +7,15 @@ import { AuthNavigator } from '@navigation/helper/shortcut';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { selectProfile } from '@redux/selectors/user';
+import LinkingHelper from '@shared/helper/LinkingHelper';
 import { Dimensions } from '@theme/Dimensions';
 import { theme } from '@theme/index';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LinkingHelper from '@shared/helper/LinkingHelper';
+import { useSelector } from 'react-redux';
 
 interface IProps {
     navigation: StackNavigationProp<any, any>;
@@ -41,6 +41,28 @@ const AccountScreen = (props: IProps) => {
             },
             {
                 text: t('logout') ?? '',
+                style: 'destructive',
+                onPress: () => {
+                    const usecase = new LogoutUseCase(new UserRepository());
+                    usecase.execute().catch(error => {
+                        console.warn('Logout error: ', error);
+                    });
+                    navigation.dispatch(AuthNavigator);
+                }
+            }
+        ], {
+            cancelable: true,
+        });
+    }, [navigation, t]);
+
+    const deleteAccount = useCallback(() => {
+        Alert.alert(t('deleteAccount'), t('deleteAccountConfirmation') ?? '', [
+            {
+                text: t('cancel') ?? '',
+                style: 'cancel'
+            },
+            {
+                text: t('delete') ?? '',
                 style: 'destructive',
                 onPress: () => {
                     const usecase = new LogoutUseCase(new UserRepository());
@@ -116,6 +138,19 @@ const AccountScreen = (props: IProps) => {
                 color: theme.color.danger,
                 fontWeight: '400'
             }} variant="body1">{t('logout')}</TextPrimary>
+        </TouchableOpacity>
+        <Box marginTop={theme.spacing.small} />
+        <TouchableOpacity
+            style={styles.itemContainer}
+            activeOpacity={0.8}
+            onPress={deleteAccount}
+        >
+            <TextPrimary style={{
+                textAlign: 'center',
+                flex: 1,
+                color: theme.color.danger,
+                fontWeight: '500'
+            }} variant="body1">{t('deleteAccount')}</TextPrimary>
         </TouchableOpacity>
     </View>;
 };

@@ -1,6 +1,7 @@
 import analytics, { FirebaseAnalyticsTypes } from '@react-native-firebase/analytics';
 import firebase from '@react-native-firebase/app';
 import UserModel from 'app/models/user/response/UserModel';
+import { OneSignal } from 'react-native-onesignal';
 
 class AnalyticsHelper {
     analytics: FirebaseAnalyticsTypes.Module;
@@ -24,9 +25,12 @@ class AnalyticsHelper {
         this.analytics.setUserProperties({
             username: user.email || '',
             email: user.email || '',
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
+            fullname: user.fullname ?? '',
         }).catch();
+        OneSignal.login(`${user.id}`);
+        if (user.email) {
+            OneSignal.User.addEmail(user.email);
+        }
     };
 
     logEvent = (eventName: string, params?: any) => {

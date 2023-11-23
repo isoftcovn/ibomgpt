@@ -9,6 +9,7 @@ declare module 'react-native-config' {
         ENV: BuildEnv;
         DYNAMIC_LINK_URL: string;
         DEEPLINK_SCHEME: string;
+        ONESIGNAL_APP_ID: string;
     }
 
     export const Config: NativeConfig

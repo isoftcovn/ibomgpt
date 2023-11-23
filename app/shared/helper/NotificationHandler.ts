@@ -1,12 +1,12 @@
 import Notifee, { Notification } from '@notifee/react-native';
-import { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { DeviceEventEmitter, EmitterSubscription } from 'react-native';
+import { NotificationWillDisplayEvent } from 'react-native-onesignal';
 import { v4 as uuidv4 } from 'uuid';
 import { NOTIFICATION_CHANNEL } from '../constants';
 import AppManager from '../managers/AppManager';
 
 export interface INotificationHandler {
-    onMessage: (message: FirebaseMessagingTypes.RemoteMessage) => void;
+    onMessage: (message: NotificationWillDisplayEvent) => void;
     onNotificationDisplayed?: (notification: any) => void;
     onNotificationOpened?: (notificationOpen: Notification, isForeground: boolean) => void;
 }
@@ -14,7 +14,7 @@ export interface INotificationHandler {
 export default class DefaultNotificationHandler implements INotificationHandler {
     _subscription?: EmitterSubscription;
 
-    onMessage = (notification: FirebaseMessagingTypes.RemoteMessage) => {
+    onMessage = (notification: NotificationWillDisplayEvent) => {
         this.displayNotification(notification);
     };
 
@@ -54,14 +54,16 @@ export default class DefaultNotificationHandler implements INotificationHandler 
         }
     };
 
-    displayNotification = async (notification: FirebaseMessagingTypes.RemoteMessage) => {
-        const payload = notification.data || {};
-        const notificationContent = notification.notification || {};
-        if (notificationContent && notificationContent.body && notificationContent.title) {
+    displayNotification = async (event: NotificationWillDisplayEvent) => {
+        event.preventDefault();
+        const notification = event.notification;
+        console.log('display notification: ', notification);
+        const payload: any = notification.additionalData || {};
+        if (notification.body && notification.title) {
             await Notifee.displayNotification({
                 id: uuidv4(),
-                body: notificationContent.body,
-                title: notificationContent.title,
+                body: notification.body,
+                title: notification.title,
                 data: payload,
                 android: {
                     channelId: NOTIFICATION_CHANNEL,

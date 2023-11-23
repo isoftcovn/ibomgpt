@@ -5,8 +5,6 @@
 #import <React/RCTRootView.h>
 #import <React/RCTLinkingManager.h>
 #import <Firebase.h>
-#import "RNFBMessagingModule.h"
-// #import <UserNotifications/UserNotifications.h>
 #import "RNSplashScreen.h"
 
 @implementation AppDelegate
@@ -20,11 +18,6 @@
 
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
-
-  NSDictionary *appProperties = [RNFBMessagingModule addCustomPropsToUserProps:nil withLaunchOptions:launchOptions];
-  // You can add your custom initial props in the dictionary below.
-  // They will be passed down to the ViewController used by React Native.
-  self.initialProps = appProperties;
 
   for (NSString *familyName in [UIFont familyNames]){
     NSLog(@"Family name: %@", familyName);
@@ -46,19 +39,6 @@
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
-
-//Notification
-//Called when a notification is delivered to a foreground app.
-// -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
-// {
-//   if (@available(iOS 14.0, *)) {
-//     completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionList);
-//   } else {
-//     // Fallback on earlier versions
-//     completionHandler(UNNotificationPresentationOptionSound  | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionAlert);
-//   }
-// }
-//Notification
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options

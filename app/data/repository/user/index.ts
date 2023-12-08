@@ -5,13 +5,13 @@ import ApiGateway from 'app/data/gateway/api';
 import { AppResource } from 'app/data/gateway/api/resource';
 import { IUserRepository } from 'app/domain/user';
 import LoginModel from 'app/models/auth/response/LoginModel';
-import UploadFileRequestModel from 'app/models/general/request/UploadFileRequestModel';
 import UpdateProfileRequestModel from 'app/models/user/request/UpdateProfileRequestModel';
 import UserModel from 'app/models/user/response/UserModel';
 import { TokenType, User } from 'app/shared/constants';
 import { Platform } from 'react-native';
 import { AuthRepository } from '../auth';
 import DeviceInfo from 'react-native-device-info';
+import { UploadFileRequestModel } from '@models/general/request/UploadFileRequestModel';
 
 export class UserRepository implements IUserRepository {
     getUserCreds = async (): Promise<string[] | null | undefined> => {

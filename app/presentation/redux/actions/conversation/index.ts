@@ -16,6 +16,12 @@ export interface IEditMessagesPayload {
     messages: IAppChatMessage[];
 }
 
+export interface IUpdateLocalMessageIdsPayload {
+    objectId: number;
+    objectInstanceId: number;
+    messageIdsToReplace: Record<string, string>;
+}
+
 export const getMessagesType = 'get_messages';
 export const getMessagesActionTypes = createActionTypes<ChatMessagesRequestModel, IAppChatMessage[]>(getMessagesType, DOMAIN);
 
@@ -27,3 +33,6 @@ export const editMessagesActionTypes = createActionTypes<IEditMessagesPayload, v
 
 export const deleteMessageType = 'delete_message';
 export const deleteMessageActionTypes = createActionTypes<IDeleteMessagePayload, void>(deleteMessageType, DOMAIN);
+
+export const updateLocalMessageIdsType = 'update_local_message_ids';
+export const updateLocalMessageIdsActionTypes = createActionTypes<IUpdateLocalMessageIdsPayload, void>(updateLocalMessageIdsType, DOMAIN);

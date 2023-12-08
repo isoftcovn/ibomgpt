@@ -1,7 +1,7 @@
 import { ChatRepository } from '@data/repository/chat';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import UserModel from '@models/user/response/UserModel';
-import { editMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
+import { editMessagesActionTypes, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { selectProfile } from '@redux/selectors/user';
 import { FileHelper } from '@shared/helper/FileHelper';
 import { MessageHelper } from '@shared/helper/MessageHelper';
@@ -26,6 +26,10 @@ export const useSendTextMessage = () => {
                 }
                 requestModels.push(request);
                 item._id = isEdit ? parseInt(`${editMessage!._id}`, 10) : MessageHelper.shared.generateMessageLocalId();
+                if (!isEdit) {
+                    // @ts-ignore
+                    request._localMessageId = item._id;
+                }
             }
         }
         if (isEdit) {
@@ -39,7 +43,32 @@ export const useSendTextMessage = () => {
                 sectionId: `${objectId}-${objectInstanceId}`,
             }));
         }
-        await Promise.all(requestModels.map(request => chatRepo.submitChatMessages(request)));
+        const requestCount = requestModels.length;
+        let doneRequestCount = 0;
+        const localMessageIdAndRealIdMap: Record<string, string> = {};
+        for (const request of requestModels) {
+            chatRepo.submitChatMessages(request).then(messageId => {
+                if (!isEdit && messageId) {
+                    // @ts-ignore
+                    localMessageIdAndRealIdMap[`${request._localMessageId ?? ''}`] = `${messageId}`;
+                }
+            }).catch(error => {
+                console.error('Send message failed: ', error);
+            }).finally(() => {
+                doneRequestCount++;
+                if (doneRequestCount === requestCount && Object.keys(localMessageIdAndRealIdMap).length > 0) {
+                    dispatch(updateLocalMessageIdsActionTypes.startAction({
+                        messageIdsToReplace: localMessageIdAndRealIdMap,
+                        objectId,
+                        objectInstanceId
+                    }));
+                }
+            });
+        }
+        // const ids = await Promise.all(requestModels.map(request => chatRepo.submitChatMessages(request)));
+        // if (!isEdit) {
+
+        // }
     }, [dispatch, editMessage]);
 
     return {
@@ -72,7 +101,7 @@ export const useSendMediaMessage = () => {
         }));
         const messages: IAppChatMessage[] = assets.map(item => {
             const message: IAppChatMessage = {
-                _id: MessageHelper.shared.generateMessageLocalId(),
+                _id: `media-${MessageHelper.shared.generateMessageLocalId()}-${item.name}`,
                 user: {
                     _id: user.id,
                     avatar: user.avatar,
@@ -99,14 +128,38 @@ export const useSendMediaMessage = () => {
         dispatch(sendMessagesActionTypes.startAction(messages, {
             sectionId: `${objectId}-${objectInstanceId}`,
         }));
-        for (const request of requests) {
-            chatRepo.submitChatMessages(request).then(() => {
-                console.info('Sent media message done: ', request.FileUpload?.[0]?.name);
+        const requestCount = requests.length;
+        let doneRequestCount = 0;
+        const localMessageIdAndRealIdMap: Record<string, string> = {};
+        requests.forEach((request, index) => {
+            chatRepo.submitChatMessages(request).then(messageId => {
+                console.info('Sent media message done: ', messageId, request.FileUpload?.[0]?.name);
+                const localMessageId = messages[index]?._id;
+                if (localMessageId && messageId) {
+                    localMessageIdAndRealIdMap[`${localMessageId}`] = `${messageId}`;
+                }
             }).catch(error => {
                 console.info('Sent media message error: ', request.FileUpload?.[0]?.name);
                 console.info(error);
+            }).finally(() => {
+                doneRequestCount++;
+                if (doneRequestCount === requestCount && Object.keys(localMessageIdAndRealIdMap).length > 0) {
+                    dispatch(updateLocalMessageIdsActionTypes.startAction({
+                        messageIdsToReplace: localMessageIdAndRealIdMap,
+                        objectId,
+                        objectInstanceId
+                    }));
+                }
             });
-        }
+        });
+        // for (const request of requests) {
+        //     chatRepo.submitChatMessages(request).then(messageId => {
+        //         console.info('Sent media message done: ', messageId, request.FileUpload?.[0]?.name);
+        //     }).catch(error => {
+        //         console.info('Sent media message error: ', request.FileUpload?.[0]?.name);
+        //         console.info(error);
+        //     });
+        // }
         // await chatRepo.submitChatMessages(request);
     }, [dispatch, user]);
 

@@ -163,8 +163,13 @@ class ApiGateway {
 
     _responseTransform = (response: AxiosResponse<any>) => response.data;
 
-    execute = (): Promise<any> =>
-        this._instanceAxios.request(this.requestConfig).then(this._responseTransform);
+    execute = (useResponseTransformer: boolean = true): Promise<any> =>
+        this._instanceAxios.request(this.requestConfig).then(response => {
+            if (useResponseTransformer) {
+                return this._responseTransform(response);
+            }
+            return response;
+        });
 }
 
 export default ApiGateway;

@@ -6,9 +6,11 @@ import { StyleSheet } from 'react-native';
 import {
     Avatar, AvatarProps, Bubble, BubbleProps, Message, MessageProps, MessageText, MessageTextProps,
     SystemMessage, SystemMessageProps,
-    Time, TimeProps
+    Time, TimeProps, User,
 } from 'react-native-gifted-chat';
 import { FileMessage } from './FileMessage';
+import { TextPrimary } from '@components/index';
+import { MyMessage } from './Message';
 
 export const MyAvatar = (props: AvatarProps<IAppChatMessage>) => {
     return <Avatar
@@ -30,10 +32,17 @@ export const TimeText = (props: TimeProps<IAppChatMessage>) => {
     />;
 };
 
+export const UserNameText = (user: User) => {
+    return <TextPrimary style={styles.left.username}>
+        {user.name ?? ''}
+    </TextPrimary>;
+};
+
 export const MyBubble = (props: BubbleProps<IAppChatMessage>) => (
     <Bubble
         {...props}
         renderTime={TimeText}
+        renderUsernameOnMessage={false}
         containerToNextStyle={{
             right: styles.right.containerToNext,
             left: styles.left.containerToNext,
@@ -53,14 +62,13 @@ export const MyBubble = (props: BubbleProps<IAppChatMessage>) => (
     />
 );
 
-export const MyMessage = (props: MessageProps<IAppChatMessage>) => (
-    <Message
+export const RenderMessage = (props: MessageProps<IAppChatMessage>) => (
+    <MyMessage
         {...props}
         containerStyle={{
             left: styles.left.messageContainer,
             right: styles.right.messageContainer,
         }}
-    // renderDay={() => <Text>Date</Text>}
     />
 );
 
@@ -111,10 +119,14 @@ const styles = {
         containerToNext: {
             borderBottomLeftRadius: 10,
             borderTopLeftRadius: 10,
+            borderBottomRightRadius: 10,
+            borderTopRightRadius: 10,
         },
         containerToPrevious: {
             borderBottomLeftRadius: 10,
             borderTopLeftRadius: 10,
+            borderBottomRightRadius: 10,
+            borderTopRightRadius: 10,
         },
         messageContainer: {
             marginBottom: theme.spacing.tiny,
@@ -134,6 +146,10 @@ const styles = {
             flexDirection: 'row',
             alignItems: 'center'
         },
+        username: {
+            ...theme.textVariants.label1,
+            color: theme.color.labelColor,
+        }
     }),
     right: StyleSheet.create({
         avatarContainer: {

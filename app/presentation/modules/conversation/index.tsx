@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MyAudioMessage } from './components/AudioMessage';
 import { RenderImageMessage } from './components/ImageMessage';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
-import { MyAvatar, MyBubble, MyCustomMessage, MyMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
+import { MyAvatar, MyBubble, MyCustomMessage, RenderMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
 import { MyVideoMessage } from './components/VideoMessage';
 import { ConversationContext, ConversationInputContext } from './context/ConversationContext';
 import { useOnMessageLongPress } from './hooks/CommonHooks';
@@ -55,7 +55,7 @@ export const ConversationScreen = (props: IProps) => {
             <ConversationContent {...props} />
         </ConversationInputContext.Provider>
     </ConversationContext.Provider>;
-}
+};
 
 const ConversationContent = React.memo((props: IProps) => {
     const { navigation, route } = props;
@@ -184,7 +184,7 @@ const ConversationContent = React.memo((props: IProps) => {
             renderUsernameOnMessage
             showAvatarForEveryMessage={false}
             bottomOffset={Platform.select({
-                ios: 20,
+                ios: 0,
                 android: undefined
             })}
             listViewProps={{
@@ -208,7 +208,7 @@ const ConversationContent = React.memo((props: IProps) => {
             renderComposer={renderComposer}
             renderAvatar={MyAvatar}
             renderBubble={MyBubble}
-            renderMessage={MyMessage}
+            renderMessage={RenderMessage}
             renderMessageText={MyTextMessage}
             renderMessageVideo={MyVideoMessage}
             renderMessageAudio={MyAudioMessage}

@@ -3,7 +3,7 @@ module.exports = function getBabelConfig(api) {
 
     const plugins = [
         [
-            require.resolve('babel-plugin-module-resolver'), 
+            require.resolve('babel-plugin-module-resolver'),
             {
                 root: ['./'],
                 alias: {
@@ -21,7 +21,7 @@ module.exports = function getBabelConfig(api) {
                     '@shared': './app/shared',
                 },
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
-            },            
+            },
         ],
         'react-native-reanimated/plugin'
     ];

@@ -8,7 +8,7 @@ import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 
 export class ChatRepository implements IChatRepository {
-    submitChatMessages = async (body: SubmitMessageRequestModel): Promise<boolean> => {
+    submitChatMessages = async (body: SubmitMessageRequestModel): Promise<number | undefined> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {
@@ -18,7 +18,6 @@ export class ChatRepository implements IChatRepository {
         });
         if (body.FileUpload) {
             body.FileUpload!.forEach(file => {
-                console.log('Sent file: ', file);
                 formData.append('FileUpload', {
                     name: file.name,
                     type: file.type,
@@ -33,8 +32,8 @@ export class ChatRepository implements IChatRepository {
             body: formData,
         });
 
-        await apiGateway.execute();
-        return true;
+        const response = await apiGateway.execute();
+        return response.comment_id;
     };
 
     getChatMessages = async (body: ChatMessagesRequestModel): Promise<ChatMessageResponse[]> => {

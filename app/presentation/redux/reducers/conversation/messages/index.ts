@@ -1,4 +1,4 @@
-import { IDeleteMessagePayload, IEditMessagesPayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, sendMessagesActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, IEditMessagesPayload, IUpdateLocalMessageIdsPayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
 import { logoutActionTypes } from '../../../actions/auth';
 import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
@@ -145,6 +145,27 @@ export default function (state = initialState, action: IAction<any>) {
                     message.text = editMessagge.text;
                 }
             }
+            draft.data[sectionId] = currentData;
+        });
+    }
+    if (actionType === updateLocalMessageIdsActionTypes.start) {
+        const { messageIdsToReplace, objectId, objectInstanceId } = action.payload! as IUpdateLocalMessageIdsPayload;
+        return produce(state, draft => {
+            const sectionId = `${objectId}-${objectInstanceId}`;
+            let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
+            Object.keys(messageIdsToReplace).forEach(localMessageId => {
+                let didStartReplacing = false;
+                for (const item of currentData) {
+                    if (`${item._id}`.includes(localMessageId)) {
+                        didStartReplacing = true;
+                        console.log(`replacing local message: ${item._id} with ${messageIdsToReplace[localMessageId]}`);
+                        item._id = `${item._id}`.replace(localMessageId, messageIdsToReplace[localMessageId]);
+                    } else if (didStartReplacing) {
+                        console.log(`did end replacing local message: ${localMessageId}`);
+                        break;
+                    }
+                }
+            });
             draft.data[sectionId] = currentData;
         });
     }

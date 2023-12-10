@@ -1,4 +1,4 @@
-import { IDeleteMessagePayload, IEditMessagesPayload, IUpdateLocalMessageIdsPayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, IEditMessagesPayload, IUpdateLocalMessageIdsPayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, receiveNewMessagesActionTypes, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
 import { logoutActionTypes } from '../../../actions/auth';
 import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';

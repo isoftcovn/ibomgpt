@@ -1,14 +1,15 @@
 import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
-import { IDeleteMessagePayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, sendMessagesActionTypes } from '@redux/actions/conversation';
-import { combineEpics, ofType } from 'redux-observable';
+import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes } from '@redux/actions/conversation';
+import { selectMessagesByKey } from '@redux/selectors/conversation';
+import { MessageHelper } from '@shared/helper/MessageHelper';
+import { IAppChatMessage } from 'app/presentation/models/chat';
+import { StateObservable, combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
-import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
-import { MessageHelper } from '@shared/helper/MessageHelper';
-import { IAppChatMessage } from 'app/presentation/models/chat';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -54,8 +55,41 @@ export const deleteMessageEpic = (action$: any, state$: any) =>
         )
     );
 
+export const receiveMessageEpic = (action$: any, state$: StateObservable<any>) =>
+    action$.pipe(
+        ofType(receiveNewMessagesActionTypes.start),
+        mergeMap((action: IAction<IAppChatMessage[]>) =>
+            new Observable(obs => {
+                const messages = action.payload!;
+                const objectId = messages[0]?.objectId;
+                const objectInstanceId = messages[0]?.objectInstanceId;
+                const state = state$.value;
+                if (objectId && objectInstanceId && messages.length > 0) {
+                    const key = `${objectId}-${objectInstanceId}`;
+                    const currentMessages = selectMessagesByKey(state, key);
+                    const latestMessagesToCheck = currentMessages.slice(0, 20);
+                    const message = messages[0];
+                    let isMessagesValidToInsert = true;
+                    if (latestMessagesToCheck.find(item => item._id === message._id)) {
+                        isMessagesValidToInsert = false;
+                    }
+
+                    if (isMessagesValidToInsert) {
+                        obs.next(getMessagesActionTypes.successAction(messages, {
+                            isPrepend: true,
+                            sectionId: key
+                        }));
+                    }
+
+                    obs.complete();
+                }
+            })
+        )
+    );
+
 export const conversationEpic = combineEpics(
     getMessagesEpic,
     deleteMessageEpic,
+    receiveMessageEpic,
 );
 

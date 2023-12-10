@@ -1,12 +1,14 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import { deleteMessageActionTypes } from '@redux/actions/conversation';
+import { deleteMessageActionTypes, receiveNewMessagesActionTypes } from '@redux/actions/conversation';
 import { selectUserId } from '@redux/selectors/user';
 import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { ConversationContext, ConversationInputContext } from '../context/ConversationContext';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
+import { Subscription } from 'rxjs';
 
 export const useOnMessageLongPress = (objectId: number, objectInstanceId: number) => {
     const userId = useSelector(selectUserId);
@@ -86,4 +88,19 @@ export const useInputText = () => {
         text,
         setText
     }), [text, setText]);
+};
+
+export const useRealtimeMessage = () => {
+    const receiveMessageSubcription = useRef<Subscription | undefined>();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        receiveMessageSubcription.current = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
+            dispatch(receiveNewMessagesActionTypes.startAction(messages));
+        });
+
+        return () => {
+            receiveMessageSubcription.current?.unsubscribe();
+        }
+    }, [dispatch]);
 };

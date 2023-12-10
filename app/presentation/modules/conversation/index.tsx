@@ -24,6 +24,8 @@ import { ConversationContext, ConversationInputContext } from './context/Convers
 import { useOnMessageLongPress } from './hooks/CommonHooks';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
+import { Subscription } from 'rxjs';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -62,6 +64,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const insets = useSafeAreaInsets();
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
+    const receiveMessageSubcription = useRef<Subscription | undefined>();
     const { textInputRef, editMessage } = useContext(ConversationContext);
     const { t } = useTranslation();
     const dispatch = useDispatch();

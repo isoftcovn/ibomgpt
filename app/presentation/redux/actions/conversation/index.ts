@@ -36,3 +36,6 @@ export const deleteMessageActionTypes = createActionTypes<IDeleteMessagePayload,
 
 export const updateLocalMessageIdsType = 'update_local_message_ids';
 export const updateLocalMessageIdsActionTypes = createActionTypes<IUpdateLocalMessageIdsPayload, void>(updateLocalMessageIdsType, DOMAIN);
+
+export const receiveNewMessagesType = 'receive_new_messages';
+export const receiveNewMessagesActionTypes = createActionTypes<IAppChatMessage[], void>(receiveNewMessagesType, DOMAIN);

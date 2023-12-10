@@ -10,7 +10,7 @@ import { ListState } from 'app/presentation/models/general';
 import { theme } from 'app/presentation/theme';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { InteractionManager, ListRenderItemInfo, StyleSheet, View } from 'react-native';
-import { BehaviorSubject, debounceTime, skip } from 'rxjs';
+import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
 import { HomeHeader } from './components/HomeHeader';
 import { AppStackParamList } from '@navigation/RouteParams';
@@ -19,6 +19,7 @@ import { selectProfile } from '@redux/selectors/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProfileActionTypes } from '@redux/actions/user';
 import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -30,6 +31,7 @@ const HomeScreen = (props: IProps) => {
     const dispatch = useDispatch();
     const searchTermRef = useRef<BehaviorSubject<string>>(new BehaviorSubject(''));
     const didMountRef = useRef(false);
+    const receiveMessageSubcription = useRef<Subscription | undefined>();
     const [listState, setListState] = useState<ListState>(ListState.initial);
     const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
     const user: UserModel | undefined = useSelector(selectProfile).data;
@@ -41,6 +43,18 @@ const HomeScreen = (props: IProps) => {
             AnalyticsHelper.setUser(user);
         }
     }, [user]);
+
+    useEffect(() => {
+        ChatManager.shared.startConnection();
+        receiveMessageSubcription.current = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
+
+        });
+
+        return () => {
+            ChatManager.shared.stopConnection();
+            receiveMessageSubcription.current?.unsubscribe();
+        };
+    }, []);
 
     const onChangeText = useCallback((text: string) => {
         searchTermRef.current.next(text);

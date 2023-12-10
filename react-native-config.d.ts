@@ -10,8 +10,9 @@ declare module 'react-native-config' {
         DYNAMIC_LINK_URL: string;
         DEEPLINK_SCHEME: string;
         ONESIGNAL_APP_ID: string;
+        SIGNALR_URL: string;
     }
 
-    export const Config: NativeConfig
-    export default Config
+    export const Config: NativeConfig;
+    export default Config;
 }

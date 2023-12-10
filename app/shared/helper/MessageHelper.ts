@@ -26,6 +26,8 @@ export class MessageHelper {
                     avatar: data.avatar,
                     name: data.senderName,
                 },
+                objectId: data.objectId,
+                objectInstanceId: data.objectInstanceId,
             });
         }
         if (data.fileList.length > 0) {
@@ -42,6 +44,8 @@ export class MessageHelper {
                         avatar: data.avatar,
                         name: data.senderName,
                     },
+                    objectId: data.objectId,
+                    objectInstanceId: data.objectInstanceId,
                 };
                 switch (fileType) {
                     case FileType.image:
@@ -81,6 +85,8 @@ export class MessageHelper {
                 avatar: user.avatar,
                 name: user.fullname,
             },
+            objectId: request.object_id,
+            objectInstanceId: request.object_instance_id,
         };
         messages.push(parentMessage);
 
@@ -100,6 +106,8 @@ export class MessageHelper {
                             avatar: user.avatar,
                             name: user.fullname,
                         },
+                        objectId: request.object_id,
+                        objectInstanceId: request.object_instance_id,
                     };
                     switch (fileType) {
                         case FileType.image:

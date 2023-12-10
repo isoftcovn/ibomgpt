@@ -5,4 +5,6 @@ export interface IAppChatMessage extends IMessage {
     fileType?: FileType;
     fileUrl?: string;
     parentMessageId?: string | number;
+    objectId?: number;
+    objectInstanceId?: number;
 }

@@ -2,7 +2,7 @@ import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
-import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { selectMessagesByKey } from '@redux/selectors/conversation';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
@@ -79,6 +79,17 @@ export const receiveMessageEpic = (action$: any, state$: StateObservable<any>) =
                             isPrepend: true,
                             sectionId: key
                         }));
+                    } else {
+                        // Find local message to replace
+                        const localMessage = latestMessagesToCheck
+                            .find(item => `${item._id}`.startsWith('local_message') && message.text === item.text);
+                        if (localMessage) {
+                            obs.next(updateLocalMessageIdsActionTypes.startAction({
+                                messageIdsToReplace: {[`$localMessage._id{}`]: `${message._id}`},
+                                objectId,
+                                objectInstanceId,
+                            }));
+                        }
                     }
 
                     obs.complete();

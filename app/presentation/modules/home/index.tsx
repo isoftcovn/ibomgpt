@@ -8,7 +8,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import ListingHelper from '@shared/helper/ListingHelper';
 import { ListState } from 'app/presentation/models/general';
 import { theme } from 'app/presentation/theme';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { InteractionManager, ListRenderItemInfo, StyleSheet, View } from 'react-native';
 import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getProfileActionTypes } from '@redux/actions/user';
 import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
 import { ChatManager } from 'app/presentation/managers/ChatManager';
+import { useRealtimeMessage } from '@modules/conversation/hooks/CommonHooks';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -35,8 +36,10 @@ const HomeScreen = (props: IProps) => {
     const [listState, setListState] = useState<ListState>(ListState.initial);
     const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
     const user: UserModel | undefined = useSelector(selectProfile).data;
+    const userId = useMemo(() => user?.id, [user]);
     const chatListRequest = useRef<ChatListRequestModel>(new ChatListRequestModel());
     const canLoadMore = useRef<boolean>(false);
+    useRealtimeMessage();
 
     useEffect(() => {
         if (user) {
@@ -45,16 +48,18 @@ const HomeScreen = (props: IProps) => {
     }, [user]);
 
     useEffect(() => {
-        ChatManager.shared.startConnection();
-        receiveMessageSubcription.current = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
+        if (userId) {
+            ChatManager.shared.startConnection(`${userId}`);
+            receiveMessageSubcription.current = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
 
-        });
+            });
+        }
 
         return () => {
             ChatManager.shared.stopConnection();
             receiveMessageSubcription.current?.unsubscribe();
         };
-    }, []);
+    }, [userId]);
 
     const onChangeText = useCallback((text: string) => {
         searchTermRef.current.next(text);

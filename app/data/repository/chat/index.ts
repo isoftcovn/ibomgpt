@@ -6,9 +6,10 @@ import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesReque
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
+import { SubmitChatResponse } from '@models/chat/response/SubmitChatResponse';
 
 export class ChatRepository implements IChatRepository {
-    submitChatMessages = async (body: SubmitMessageRequestModel): Promise<number | undefined> => {
+    submitChatMessages = async (body: SubmitMessageRequestModel): Promise<SubmitChatResponse | undefined> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {
@@ -33,7 +34,7 @@ export class ChatRepository implements IChatRepository {
         });
 
         const response = await apiGateway.execute();
-        return response.comment_id;
+        return SubmitChatResponse.parseFromResponse(response);
     };
 
     getChatMessages = async (body: ChatMessagesRequestModel): Promise<ChatMessageResponse[]> => {

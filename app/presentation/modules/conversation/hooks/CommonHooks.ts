@@ -101,6 +101,6 @@ export const useRealtimeMessage = () => {
 
         return () => {
             receiveMessageSubcription.current?.unsubscribe();
-        }
+        };
     }, [dispatch]);
 };

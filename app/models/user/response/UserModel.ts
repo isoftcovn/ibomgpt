@@ -18,4 +18,14 @@ export default class UserModel {
 
         return obj;
     };
+
+    static parseFromChatResponse = (data: any): UserModel => {
+        const obj = new UserModel();
+        const { email, user_id } = data;
+
+        obj.id = user_id;
+        obj.email = email;
+
+        return obj;
+    };
 }

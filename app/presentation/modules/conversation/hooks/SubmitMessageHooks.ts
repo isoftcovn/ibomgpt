@@ -10,6 +10,12 @@ import { useCallback, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IPickerAsset } from './MediaHooks';
 import { ConversationContext } from '../context/ConversationContext';
+import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
+
+const sendMessagesToHub = (userIds: string[], message: ChatMessageResponse) => {
+    ChatManager.shared.sendMessageToUsers(userIds, message);
+};
 
 export const useSendTextMessage = () => {
     const dispatch = useDispatch();
@@ -47,10 +53,18 @@ export const useSendTextMessage = () => {
         let doneRequestCount = 0;
         const localMessageIdAndRealIdMap: Record<string, string> = {};
         for (const request of requestModels) {
-            chatRepo.submitChatMessages(request).then(messageId => {
+            chatRepo.submitChatMessages(request).then(response => {
+                const messageId = response?.commentId;
+                console.log('send message response: ', response);
                 if (!isEdit && messageId) {
                     // @ts-ignore
                     localMessageIdAndRealIdMap[`${request._localMessageId ?? ''}`] = `${messageId}`;
+
+                    const userIds = response?.participants?.map(item => `${item.id}`) ?? [];
+                    const messageResponse = response?.commentInfo;
+                    if (messageResponse) {
+                        sendMessagesToHub(userIds, messageResponse);
+                    }
                 }
             }).catch(error => {
                 console.error('Send message failed: ', error);
@@ -132,11 +146,18 @@ export const useSendMediaMessage = () => {
         let doneRequestCount = 0;
         const localMessageIdAndRealIdMap: Record<string, string> = {};
         requests.forEach((request, index) => {
-            chatRepo.submitChatMessages(request).then(messageId => {
+            chatRepo.submitChatMessages(request).then(response => {
+                const messageId = response?.commentId;
                 console.info('Sent media message done: ', messageId, request.FileUpload?.[0]?.name);
                 const localMessageId = messages[index]?._id;
                 if (localMessageId && messageId) {
                     localMessageIdAndRealIdMap[`${localMessageId}`] = `${messageId}`;
+                }
+
+                const userIds = response?.participants?.map(item => `${item.id}`) ?? [];
+                const messageResponse = response?.commentInfo;
+                if (messageResponse) {
+                    sendMessagesToHub(userIds, messageResponse);
                 }
             }).catch(error => {
                 console.info('Sent media message error: ', request.FileUpload?.[0]?.name);

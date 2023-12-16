@@ -1,11 +1,12 @@
-import signalR from '@microsoft/signalr';
+import * as signalR from '@microsoft/signalr';
 import { MessageHelper } from '@shared/helper/MessageHelper';
-import Config from 'react-native-config';
 import { IChatMessage } from 'react-native-gifted-chat';
 import { Subject } from 'rxjs';
 
 export class ChatManager {
     static shared = new ChatManager();
+
+    _chathubURI?: string;
 
     connection?: signalR.HubConnection;
     receiveMessageEvent: Subject<IChatMessage[]>;
@@ -17,12 +18,29 @@ export class ChatManager {
         console.log('receive raw message: ', data);
         // TODO: Convert to app message
         const messages = MessageHelper.shared.convertMessageResponseToChatMessage(data);
+        console.log('receive converted messages: ', messages);
         this.receiveMessageEvent.next(messages);
     };
 
-    startConnection = () => {
+    sendMessageToUsers = (userIds: string[], payload: any) => {
+        this.connection?.invoke('SendMessageToUsers', userIds, JSON.stringify(payload)).then(() => {
+            console.log('Invoke send messages done');
+        }).catch(error => {
+            console.error('Invoke send messages error: ', error);
+        });
+    };
+
+    startConnection = (userId: string) => {
+        if (!this._chathubURI) {
+            console.error('Please config chathubURI first');
+            return;
+        }
+        const uri = `${this._chathubURI}chatHub?username=${userId}`;
+        console.info('Chathub uri: ', uri);
         let connection = new signalR.HubConnectionBuilder()
-            .withUrl(Config.SIGNALR_URL)
+            .withUrl(uri)
+            .configureLogging(signalR.LogLevel.Debug)
+            .withAutomaticReconnect()
             .build();
         this.connection = connection;
 
@@ -62,5 +80,9 @@ export class ChatManager {
     stopConnection = () => {
         this.connection?.off('ReceiveMessage');
         this.connection?.stop();
+    };
+
+    storeChatHubURI = (uri: string) => {
+        this._chathubURI = uri;
     };
 }

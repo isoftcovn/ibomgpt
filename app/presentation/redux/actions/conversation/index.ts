@@ -1,6 +1,7 @@
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { createActionTypes } from '../helper';
+import UserModel from '@models/user/response/UserModel';
 
 const DOMAIN = 'conversation';
 
@@ -39,3 +40,6 @@ export const updateLocalMessageIdsActionTypes = createActionTypes<IUpdateLocalMe
 
 export const receiveNewMessagesType = 'receive_new_messages';
 export const receiveNewMessagesActionTypes = createActionTypes<IAppChatMessage[], void>(receiveNewMessagesType, DOMAIN);
+
+export const updateConversationParticipantsType = 'update_participants';
+export const updateConversationParticipantsActionTypes = createActionTypes<UserModel[], void>(updateConversationParticipantsType, DOMAIN);

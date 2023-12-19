@@ -1,3 +1,4 @@
+import UserModel from '@models/user/response/UserModel';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { createSelector } from 'reselect';
 
@@ -9,6 +10,11 @@ export const selectConversationState = createSelector(
 export const selectMessagesState = createSelector(
     (state: any) => selectConversationState(state),
     (conversation: any) => conversation.messages
+);
+
+export const selectParticipantsState = createSelector(
+    (state: any) => selectConversationState(state),
+    (conversation: any) => conversation.participants
 );
 
 export const selectMessagesByKey = createSelector(
@@ -46,5 +52,15 @@ export const selectMessagesFetchingState = createSelector(
     (state: any): any => selectMessagesState(state),
     (state): boolean => {
         return state.isFetching;
+    }
+);
+
+export const selectParticipantsByKey = createSelector(
+    [
+        (state: any): Record<string, UserModel[]> | undefined => selectParticipantsState(state).data,
+        (state: any, key: string): string => key,
+    ],
+    (grouped, key): UserModel[] => {
+        return grouped?.[key] ?? [];
     }
 );

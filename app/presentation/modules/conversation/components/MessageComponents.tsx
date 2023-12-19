@@ -11,6 +11,7 @@ import {
 import { FileMessage } from './FileMessage';
 import { TextPrimary } from '@components/index';
 import { MyMessage } from './Message';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const MyAvatar = (props: AvatarProps<IAppChatMessage>) => {
     return <Avatar
@@ -93,6 +94,14 @@ export const MyCustomMessage = (props: BubbleProps<IAppChatMessage>) => {
     return null;
 };
 
+export const renderScrollToBottom = () => {
+    return <Ionicons
+        name={'chevron-down-outline'}
+        size={Dimensions.moderateScale(24)}
+        color={theme.color.textColor}
+    />;
+};
+
 const styles = {
     left: StyleSheet.create({
         avatarContainer: {
@@ -136,7 +145,7 @@ const styles = {
             color: theme.color.labelColor,
         },
         fileNameMessage: {
-            maxWidth: Dimensions.screenWidth() / 2 * 3,
+            maxWidth: Dimensions.screenWidth() / 3 * 2,
             ...theme.textVariants.body1,
             color: theme.color.textColor,
             fontWeight: '400',

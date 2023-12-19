@@ -2,7 +2,7 @@ import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
-import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes, updateConversationParticipantsActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { selectMessagesByKey } from '@redux/selectors/conversation';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
@@ -18,11 +18,15 @@ export const getMessagesEpic = (action$: any, state$: any) =>
             new Observable(obs => {
                 const usecase = new GetChatMessagesUseCase(new ChatRepository(), action.payload!);
                 usecase.execute().then(response => {
+                    const [messages, users] = response;
                     const sectionId = `${action.payload!.object_id}-${action.payload!.object_instance_id}`;
-                    obs.next(getMessagesActionTypes.successAction(response, {
+                    obs.next(getMessagesActionTypes.successAction(messages, {
                         sectionId: sectionId,
                         isAppend: (action.payload!.last_id ?? 0) > 0,
-                        canLoadMore: response.length > 0,
+                        canLoadMore: messages.length > 0,
+                    }));
+                    obs.next(updateConversationParticipantsActionTypes.startAction(users, {
+                        sectionId
                     }));
                     obs.complete();
                 }).catch(error => {
@@ -79,17 +83,6 @@ export const receiveMessageEpic = (action$: any, state$: StateObservable<any>) =
                             isPrepend: true,
                             sectionId: key
                         }));
-                    } else {
-                        // Find local message to replace
-                        const localMessage = latestMessagesToCheck
-                            .find(item => `${item._id}`.startsWith('local_message') && message.text === item.text);
-                        if (localMessage) {
-                            obs.next(updateLocalMessageIdsActionTypes.startAction({
-                                messageIdsToReplace: {[`$localMessage._id{}`]: `${message._id}`},
-                                objectId,
-                                objectInstanceId,
-                            }));
-                        }
                     }
 
                     obs.complete();

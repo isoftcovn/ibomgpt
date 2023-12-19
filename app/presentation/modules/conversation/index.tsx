@@ -11,21 +11,19 @@ import { IAppChatMessage } from 'app/presentation/models/chat';
 import { theme } from 'app/presentation/theme';
 import React, { createRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InteractionManager, Platform, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, InteractionManager, Platform, StyleSheet, TextInput, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { MyAudioMessage } from './components/AudioMessage';
 import { RenderImageMessage } from './components/ImageMessage';
 import { IMyComposerProps, MyComposer, MyInputToolbar, MySend } from './components/InputToolbar';
-import { MyAvatar, MyBubble, MyCustomMessage, RenderMessage, MySystemMessage, MyTextMessage } from './components/MessageComponents';
+import { MyAvatar, MyBubble, MyCustomMessage, MySystemMessage, MyTextMessage, RenderMessage, renderScrollToBottom } from './components/MessageComponents';
 import { MyVideoMessage } from './components/VideoMessage';
 import { ConversationContext, ConversationInputContext } from './context/ConversationContext';
 import { useOnMessageLongPress } from './hooks/CommonHooks';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
-import { Subscription } from 'rxjs';
-import { ChatManager } from 'app/presentation/managers/ChatManager';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -64,25 +62,24 @@ const ConversationContent = React.memo((props: IProps) => {
     const insets = useSafeAreaInsets();
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
-    const receiveMessageSubcription = useRef<Subscription | undefined>();
     const { textInputRef, editMessage } = useContext(ConversationContext);
     const { t } = useTranslation();
     const dispatch = useDispatch();
-    const { openPicker } = usePickMediaAssets();
-    const { openDocumentsPicker } = usePickDocuments();
-    const { sendTextMessage } = useSendTextMessage();
-    const { sendMediaMessage } = useSendMediaMessage();
-    const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri,
-        audioUri, isAudioModalVisible, setAudioModalVisible } = useOnMessagePressed(navigation);
-
     const objectId = useMemo(() => { return route.params.objectId; }, [route.params]);
     const objectInstanceId = useMemo(() => { return route.params.objectInstanceId; }, [route.params]);
+    const { openPicker } = usePickMediaAssets();
+    const { openDocumentsPicker } = usePickDocuments();
+    const { sendTextMessage } = useSendTextMessage(objectId, objectInstanceId);
+    const { sendMediaMessage } = useSendMediaMessage(objectId, objectInstanceId);
+    const { onMessagePressed, isVideoModalVisible, setVideoModalVisible, videoUri,
+        audioUri, isAudioModalVisible, setAudioModalVisible } = useOnMessagePressed(navigation);
     const key = useMemo(() => { return `${objectId}-${objectInstanceId}`; }, [objectId, objectInstanceId]);
     const user: UserModel | undefined = useSelector(selectProfile).data;
     const messages = useSelector(state => selectMessagesByKey(state, key));
     const canLoadMore = useSelector(state => selectMessagesCanLoadMoreByKey(state, key));
     const isFetching = useSelector(selectMessagesFetchingState);
     const { onMessageLongPress } = useOnMessageLongPress(objectId, objectInstanceId);
+    const isLoading = useMemo(() => messages.length === 0 && isFetching, [isFetching, messages.length]);
 
     console.log('rerender chat main');
 
@@ -116,12 +113,12 @@ const ConversationContent = React.memo((props: IProps) => {
         try {
             const assets = await openPicker();
             if (assets.length === 0) { return; }
-            await sendMediaMessage(assets, objectInstanceId, objectId);
+            await sendMediaMessage(assets);
             console.info('Media Messages sent.');
         } catch (error) {
             console.error('onSelectMediaPressed error: ', error);
         }
-    }, [openPicker, sendMediaMessage, objectInstanceId, objectId]);
+    }, [openPicker, sendMediaMessage]);
 
     const onSelectFilePressed = useCallback(async () => {
         try {
@@ -133,12 +130,12 @@ const ConversationContent = React.memo((props: IProps) => {
                 mime: item.type ?? '',
                 path: item.uri,
             }));
-            await sendMediaMessage(convertedAssets, objectInstanceId, objectId);
+            await sendMediaMessage(convertedAssets);
             console.info('File Messages sent.');
         } catch (error) {
             console.error('onSelectFilePressed error: ', error);
         }
-    }, [openDocumentsPicker, sendMediaMessage, objectInstanceId, objectId]);
+    }, [openDocumentsPicker, sendMediaMessage]);
 
     const loadEalierMessages = useCallback(() => {
         if (isFetching || !canLoadMore) {
@@ -166,12 +163,12 @@ const ConversationContent = React.memo((props: IProps) => {
     }, [onSelectMediaPressed, onSelectFilePressed]);
 
     const onSend = useCallback((sentMessages: IMessage[] = []) => {
-        sendTextMessage(sentMessages, objectInstanceId, objectId).then(() => {
+        sendTextMessage(sentMessages).then(() => {
             console.info('Text Messages sent.');
         }).catch(error => {
             console.error('Sent text message error: ', error);
         });
-    }, [sendTextMessage, objectId, objectInstanceId]);
+    }, [sendTextMessage]);
 
     return <View style={[styles.container]}>
         <GiftedChat
@@ -218,6 +215,7 @@ const ConversationContent = React.memo((props: IProps) => {
             renderMessageImage={RenderImageMessage}
             renderSystemMessage={MySystemMessage}
             renderCustomView={MyCustomMessage}
+            scrollToBottomComponent={renderScrollToBottom}
         />
         <View
             style={{
@@ -225,6 +223,9 @@ const ConversationContent = React.memo((props: IProps) => {
                 paddingBottom: insets.bottom,
             }}
         />
+        {isLoading ? <View style={styles.viewLoading}>
+            <ActivityIndicator animating size={'large'} />
+        </View> : null}
         <VideoPlayerModal
             videoUri={videoUri ?? ''}
             visible={isVideoModalVisible}
@@ -241,5 +242,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#e1e8f0'
-    }
+    },
+    viewLoading: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });

@@ -101,7 +101,7 @@ export const FileMessage = React.memo((props: BubbleProps<IAppChatMessage>) => {
 const styles = {
     left: StyleSheet.create({
         fileNameMessage: {
-            maxWidth: Dimensions.screenWidth() / 2 * 3,
+            maxWidth: Dimensions.screenWidth() / 3 * 2,
             ...theme.textVariants.body1,
             color: theme.color.textColor,
             fontWeight: '400',

@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
     textInput: {
         ...theme.textVariants.body1,
         marginLeft: theme.spacing.medium,
+        color: theme.color.textColor,
     },
     composerContainer: {
         flex: 1,

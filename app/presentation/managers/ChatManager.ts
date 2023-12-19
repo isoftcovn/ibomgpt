@@ -1,4 +1,5 @@
 import * as signalR from '@microsoft/signalr';
+import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IChatMessage } from 'react-native-gifted-chat';
 import { Subject } from 'rxjs';
@@ -14,17 +15,26 @@ export class ChatManager {
         this.receiveMessageEvent = new Subject<IChatMessage[]>();
     }
 
-    _onReceivedMessage = (data: any) => {
-        console.log('receive raw message: ', data);
+    _isValidMessage = (data: any) => {
+        const message = data as ChatMessageResponse | undefined;
+
+        return message && message.id && message.objectId && message.objectInstanceId;
+    };
+
+    _onReceivedMessage = (user: string, dataString: string) => {
+        console.log('receive raw data: ', user, dataString);
         // TODO: Convert to app message
-        const messages = MessageHelper.shared.convertMessageResponseToChatMessage(data);
-        console.log('receive converted messages: ', messages);
-        this.receiveMessageEvent.next(messages);
+        const data = JSON.parse(dataString);
+        if (this._isValidMessage(data)) {
+            const messages = MessageHelper.shared.convertMessageResponseToChatMessage(data);
+            console.log('receive converted messages: ', messages);
+            this.receiveMessageEvent.next(messages);
+        }
     };
 
     sendMessageToUsers = (userIds: string[], payload: any) => {
         this.connection?.invoke('SendMessageToUsers', userIds, JSON.stringify(payload)).then(() => {
-            console.log('Invoke send messages done');
+            console.log('Invoke send messages done: ', userIds);
         }).catch(error => {
             console.error('Invoke send messages error: ', error);
         });

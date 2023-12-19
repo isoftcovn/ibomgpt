@@ -6,21 +6,24 @@ import { selectProfile } from '@redux/selectors/user';
 import { FileHelper } from '@shared/helper/FileHelper';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IPickerAsset } from './MediaHooks';
 import { ConversationContext } from '../context/ConversationContext';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { ChatManager } from 'app/presentation/managers/ChatManager';
+import { selectParticipantsByKey } from '@redux/selectors/conversation';
 
 const sendMessagesToHub = (userIds: string[], message: ChatMessageResponse) => {
     ChatManager.shared.sendMessageToUsers(userIds, message);
 };
 
-export const useSendTextMessage = () => {
+export const useSendTextMessage = (objectId: number, objectInstanceId: number) => {
     const dispatch = useDispatch();
     const { editMessage } = useContext(ConversationContext);
-    const sendTextMessage = useCallback(async (messages: IAppChatMessage[], objectInstanceId: number, objectId: number) => {
+    const key = useMemo(() => `${objectId}-${objectInstanceId}`, [objectId, objectInstanceId]);
+    const participants = useSelector(state => selectParticipantsByKey(state, key));
+    const sendTextMessage = useCallback(async (messages: IAppChatMessage[]) => {
         const chatRepo = new ChatRepository();
         const requestModels: SubmitMessageRequestModel[] = [];
         const isEdit = !!editMessage;
@@ -55,12 +58,11 @@ export const useSendTextMessage = () => {
         for (const request of requestModels) {
             chatRepo.submitChatMessages(request).then(response => {
                 const messageId = response?.commentId;
-                console.log('send message response: ', response);
                 if (!isEdit && messageId) {
                     // @ts-ignore
                     localMessageIdAndRealIdMap[`${request._localMessageId ?? ''}`] = `${messageId}`;
 
-                    const userIds = response?.participants?.map(item => `${item.id}`) ?? [];
+                    const userIds = participants.map(item => `${item.id}`);
                     const messageResponse = response?.commentInfo;
                     if (messageResponse) {
                         sendMessagesToHub(userIds, messageResponse);
@@ -83,17 +85,19 @@ export const useSendTextMessage = () => {
         // if (!isEdit) {
 
         // }
-    }, [dispatch, editMessage]);
+    }, [dispatch, editMessage, objectId, objectInstanceId, participants]);
 
     return {
         sendTextMessage
     };
 };
 
-export const useSendMediaMessage = () => {
+export const useSendMediaMessage = (objectId: number, objectInstanceId: number) => {
     const dispatch = useDispatch();
     const user: UserModel | undefined = useSelector(selectProfile).data;
-    const sendMediaMessage = useCallback(async (assets: IPickerAsset[], objectInstanceId: number, objectId: number) => {
+    const key = useMemo(() => `${objectId}-${objectInstanceId}`, [objectId, objectInstanceId]);
+    const participants = useSelector(state => selectParticipantsByKey(state, key));
+    const sendMediaMessage = useCallback(async (assets: IPickerAsset[]) => {
         if (!user) { return; }
         const chatRepo = new ChatRepository();
         // const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'submit', '');
@@ -154,7 +158,7 @@ export const useSendMediaMessage = () => {
                     localMessageIdAndRealIdMap[`${localMessageId}`] = `${messageId}`;
                 }
 
-                const userIds = response?.participants?.map(item => `${item.id}`) ?? [];
+                const userIds = participants.map(item => `${item.id}`);
                 const messageResponse = response?.commentInfo;
                 if (messageResponse) {
                     sendMessagesToHub(userIds, messageResponse);
@@ -182,7 +186,7 @@ export const useSendMediaMessage = () => {
         //     });
         // }
         // await chatRepo.submitChatMessages(request);
-    }, [dispatch, user]);
+    }, [dispatch, user, objectId, objectInstanceId, participants]);
 
     return {
         sendMediaMessage

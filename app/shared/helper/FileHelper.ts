@@ -1,4 +1,5 @@
 import mime from 'mime-types';
+import { Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 
 const dirs = ReactNativeBlobUtil.fs.dirs;
@@ -37,7 +38,7 @@ export class FileHelper {
     };
 
     getAppFolderPath = (): string => {
-        return `${dirs.DocumentDir}/Downloads`;
+        return Platform.OS === 'ios' ? `${dirs.DocumentDir}/Downloads` : dirs.DownloadDir;
     };
 
     getFilePath = (fileName: string): string => {
@@ -47,8 +48,10 @@ export class FileHelper {
     createAppFolderIfNeeded = async (): Promise<string> => {
         const appFolderPath = this.getAppFolderPath();
         const folderExisted = await ReactNativeBlobUtil.fs.exists(appFolderPath);
+        console.info('App Folder path: ', appFolderPath);
         if (!folderExisted) {
             await ReactNativeBlobUtil.fs.mkdir(appFolderPath);
+            console.info('App Folder created');
         }
 
         return appFolderPath;

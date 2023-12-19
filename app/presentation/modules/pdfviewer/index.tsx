@@ -20,7 +20,7 @@ export const PdfViewer = (props: IProps) => {
             uri: url,
             cache: true,
         }}
-        trustAllCerts
+        trustAllCerts={false}
         onPressLink={pressLink => LinkingHelper.openUrl(pressLink)}
         onLoadComplete={(numberOfPages) => {
             console.info('pdf loaded', numberOfPages);

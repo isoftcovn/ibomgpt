@@ -5,9 +5,12 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
 
 project.ext.envConfigFiles = [
-    dev: ".env.development",
-    staging: ".env.uat",
-    production: ".env.production",
+    devdebug: ".env.development",
+    devrelease: ".env.development",
+    stagingdebug: ".env.uat",
+    stagingrelease: ".env.uat",
+    productiondebug: ".env.production",
+    productionrelease: ".env.production",
 ]
 
 // 2nd line, add a new apply:
@@ -102,7 +105,7 @@ android {
         multiDexEnabled true
         resConfigs "en"
         resValue "string", "build_config_package", "com.runner"
-        resValue "string", "app_name", project.env.get("APP_NAME", "")
+        resValue "string", "app_name", "IBOMGPT"
     }
 
     configurations.all {
@@ -113,11 +116,13 @@ android {
         dev {
             dimension "app"
             applicationIdSuffix ".dev"
+            resValue "string", "app_name", "DEV-IBOMGPT"
         }
 
         staging {
             dimension "app"
             applicationIdSuffix ".staging"
+            resValue "string", "app_name", "UAT-IBOMGPT"
         }
 
         production {

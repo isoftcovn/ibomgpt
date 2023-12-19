@@ -8,6 +8,7 @@ import { DocumentPickerResponse, pick } from 'react-native-document-picker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { DownloadManager } from '@shared/managers/DownloadManager';
+import DropDownHolder from '@shared/helper/DropdownHolder';
 
 export interface IPickerAsset {
     uri: string;
@@ -114,6 +115,7 @@ export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackPara
                     status: 'done',
                     url: fileUrl,
                 });
+                DropDownHolder.showInfoAlert('Saved to path: ' + filePath);
             }
         } catch (error) {
             console.warn('download file error: ', error);

@@ -106,17 +106,16 @@ export const useSendMediaMessage = (objectId: number, objectInstanceId: number) 
         //     type: item.mime ?? '',
         //     uri: item.uri,
         // }));
-        const requests: SubmitMessageRequestModel[] = assets.map(item => ({
-            object_id: objectId,
-            object_instance_id: objectInstanceId,
-            mode: 'submit',
-            comment_content: '',
-            FileUpload: [{
+        const requests: SubmitMessageRequestModel[] = assets.map(item => {
+            const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'submit', '');
+            request.FileUpload = [{
                 name: item.name,
                 type: item.mime ?? '',
                 uri: item.uri,
-            }]
-        }));
+            }];
+
+            return request;
+        });
         const messages: IAppChatMessage[] = assets.map(item => {
             const message: IAppChatMessage = {
                 _id: `media-${MessageHelper.shared.generateMessageLocalId()}-${item.name}`,
@@ -152,10 +151,12 @@ export const useSendMediaMessage = (objectId: number, objectInstanceId: number) 
         requests.forEach((request, index) => {
             chatRepo.submitChatMessages(request).then(response => {
                 const messageId = response?.commentId;
+                const commentInfo = response?.commentInfo;
+                const fileId = commentInfo?.fileList?.[0]?.id;
                 console.info('Sent media message done: ', messageId, request.FileUpload?.[0]?.name);
                 const localMessageId = messages[index]?._id;
-                if (localMessageId && messageId) {
-                    localMessageIdAndRealIdMap[`${localMessageId}`] = `${messageId}`;
+                if (localMessageId && messageId && fileId) {
+                    localMessageIdAndRealIdMap[`${localMessageId}`] = `media-${messageId}-${fileId}`;
                 }
 
                 const userIds = participants.map(item => `${item.id}`);

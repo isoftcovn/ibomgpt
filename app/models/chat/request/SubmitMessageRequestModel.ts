@@ -9,11 +9,13 @@ export class SubmitMessageRequestModel {
     comment_content: string;
     comment_id?: number;
     FileUpload?: UploadFileRequestModel[];
+    app_type: number;
 
     constructor(object_id: number, object_instance_id: number, mode: SubmitMode, comment_content: string) {
         this.object_id = object_id;
         this.object_instance_id = object_instance_id;
         this.mode = mode;
         this.comment_content = comment_content;
+        this.app_type = 1; // Only for BE knows which app is
     }
 }

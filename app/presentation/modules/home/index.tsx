@@ -1,44 +1,56 @@
-import { MyFlatList } from '@components/index';
 import { ChatRepository } from '@data/repository/chat';
 import { GetChatListUseCase } from '@domain/chat/GetChatListUseCase';
 import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
 import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
+import UserModel from '@models/user/response/UserModel';
+import { useRealtimeMessage } from '@modules/conversation/hooks/CommonHooks';
+import { AppStackParamList } from '@navigation/RouteParams';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { getProfileActionTypes } from '@redux/actions/user';
+import { selectProfile } from '@redux/selectors/user';
 import ListingHelper from '@shared/helper/ListingHelper';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { ListState } from 'app/presentation/models/general';
 import { theme } from 'app/presentation/theme';
+import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { InteractionManager, ListRenderItemInfo, StyleSheet, View } from 'react-native';
+import { InteractionManager, ListRenderItemInfo, StyleSheet, View, ActivityIndicator } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
+import { useDispatch, useSelector } from 'react-redux';
 import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
 import { HomeHeader } from './components/HomeHeader';
-import { AppStackParamList } from '@navigation/RouteParams';
-import UserModel from '@models/user/response/UserModel';
-import { selectProfile } from '@redux/selectors/user';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProfileActionTypes } from '@redux/actions/user';
-import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
-import { ChatManager } from 'app/presentation/managers/ChatManager';
-import { useRealtimeMessage } from '@modules/conversation/hooks/CommonHooks';
+import { TextPrimary } from '@components/index';
+import { useTranslation } from 'react-i18next';
+import { useConversations } from './hooks';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
     route: RouteProp<AppStackParamList, 'HomeTab'>;
 }
 
+const ListSeparator = React.memo(() => {
+    return <View style={styles.lineSeparator} />;
+});
+
 const HomeScreen = (props: IProps) => {
     const { navigation } = props;
     const dispatch = useDispatch();
+    const { t } = useTranslation();
     const searchTermRef = useRef<BehaviorSubject<string>>(new BehaviorSubject(''));
     const didMountRef = useRef(false);
     const receiveMessageSubcription = useRef<Subscription | undefined>();
     const [listState, setListState] = useState<ListState>(ListState.initial);
     const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
+    const sortedConversations = useConversations(conversations);
     const user: UserModel | undefined = useSelector(selectProfile).data;
     const userId = useMemo(() => user?.id, [user]);
     const chatListRequest = useRef<ChatListRequestModel>(new ChatListRequestModel());
     const canLoadMore = useRef<boolean>(false);
+    const isLoading = useMemo(() => listState === ListState.loading, [listState]);
+    const isLoadMore = useMemo(() => listState === ListState.loadingMore, [listState]);
+    const refreshing = useMemo(() => listState === ListState.refreshing, [listState]);
     useRealtimeMessage();
 
     useEffect(() => {
@@ -65,9 +77,9 @@ const HomeScreen = (props: IProps) => {
         searchTermRef.current.next(text);
     }, []);
 
-    const loadData = useCallback(async (refreshing: boolean = false, searchTerm: string = '') => {
+    const loadData = useCallback(async (isRefreshing: boolean = false, searchTerm: string = '') => {
         try {
-            setListState(refreshing ? ListState.refreshing : ListState.loading);
+            setListState(isRefreshing ? ListState.refreshing : ListState.loading);
             chatListRequest.current = new ChatListRequestModel();
             if (searchTerm && searchTerm.length > 0) {
                 chatListRequest.current.keysearch = searchTerm;
@@ -154,24 +166,48 @@ const HomeScreen = (props: IProps) => {
         };
     }, [loadData]);
 
+    const renderEmpty = useCallback(() => {
+        return (
+            <View style={styles.emptyContainer}>
+                <TextPrimary style={styles.label}>{t('listEmpty')}</TextPrimary>
+            </View>
+        );
+    }, [t]);
+
+    const renderLoadMore = useCallback(() => {
+        if (isLoadMore) {
+            return (
+                <View style={styles.viewCenter}>
+                    <ActivityIndicator animating size={'large'} />
+                </View>
+            );
+        }
+
+        return null;
+    }, [isLoadMore]);
+
     return <View style={styles.container}
     >
         <HomeHeader
             onChangeText={onChangeText}
         />
-        <MyFlatList
+        {!isLoading ? <Animated.FlatList
             style={styles.list}
-            data={conversations}
-            isLoading={listState === ListState.loading}
-            refreshing={listState === ListState.refreshing}
-            isLoadMore={listState === ListState.loadingMore}
-            separatorType={'line'}
+            contentContainerStyle={styles.contentContainer}
+            data={sortedConversations}
+            refreshing={refreshing}
+            ItemSeparatorComponent={ListSeparator}
+            ListEmptyComponent={renderEmpty}
+            ListFooterComponent={renderLoadMore}
             renderItem={renderItem}
             keyExtractor={(item: ChatItemResponse) => `${item.objectId}-${item.objectInstanceId}`}
             onRefresh={() => loadData(true)}
             onEndReached={loadMoreData}
             onEndReachedThreshold={0.7}
-        />
+            itemLayoutAnimation={LinearTransition.springify()}
+        /> : <View style={styles.viewCenter}>
+            <ActivityIndicator animating size={'large'} />
+        </View>}
     </View>;
 };
 
@@ -182,6 +218,31 @@ const styles = StyleSheet.create({
     },
     list: {
         flex: 1
+    },
+    contentContainer: {
+        paddingHorizontal: theme.spacing.large,
+        paddingVertical: theme.spacing.small,
+        backgroundColor: theme.color.backgroundColorPrimary,
+    },
+    lineSeparator: {
+        height: 1,
+        backgroundColor: theme.color.colorSeparator,
+    },
+    emptyContainer: {
+        paddingVertical: theme.spacing.medium,
+        paddingHorizontal: theme.spacing.large,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    label: {
+        color: theme.color.labelColor,
+    },
+    viewCenter: {
+        width: '100%',
+        paddingHorizontal: theme.spacing.medium,
+        paddingVertical: theme.spacing.medium,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

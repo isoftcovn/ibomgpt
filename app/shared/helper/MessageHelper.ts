@@ -35,7 +35,7 @@ export class MessageHelper {
                 const fileType = FileHelper.shared.getFileTypeFromExtensions(fileItem.extension ?? 'others');
                 const fileUrl = fileItem.fileUrl;
                 const chatMessage: IAppChatMessage = {
-                    _id: `media-${data.id}-${fileItem.id}`,
+                    _id: this.getMediaMessageId(`${data.id}`, `${fileItem.id}`),
                     parentMessageId: data.id,
                     text: '',
                     createdAt: createdDate.toDate(),
@@ -97,7 +97,7 @@ export class MessageHelper {
                     const fileType = FileHelper.shared.getFileTypeFromExtensions(extension);
                     const fileUrl = fileItem.uri;
                     const chatMessage: IAppChatMessage = {
-                        _id: `media-${parentMessage._id}-${fileItem.name}`,
+                        _id: this.getMediaMessageId(`${parentMessage._id}`, fileItem.name),
                         parentMessageId: parentMessage._id,
                         text: '',
                         createdAt: new Date(),
@@ -141,5 +141,9 @@ export class MessageHelper {
         }
 
         return requestMessageId;
-    }
+    };
+
+    getMediaMessageId = (messageId: string, fileId: string): string => {
+        return `media-${messageId}-${fileId}`;
+    };
 }

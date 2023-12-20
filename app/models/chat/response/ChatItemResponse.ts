@@ -1,9 +1,13 @@
+import dayjs, { Dayjs } from 'dayjs';
+
 export class ChatItemResponse {
     lastCommentId?: number;
     lastCommentContent?: string;
     name: string;
     lastCommentCreatedDateDisplay?: string;
     lastCommentUpdatedDateDisplay?: string;
+    lastCommentCreatedDate?: Dayjs;
+    lastCommentUpdatedDate?: Dayjs;
     lastSenderName?: string;
     avatar?: string;
     objectId: number;
@@ -19,6 +23,7 @@ export class ChatItemResponse {
     static parseFromJson = (data: any): ChatItemResponse => {
         const { comment_content, OBJECT_INSTANCE_NAME, comment_id, updated_date_view, object_id,
             avatar, created_date_view, company_id, object_instance_id, user_created_name } = data;
+        const dateFormat = 'DD/MM/YYYY h:mmA';
         const obj = new ChatItemResponse();
         obj.objectId = object_id ?? 0;
         obj.objectInstanceId = object_instance_id ?? 0;
@@ -27,6 +32,16 @@ export class ChatItemResponse {
         obj.lastCommentId = comment_id;
         obj.lastCommentCreatedDateDisplay = created_date_view;
         obj.lastCommentUpdatedDateDisplay = updated_date_view;
+        if (created_date_view) {
+            const createdDateDisplay = created_date_view.trim().split(' ').filter((item: string) => item.trim().length > 0).join(' ').toUpperCase();
+            const createdDate = dayjs(createdDateDisplay, dateFormat);
+            obj.lastCommentCreatedDate = createdDate;
+        }
+        if (updated_date_view) {
+            const updatedDateDisplay = updated_date_view.trim().split(' ').filter((item: string) => item.trim().length > 0).join(' ').toUpperCase();
+            const date = dayjs(updatedDateDisplay, dateFormat);
+            obj.lastCommentUpdatedDate = date;
+        }
         obj.avatar = avatar;
         obj.companyId = company_id;
         obj.lastSenderName = user_created_name;

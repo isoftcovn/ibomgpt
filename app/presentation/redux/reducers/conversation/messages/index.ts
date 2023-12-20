@@ -64,13 +64,12 @@ export default function (state = initialState, action: IAction<any>) {
         const isAppend = action.params?.isAppend ?? false;
         const isPrepend = action.params?.isPrepend ?? false;
         const sectionId = action.params?.sectionId ?? 'default';
+        const currentData: IAppChatMessage[] = state.data?.[sectionId] ?? [];
         return produce(state, draft => {
             draft.isFetching = false;
             draft.errorMessage = undefined;
             draft.success = true;
             draft.actionType = action.type;
-
-            let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
             let returnData: IAppChatMessage[] = [];
             if (data.length > 0) {
                 if (isAppend) {

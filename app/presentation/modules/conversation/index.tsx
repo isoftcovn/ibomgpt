@@ -24,6 +24,7 @@ import { ConversationContext, ConversationInputContext } from './context/Convers
 import { useOnMessageLongPress } from './hooks/CommonHooks';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
+import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -93,11 +94,8 @@ const ConversationContent = React.memo((props: IProps) => {
     useEffect(() => {
         if (!didmountRef.current) {
             InteractionManager.runAfterInteractions(() => {
-                dispatch(getMessagesActionTypes.startAction({
-                    object_id: objectId,
-                    object_instance_id: objectInstanceId,
-                    is_older: 0,
-                }));
+                const request = new ChatMessagesRequestModel(objectId, objectInstanceId, 0);
+                dispatch(getMessagesActionTypes.startAction(request));
             });
             didmountRef.current = true;
         }
@@ -143,12 +141,9 @@ const ConversationContent = React.memo((props: IProps) => {
         }
         const lastMessage = messages[messages.length - 1];
         if (lastMessage) {
-            dispatch(getMessagesActionTypes.startAction({
-                object_id: objectId,
-                object_instance_id: objectInstanceId,
-                is_older: 1,
-                last_id: Number(lastMessage._id),
-            }));
+            const request = new ChatMessagesRequestModel(objectId, objectInstanceId, 1);
+            request.last_id = Number(lastMessage._id);
+            dispatch(getMessagesActionTypes.startAction(request));
         }
     }, [canLoadMore, isFetching, dispatch, messages, objectId, objectInstanceId]);
 

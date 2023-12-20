@@ -2,22 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>734056128553-u6jqgon3l9upde38vare1mlkd77ek0j3.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.734056128553-u6jqgon3l9upde38vare1mlkd77ek0j3</string>
 	<key>API_KEY</key>
-	<string>AIzaSyC61WMSDA8C6T-tP3dALkusVy5iTPGmNp4</string>
+	<string>AIzaSyC0oK587St2u8hNeH8Fl5dAjwb9_uP66Gk</string>
 	<key>GCM_SENDER_ID</key>
-	<string>734056128553</string>
+	<string>491911612374</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.hoangtran.rntemplate.dev</string>
+	<string>com.isoftco.ibomgpt.dev</string>
 	<key>PROJECT_ID</key>
-	<string>rntemplate-a2810</string>
+	<string>ibomgpt</string>
 	<key>STORAGE_BUCKET</key>
-	<string>rntemplate-a2810.appspot.com</string>
+	<string>ibomgpt.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:734056128553:ios:e8559cd9b7023df707fc38</string>
-	<key>DATABASE_URL</key>
-	<string>https://rntemplate-a2810.firebaseio.com</string>
+	<string>1:491911612374:ios:12153268c360c46a034677</string>
 </dict>
 </plist>

@@ -97,7 +97,7 @@ android {
     flavorDimensions "app"
 
     defaultConfig {
-        applicationId "com.hoangtran.rntemplate"
+        applicationId "com.isoftco.ibomgpt"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode code

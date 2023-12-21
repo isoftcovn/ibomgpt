@@ -3,22 +3,29 @@ import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IChatMessage } from 'react-native-gifted-chat';
 import { Subject } from 'rxjs';
+import DeviceInfo from 'react-native-device-info';
 
 export class ChatManager {
     static shared = new ChatManager();
 
     _chathubURI?: string;
+    _deviceUID?: string;
 
     connection?: signalR.HubConnection;
     receiveMessageEvent: Subject<IChatMessage[]>;
     private constructor() {
         this.receiveMessageEvent = new Subject<IChatMessage[]>();
+
+        DeviceInfo.getUniqueId().then(id => {
+            this._deviceUID = id;
+        });
     }
 
     _isValidMessage = (data: any) => {
         const message = data as ChatMessageResponse | undefined;
-
-        return message && message.id && message.objectId && message.objectInstanceId;
+        const isValidMessagePayload = message && message.id && message.objectId && message.objectInstanceId;
+        const isSentByThisDevice = message?.deviceUID === this._deviceUID;
+        return isValidMessagePayload && !isSentByThisDevice;
     };
 
     _onReceivedMessage = (user: string, dataString: string) => {

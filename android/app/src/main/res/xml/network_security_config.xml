@@ -14,5 +14,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">api.ibom.com.vn</domain>
+        <domain includeSubdomains="true">qa.ibom.com.vn</domain>
+        <domain includeSubdomains="true">commondatastorage.googleapis.com</domain>
     </domain-config>
 </network-security-config>

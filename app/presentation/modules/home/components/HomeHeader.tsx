@@ -73,5 +73,6 @@ const styles = StyleSheet.create({
         padding: 0,
         flex: 1,
         ...theme.textVariants.body2,
+        color: theme.color.textColor,
     }
 });

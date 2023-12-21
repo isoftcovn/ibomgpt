@@ -31,6 +31,9 @@ export class ChatMessageResponse {
     content?: string;
     fileList: ChatMessageFileResponse[];
 
+    // Use for realtime message. The device which sends messages should not process realtime message
+    deviceUID?: string;
+
     constructor() {
         this.id = 0;
         this.senderId = 0;

@@ -1,5 +1,5 @@
 import ImageResizer from '@bam.tech/react-native-image-resizer';
-import { openPicker as openLibPicker } from '@baronha/react-native-multiple-image-picker';
+import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
 import { AppStackParamList } from '@navigation/RouteParams';
 import { FileHelper, FileType } from '@shared/helper/FileHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
@@ -9,6 +9,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { DownloadManager } from '@shared/managers/DownloadManager';
 import DropDownHolder from '@shared/helper/DropdownHolder';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useTranslation } from 'react-i18next';
+import { theme } from '@theme/index';
 
 export interface IPickerAsset {
     uri: string;
@@ -27,48 +30,107 @@ interface IPickDocumentsResult {
 }
 
 export const usePickMediaAssets = (): IPickMediaResult => {
-    const openPicker = useCallback(async () => {
-        try {
-            const responses = await openLibPicker({
-                selectedAssets: [],
-                singleSelectedMode: false,
-                isExportThumbnail: false,
-                maxSelectedAssets: 10,
-                usedCameraButton: true,
-            });
-            const images = responses.filter(item => item.type === 'image');
-            const videos: IPickerAsset[] = responses.filter(item => item.type === 'video').map(item => ({
-                name: item.fileName,
-                uri: item.path,
-                path: item.path,
-                size: item.size,
-                mime: item.mime,
-            }));
-            const resizePromises = images.map(item => {
-                return ImageResizer.createResizedImage(
-                    item.path,
-                    1024,
-                    1024,
-                    'JPEG',
-                    80,
-                );
-            });
-            const resizedImages = await Promise.all(resizePromises);
-            const results: IPickerAsset[] = resizedImages.map((item, index) => ({
-                name: item.name,
-                uri: item.uri,
-                path: item.path,
-                size: item.size,
-                mime: images[index]?.mime,
-            }));
+    const { showActionSheetWithOptions } = useActionSheet();
+    const { t } = useTranslation();
 
-            return results.concat(videos);
+    const processMedia = useCallback(async (responses: ImageOrVideo[]) => {
+        const images = responses.filter(item => item.mime.startsWith('image'));
+        const videos: IPickerAsset[] = responses.filter(item => item.mime.startsWith('video')).map(item => ({
+            name: item.filename ?? 'video',
+            uri: item.path,
+            path: item.path,
+            size: item.size,
+            mime: item.mime,
+        }));
+        const resizePromises = images.map(item => {
+            return ImageResizer.createResizedImage(
+                item.path,
+                1024,
+                1024,
+                'JPEG',
+                80,
+            );
+        });
+        const resizedImages = await Promise.all(resizePromises);
+        const results: IPickerAsset[] = resizedImages.map((item, index) => ({
+            name: item.name,
+            uri: item.uri,
+            path: item.path,
+            size: item.size,
+            mime: images[index]?.mime,
+        }));
+
+        return results.concat(videos);
+    }, []);
+
+    const openLibrary = useCallback(async () => {
+        try {
+            const responses = await ImagePicker.openPicker({
+                multiple: true,
+                mediaType: 'any',
+                compressVideoPreset: '1280x720',
+                compressImageQuality: 0.8,
+                compressImageMaxWidth: 1024,
+            });
+
+            return processMedia(responses);
         } catch (error) {
             console.warn('Picker assets error: ', error);
         }
 
         return [];
-    }, []);
+    }, [processMedia]);
+
+    const openCamera = useCallback(async () => {
+        try {
+            const responses = await ImagePicker.openCamera({
+                mediaType: 'any',
+                compressVideoPreset: '1280x720',
+                compressImageQuality: 0.8,
+                compressImageMaxWidth: 1024,
+            });
+
+            return processMedia([responses]);
+        } catch (error) {
+            console.warn('Picker assets error: ', error);
+        }
+
+        return [];
+    }, [processMedia]);
+
+    const openPicker = useCallback(() => {
+        return new Promise<IPickerAsset[]>(async (resolve, reject) => {
+            try {
+                const options = [
+                    t('useCamera'),
+                    t('getFromlibrary'),
+                    t('close')
+                ];
+                const cancelButtonIndex = options.length - 1;
+
+                showActionSheetWithOptions({
+                    options,
+                    cancelButtonIndex,
+                    cancelButtonTintColor: theme.color.colorAccent,
+                }, async (selectedIndex) => {
+                    switch (selectedIndex) {
+                        case 0:
+                            // Open camera
+                            resolve(await openCamera());
+                            break;
+                        case 1:
+                            // Open library
+                            resolve(await openLibrary());
+                            break;
+                        default: break;
+                    }
+                });
+
+            } catch (error) {
+                console.warn('Picker assets error: ', error);
+            }
+        });
+    }, [showActionSheetWithOptions, t, openLibrary, openCamera]);
 
     return {
         openPicker

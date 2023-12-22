@@ -1158,11 +1158,6 @@
   resolved "https://registry.yarnpkg.com/@bam.tech/react-native-image-resizer/-/react-native-image-resizer-3.0.7.tgz#4e762399af7ba4eea4136d85b51b4eb49b699564"
   integrity sha512-TRYfjuaEOQjrGkj9736kW5A3xgyuVD5B2HlhPHvgVn0nM4zjPDLbjTqjId15hQCBNK6Udapcgvfb8lWlwcr7Gw==
 
-"@baronha/react-native-multiple-image-picker@^1.1.6":
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/@baronha/react-native-multiple-image-picker/-/react-native-multiple-image-picker-1.1.6.tgz#1b0ba94b4ae974661646b0fa6ee72e1947b7b907"
-  integrity sha512-7AQYgJAHJ5T9dKJJFJ6gBjcaqyYLM7NhILckjgbrdt+vVHgsG9yYPvxIY608TeYrNYEFomQjutJRYoeS70elnQ==
-
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
@@ -6929,6 +6924,11 @@ react-native-gifted-chat@^2.4.0:
     react-native-typing-animation "0.1.7"
     use-memo-one "1.1.3"
     uuid "3.4.0"
+
+react-native-image-crop-picker@^0.40.2:
+  version "0.40.2"
+  resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.40.2.tgz#be9098435504b8a2083f7cad553dfeedc442a804"
+  integrity sha512-u9iceozX8985vtZV5ozLMfNuCDjtm00GivExSxKwZmwv2wZYyv30VJkKhVJffVYsujvIzMfSCaWJPBsb5nSfZg==
 
 react-native-image-viewing@^0.2.2:
   version "0.2.2"

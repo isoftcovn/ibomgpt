@@ -24,7 +24,7 @@ const sendMessagesToHub = async (userIds: string[], message: ChatMessageResponse
 
 export const useSendTextMessage = (objectId: number, objectInstanceId: number) => {
     const dispatch = useDispatch();
-    const { editMessage } = useContext(ConversationContext);
+    const { editMessage, setEditMessage } = useContext(ConversationContext);
     const key = useMemo(() => `${objectId}-${objectInstanceId}`, [objectId, objectInstanceId]);
     const participants = useSelector(state => selectParticipantsByKey(state, key));
     const sendTextMessage = useCallback(async (messages: IAppChatMessage[]) => {
@@ -46,6 +46,7 @@ export const useSendTextMessage = (objectId: number, objectInstanceId: number) =
             }
         }
         if (isEdit) {
+            setEditMessage(undefined);
             dispatch(editMessagesActionTypes.startAction({
                 objectId,
                 objectInstanceId,
@@ -89,7 +90,7 @@ export const useSendTextMessage = (objectId: number, objectInstanceId: number) =
         // if (!isEdit) {
 
         // }
-    }, [dispatch, editMessage, objectId, objectInstanceId, participants]);
+    }, [dispatch, editMessage, objectId, objectInstanceId, participants, setEditMessage]);
 
     return {
         sendTextMessage

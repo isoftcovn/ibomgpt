@@ -2,13 +2,13 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { deleteMessageActionTypes, receiveNewMessagesActionTypes } from '@redux/actions/conversation';
 import { selectUserId } from '@redux/selectors/user';
 import { theme } from '@theme/index';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { ConversationContext, ConversationInputContext } from '../context/ConversationContext';
-import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { Subscription } from 'rxjs';
+import { ConversationContext, ConversationInputContext } from '../context/ConversationContext';
 
 export const useOnMessageLongPress = (objectId: number, objectInstanceId: number) => {
     const userId = useSelector(selectUserId);
@@ -30,7 +30,7 @@ export const useOnMessageLongPress = (objectId: number, objectInstanceId: number
             options.push(t('delete'));
         }
         if (options.length === 0) { return; }
-        options.push(t('cancel'));
+        options.push(t('close'));
         const cancelButtonIndex = options.length - 1;
         const destructiveButtonIndex = options.indexOf(t('delete'));
         context.actionSheet().showActionSheetWithOptions(

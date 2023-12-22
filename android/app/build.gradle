@@ -103,6 +103,7 @@ android {
         versionCode code
         versionName "1.0.0"
         multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
         resConfigs "en"
         resValue "string", "build_config_package", "com.runner"
         resValue "string", "app_name", "IBOMGPT"

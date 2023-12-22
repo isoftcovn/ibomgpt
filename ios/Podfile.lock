@@ -1,7 +1,6 @@
 PODS:
   - boost (1.76.0)
   - CocoaAsyncSocket (7.6.5)
-  - CropViewController (2.6.1)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.72.6)
   - FBReactNativeSpec (0.72.6):
@@ -592,15 +591,6 @@ PODS:
     - React-Core
   - react-native-image-resizer (3.0.7):
     - React-Core
-  - react-native-multiple-image-picker (1.1.6):
-    - CropViewController (= 2.6.1)
-    - React-Core
-    - react-native-multiple-image-picker/Viewer (= 1.1.6)
-    - TLPhotoPicker (= 2.1.9)
-  - react-native-multiple-image-picker/Viewer (1.1.6):
-    - CropViewController (= 2.6.1)
-    - React-Core
-    - TLPhotoPicker (= 2.1.9)
   - react-native-netinfo (11.2.0):
     - React-Core
   - react-native-onesignal (5.0.4):
@@ -769,6 +759,15 @@ PODS:
   - RNGestureHandler (2.14.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
+  - RNImageCropPicker (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - RNImageCropPicker/QBImagePickerController (= 0.40.2)
+    - TOCropViewController
+  - RNImageCropPicker/QBImagePickerController (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - TOCropViewController
   - RNNotifee (7.8.0):
     - React-Core
     - RNNotifee/NotifeeCore (= 7.8.0)
@@ -796,7 +795,7 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.6.1)
-  - TLPhotoPicker (2.1.9)
+  - TOCropViewController (2.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -864,7 +863,6 @@ DEPENDENCIES:
   - react-native-encrypted-storage (from `../node_modules/react-native-encrypted-storage`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - "react-native-image-resizer (from `../node_modules/@bam.tech/react-native-image-resizer`)"
-  - "react-native-multiple-image-picker (from `../node_modules/@baronha/react-native-multiple-image-picker`)"
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-onesignal (from `../node_modules/react-native-onesignal`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
@@ -903,6 +901,7 @@ DEPENDENCIES:
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBPerf (from `../node_modules/@react-native-firebase/perf`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -913,7 +912,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
-    - CropViewController
     - Firebase
     - FirebaseABTesting
     - FirebaseAnalytics
@@ -948,7 +946,7 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
-    - TLPhotoPicker
+    - TOCropViewController
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -1009,8 +1007,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-get-random-values"
   react-native-image-resizer:
     :path: "../node_modules/@bam.tech/react-native-image-resizer"
-  react-native-multiple-image-picker:
-    :path: "../node_modules/@baronha/react-native-multiple-image-picker"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-onesignal:
@@ -1087,6 +1083,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/perf"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNImageCropPicker:
+    :path: "../node_modules/react-native-image-crop-picker"
   RNNotifee:
     :path: "../node_modules/@notifee/react-native"
   RNReanimated:
@@ -1103,7 +1101,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  CropViewController: 58fb440f30dac788b129d2a1f24cffdcb102669c
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: 748c0ef74f2bf4b36cfcccf37916806940a64c32
   FBReactNativeSpec: 966f29e4e697de53a3b366355e8f57375c856ad9
@@ -1162,7 +1159,6 @@ SPEC CHECKSUMS:
   react-native-encrypted-storage: db300a3f2f0aba1e818417c1c0a6be549038deb7
   react-native-get-random-values: 384787fd76976f5aec9465aff6fa9e9129af1e74
   react-native-image-resizer: 681f7607418b97c084ba2d0999b153b103040d8a
-  react-native-multiple-image-picker: 7836e8269dd7696edc87bab686b3c3c7e6ebb41d
   react-native-netinfo: 25c87e28495d955b30aeca9c22594691668c907a
   react-native-onesignal: 0d90da0cdf5703356d7624ca9e705b0ea2c8ca56
   react-native-pdf: b4ca3d37a9a86d9165287741c8b2ef4d8940c00e
@@ -1201,6 +1197,7 @@ SPEC CHECKSUMS:
   RNFBCrashlytics: 5323b1b36915e36e1e7bd00294b1efd34d93326c
   RNFBPerf: 0708e00c0944048eda4ba355148e00b6acdcadc8
   RNGestureHandler: 32a01c29ecc9bb0b5bf7bc0a33547f61b4dc2741
+  RNImageCropPicker: d9616a0cb9b72e8551ff94a7a5021fbd29050aa5
   RNNotifee: f3c01b391dd8e98e67f539f9a35a9cbcd3bae744
   RNReanimated: fdbaa9c964bbab7fac50c90862b6cc5f041679b9
   RNScreens: 3c5b9f4a9dcde752466854b6109b79c0e205dad3
@@ -1209,7 +1206,7 @@ SPEC CHECKSUMS:
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  TLPhotoPicker: 939c40eaad130b69f9571e61e021e8120fa76329
+  TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: b76f1acfda8212aa16b7e26bcce3983230c82603
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

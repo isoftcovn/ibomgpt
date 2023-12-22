@@ -37,6 +37,7 @@ export const ConversationScreen = (props: IProps) => {
     const textInputRef = createRef<TextInput>();
 
     const enterEditMode = useCallback((message?: IAppChatMessage) => {
+        console.info(message ? 'Enter edit mode: ' + message.text : 'Exit edit mode');
         setEditMessage(message);
     }, []);
 
@@ -184,7 +185,7 @@ const ConversationContent = React.memo((props: IProps) => {
             })}
             listViewProps={{
                 onEndReached: loadEalierMessages,
-                onEndReachedThreshold: 0.6,
+                onEndReachedThreshold: 0.5,
             }}
             lightboxProps={{
                 onLongPress: undefined

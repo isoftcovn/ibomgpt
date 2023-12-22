@@ -28,7 +28,7 @@
         "publishAndroid": "export ENVFILE=.env.production && yarn fastlaneProductionEnv && yarn android:ship",
         "publishIOSDev": "export ENVFILE=.env.development && yarn fastlaneDevEnv && yarn ios:adhoc",
         "publishIOS": "export ENVFILE=.env.production && yarn fastlaneProductionEnv && yarn ios:adhoc",
-        "publishIOSTFDev": "export ENVFILE=.env.development && yarn fastlaneDevEnv && yarn run ios:tf",        
+        "publishIOSTFDev": "export ENVFILE=.env.development && yarn fastlaneDevEnv && yarn run ios:tf",
         "publishIOSTF": "export ENVFILE=.env.production && yarn fastlaneProductionEnv && yarn run ios:tf",
         "postinstall": "patch-package && react-native-schemes-manager all"
     },
@@ -45,7 +45,6 @@
     "projectDirectory": "ios",
     "dependencies": {
         "@bam.tech/react-native-image-resizer": "^3.0.7",
-        "@baronha/react-native-multiple-image-picker": "^1.1.6",
         "@microsoft/signalr": "^7.0.14",
         "@notifee/react-native": "^7.8.0",
         "@react-native-async-storage/async-storage": "^1.21.0",
@@ -86,6 +85,7 @@
         "react-native-gesture-handler": "^2.14.0",
         "react-native-get-random-values": "^1.10.0",
         "react-native-gifted-chat": "^2.4.0",
+        "react-native-image-crop-picker": "^0.40.2",
         "react-native-image-viewing": "^0.2.2",
         "react-native-keyboard-aware-scroll-view": "^0.9.5",
         "react-native-modal": "^13.0.1",

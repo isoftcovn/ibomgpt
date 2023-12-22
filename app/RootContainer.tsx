@@ -15,6 +15,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import RNShake from 'react-native-shake';
 import DeeplinkHandler from './presentation/managers/DeeplinkHandler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 interface Props {
 }
@@ -197,25 +198,27 @@ const RootContainer = React.memo((props: Props) => {
     return (
         <GestureHandlerRootView style={styles.container}>
             <SafeAreaProvider>
-                <NavigationContainer
-                    ref={(ref: any) =>
-                        NavigationService.setTopLevelNavigator(ref)
-                    }
-                    onStateChange={onNavigationStateChange}
-                >
-                    <StatusBar barStyle={Platform.select({
-                        android: 'light-content',
-                        ios: 'dark-content',
-                    })} />
-                    <RootStack />
-                    <DropdownAlert />
-                    <ViewConnectionStatus />
-                    <LoadingIndicator
-                        ref={(ref: LoadingIndicator) =>
-                            LoadingManager.setLoadingRef(ref)
+                <ActionSheetProvider>
+                    <NavigationContainer
+                        ref={(ref: any) =>
+                            NavigationService.setTopLevelNavigator(ref)
                         }
-                    />
-                </NavigationContainer>
+                        onStateChange={onNavigationStateChange}
+                    >
+                        <StatusBar barStyle={Platform.select({
+                            android: 'light-content',
+                            ios: 'dark-content',
+                        })} />
+                        <RootStack />
+                        <DropdownAlert />
+                        <ViewConnectionStatus />
+                        <LoadingIndicator
+                            ref={(ref: LoadingIndicator) =>
+                                LoadingManager.setLoadingRef(ref)
+                            }
+                        />
+                    </NavigationContainer>
+                </ActionSheetProvider>
             </SafeAreaProvider>
         </GestureHandlerRootView>
     );

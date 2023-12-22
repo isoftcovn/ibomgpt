@@ -13,6 +13,7 @@
     "confirmPassword": "Xác nhận mật khẩu",
     "content": "Nội dung",
     "copy": "Sao chép",
+    "close": "Đóng",    
  
     "done": "Done",
     "dontHaveAccountYet": "Bạn chưa có tài khoản?",
@@ -32,6 +33,7 @@
     "from": "From",
 
     "gender": "Gender",
+    "getFromlibrary": "Lấy từ Thư viện",
 
     "home": "Home",
     "helpCenter": "Trung tâm trợ giúp",
@@ -50,7 +52,7 @@
     "languages": "Languages",
     "loading": "Loading...",
     "lostInternetConnection": "Your network connection is unstable.",
-    "listEmpty": "No data.",
+    "listEmpty": "No data.",    
 
     "male": "Male",
     "message": "Tin nhắn",
@@ -82,6 +84,7 @@
     "sentAFile": "Đã gửi tệp tin",
 
     "used": "Used",
+    "useCamera": "Sử dụng máy ảnh",
 
     "warning": "Waring",
 

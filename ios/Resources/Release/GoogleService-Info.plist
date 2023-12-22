@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyC0oK587St2u8hNeH8Fl5dAjwb9_uP66Gk</string>
+	<string>AIzaSyAjOlNI3seFbWLA3lEXAvWPOKtZb-7nsjU</string>
 	<key>GCM_SENDER_ID</key>
-	<string>491911612374</string>
+	<string>158559196141</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.isoftco.ibomgpt</string>
+	<string>com.isoftco.ibomgpt.app</string>
 	<key>PROJECT_ID</key>
-	<string>ibomgpt</string>
+	<string>ibom-6a52d</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ibomgpt.appspot.com</string>
+	<string>ibom-6a52d.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:491911612374:ios:8e717d940ba8dc3c034677</string>
+	<string>1:158559196141:ios:a60ecabf661a7bf166cde4</string>
 </dict>
 </plist>

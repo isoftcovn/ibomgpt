@@ -139,8 +139,8 @@ const AccountScreen = (props: IProps) => {
                 fontWeight: '400'
             }} variant="body1">{t('logout')}</TextPrimary>
         </TouchableOpacity>
-        <Box marginTop={theme.spacing.small} />
-        <TouchableOpacity
+        {/* <Box marginTop={theme.spacing.small} /> */}
+        {/* <TouchableOpacity
             style={styles.itemContainer}
             activeOpacity={0.8}
             onPress={deleteAccount}
@@ -151,7 +151,7 @@ const AccountScreen = (props: IProps) => {
                 color: theme.color.danger,
                 fontWeight: '500'
             }} variant="body1">{t('deleteAccount')}</TextPrimary>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
     </View>;
 };
 

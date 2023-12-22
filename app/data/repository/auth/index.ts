@@ -31,9 +31,7 @@ export class AuthRepository implements IAuthRepository {
             resource: resource,
             body: formData,
         });
-
         const response = await apiGateway.execute();
-
         return LoginModel.parseFromJson(response);
     };
 }

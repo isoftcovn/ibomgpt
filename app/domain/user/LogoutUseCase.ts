@@ -10,7 +10,7 @@ export default class LogoutUseCase implements IUseCase<boolean> {
 
     execute = async () => {
         await this.userRepository.logoutUser();
-        await Promise.all([this.userRepository.removeSavedToken()]);
+        // await Promise.all([this.userRepository.removeSavedToken()]);
         return true;
     };
 }

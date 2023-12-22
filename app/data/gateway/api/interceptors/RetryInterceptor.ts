@@ -6,7 +6,7 @@ import Interceptor from './interceptor';
 let maxRetries = 3;
 let retryCount = 0;
 
-type RefreshTokenCallback = (token: string, refreshToken?: string) => void
+type RefreshTokenCallback = (token?: string, refreshToken?: string, error?: AxiosError) => void
 
 let isRefreshing = false;
 let refreshSubscribers: RefreshTokenCallback[] = [];
@@ -72,19 +72,26 @@ export default class RetryInterceptor extends Interceptor {
                             isRefreshing = false;
                             retryCount = 0;
                             onRefreshed(response.token);
+                        }).catch(() => {
+                            isRefreshing = false;
+                            onRefreshed(undefined, undefined, error);
                         });
                 }
 
-                const retryOrigReq = new Promise((resolve) => {
-                    const handler: RefreshTokenCallback = async (token, refreshToken) => {
+                const retryOrigReq = new Promise((resolve, reject) => {
+                    const handler: RefreshTokenCallback = async (token, refreshToken, innerError) => {
                         // replace the expired token and retry
-                        if (!originalRequest.headers) {
-                            originalRequest.headers = new AxiosHeaders();
-                        }
-                        originalRequest.headers.token = token;
-                        await this.customerRepo.saveUserToken(token, refreshToken);
+                        if (token) {
+                            if (!originalRequest.headers) {
+                                originalRequest.headers = new AxiosHeaders();
+                            }
+                            originalRequest.headers.token = token;
+                            await this.customerRepo.saveUserToken(token, refreshToken);
 
-                        resolve(this.axiosInstance.request(originalRequest));
+                            resolve(this.axiosInstance.request(originalRequest));
+                        } else {
+                            reject(innerError);
+                        }
                     };
                     subscribeTokenRefresh(handler);
                 });
@@ -102,7 +109,7 @@ const subscribeTokenRefresh = (cb: RefreshTokenCallback) => {
     refreshSubscribers.push(cb);
 };
 
-const onRefreshed = (token: string, refreshToken?: string) => {
-    refreshSubscribers.map(cb => cb(token, refreshToken));
+const onRefreshed = (token?: string, refreshToken?: string, error?: AxiosError) => {
+    refreshSubscribers.map(cb => cb(token, refreshToken, error));
     refreshSubscribers = [];
 };

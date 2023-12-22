@@ -27,6 +27,7 @@ import * as Yup from 'yup';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { OneSignal } from 'react-native-onesignal';
+import { IUserRepository } from '@domain/user';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'SignIn'>;
@@ -42,6 +43,9 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
     const { navigation } = props;
     const emailInput = useRef<TextInput | null>();
     const passwordInput = useRef<TextInput | null>();
+    const userRepository = useRef<IUserRepository>(new UserRepository());
+    const [initialEmail, setInitialEmail] = useState('');
+    const [initialPass, setInitialPass] = useState('');
     const [secureText, setSecureText] = useState(true);
     const { t, } = useTranslation();
     const insets = useSafeAreaInsets();
@@ -61,6 +65,14 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
     useEffect(() => {
         DeviceEventEmitter.emit('credentialsReadyForUnauth');
         OneSignal.logout();
+
+        userRepository.current.getUserCreds().then(userCreds => {
+            if (userCreds && userCreds.length >= 2) {
+                const [username, password] = userCreds;
+                setInitialEmail(username);
+                setInitialPass(password);
+            }
+        }).catch(() => { });
     }, []);
 
     const toHome = useCallback(() => {
@@ -106,7 +118,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
             validateOnBlur={false}
             validateOnChange
             enableReinitialize
-            initialValues={{ email: '', password: '' }}
+            initialValues={{ email: initialEmail, password: initialPass }}
             validationSchema={validationSchema}
             onSubmit={(values) => onSubmit(values)}
         >
@@ -126,10 +138,12 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                                 size={theme.fontSize.fontSizeLarge}
                                 color={theme.color.textColor}
                             />}
+                            value={values.email}
                             errorMessage={touched.email ? errors.email : undefined}
                             keyboardType={'email-address'}
                             textContentType={'emailAddress'}
                             returnKeyType={'next'}
+                            autoCapitalize="none"
                             onSubmitEditing={() => passwordInput.current?.focus()}
                             onFocus={() => setFieldTouched('email', true)}
                             onChangeText={handleChange('email')}
@@ -146,6 +160,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                             secureTextEntry={secureText}
                             textContentType={'password'}
                             returnKeyType={'done'}
+                            autoCapitalize="none"
                             value={values.password}
                             errorMessage={touched.password ? errors.password : undefined}
                             onSubmitEditing={() => handleSubmit()}

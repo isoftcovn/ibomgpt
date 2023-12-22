@@ -76,6 +76,10 @@ export const RenderMessage = (props: MessageProps<IAppChatMessage>) => (
 export const MyTextMessage = (props: MessageTextProps<IAppChatMessage>) => (
     <MessageText
         {...props}
+        linkStyle={{
+            left: styles.left.link,
+            right: styles.right.link,
+        }}
     />
 );
 
@@ -123,6 +127,11 @@ const styles = {
         textMessage: {
             ...theme.textVariants.body1,
             color: theme.color.textColor,
+            fontWeight: '400',
+        },
+        link: {
+            ...theme.textVariants.body1,
+            color: '#0000EE',
             fontWeight: '400',
         },
         containerToNext: {
@@ -180,6 +189,11 @@ const styles = {
         textMessage: {
             ...theme.textVariants.body1,
             color: theme.color.textColor,
+            fontWeight: '400',
+        },
+        link: {
+            ...theme.textVariants.body1,
+            color: '#0000EE',
             fontWeight: '400',
         },
         containerToNext: {

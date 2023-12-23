@@ -12,6 +12,7 @@ export class ChatHelper {
                 sentDeviceUID: ChatManager.shared._deviceUID,
                 payload,
             });
+            console.info('Send typing event: ', payload);
         }
 
         ChatManager.shared.channelTypingState[key] = payload.typingState;

@@ -82,8 +82,9 @@ const MyInput = React.memo((props: IMyComposerProps) => {
         }
     }, [editMessage, setText]);
 
-    const onTextChanged = useCallback((input: string) => {
-        if (input.length > 0) {
+    useEffect(() => {
+        console.log('my input text changed: ', text);
+        if (text.length > 0) {
             ChatHelper.shared.sendTypingEvent(userIds, {
                 typingState: 'typing',
                 userName: displayName,
@@ -98,13 +99,12 @@ const MyInput = React.memo((props: IMyComposerProps) => {
                 objectInstanceId,
             });
         }
-        setText(input);
-    }, [setText, userIds, displayName, objectId, objectInstanceId]);
+    }, [text, userIds, displayName, objectId, objectInstanceId]);
 
     return <Composer
         {...props}
         textInputStyle={styles.textInput}
-        onTextChanged={onTextChanged}
+        onTextChanged={setText}
         text={text}
     />;
 });

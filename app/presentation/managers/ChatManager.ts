@@ -67,7 +67,7 @@ export class ChatManager {
 
     sendMessageToUsers = (userIds: string[], payload: ISignalRData) => {
         this.connection?.invoke('SendMessageToUsers', userIds, JSON.stringify(payload)).then(() => {
-            console.log('Invoke send messages done: ', userIds);
+            console.log('Invoke send messages done');
         }).catch(error => {
             console.error('Invoke send messages error: ', error);
         });

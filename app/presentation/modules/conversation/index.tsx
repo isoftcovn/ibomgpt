@@ -72,6 +72,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
     const { textInputRef, editMessage } = useContext(ConversationContext);
+    const { setText } = useContext(ConversationInputContext);
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const objectId = useMemo(() => { return route.params.objectId; }, [route.params]);
@@ -167,6 +168,15 @@ const ConversationContent = React.memo((props: IProps) => {
         }
     }, [canLoadMore, isFetching, dispatch, messages, objectId, objectInstanceId]);
 
+    const onSend = useCallback((sentMessages: IMessage[] = []) => {
+        sendTextMessage(sentMessages).then(() => {
+            console.info('Text Messages sent.');
+        }).catch(error => {
+            console.error('Sent text message error: ', error);
+        });
+        setText('');
+    }, [sendTextMessage, setText]);
+
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const renderComposer = useCallback((props: IMyComposerProps) => {
         return <MyComposer
@@ -180,14 +190,6 @@ const ConversationContent = React.memo((props: IProps) => {
     const renderFooter = useCallback(() => {
         return <TypingAnimation />;
     }, []);
-
-    const onSend = useCallback((sentMessages: IMessage[] = []) => {
-        sendTextMessage(sentMessages).then(() => {
-            console.info('Text Messages sent.');
-        }).catch(error => {
-            console.error('Sent text message error: ', error);
-        });
-    }, [sendTextMessage]);
 
     return <View style={[styles.container]}>
         <GiftedChat

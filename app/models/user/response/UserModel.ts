@@ -11,10 +11,11 @@ export default class UserModel {
 
     static parseFromJson = (data: any): UserModel => {
         const obj = new UserModel();
-        const { email, id } = data;
+        const { email, id, fullname } = data;
 
         obj.id = id;
         obj.email = email;
+        obj.fullname = fullname;
 
         return obj;
     };

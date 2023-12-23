@@ -15,11 +15,12 @@ import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { selectParticipantsByKey } from '@redux/selectors/conversation';
 
 const sendMessagesToHub = async (userIds: string[], message: ChatMessageResponse) => {
-    const sentMessage = {
-        ...message,
-        deviceUID: ChatManager.shared._deviceUID,
-    };
-    ChatManager.shared.sendMessageToUsers(userIds, sentMessage);
+    const sentMessage = message;
+    ChatManager.shared.sendMessageToUsers(userIds, {
+        event: 'new-messages',
+        payload: sentMessage,
+        sentDeviceUID: ChatManager.shared._deviceUID,
+    });
 };
 
 export const useSendTextMessage = (objectId: number, objectInstanceId: number) => {

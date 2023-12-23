@@ -5,8 +5,8 @@ import { AppStackParamList } from '@navigation/RouteParams';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { getMessagesActionTypes } from '@redux/actions/conversation';
-import { selectMessagesByKey, selectMessagesCanLoadMoreByKey, selectMessagesFetchingState } from '@redux/selectors/conversation';
-import { selectProfile } from '@redux/selectors/user';
+import { selectMessagesByKey, selectMessagesCanLoadMoreByKey, selectMessagesFetchingState, selectParticipantsByKey } from '@redux/selectors/conversation';
+import { selectDisplayName, selectProfile } from '@redux/selectors/user';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { theme } from 'app/presentation/theme';
 import React, { createRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -25,6 +25,8 @@ import { useOnMessageLongPress } from './hooks/CommonHooks';
 import { IPickerAsset, useOnMessagePressed, usePickDocuments, usePickMediaAssets } from './hooks/MediaHooks';
 import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHooks';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
+import { TypingAnimation } from './components/TypingAninimation';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -32,9 +34,12 @@ interface IProps {
 }
 
 export const ConversationScreen = (props: IProps) => {
+    const { route } = props;
     const [editMessage, setEditMessage] = useState<IAppChatMessage>();
     const [text, setText] = useState('');
     const textInputRef = createRef<TextInput>();
+    const objectId = useMemo(() => { return route.params.objectId; }, [route.params]);
+    const objectInstanceId = useMemo(() => { return route.params.objectInstanceId; }, [route.params]);
 
     const enterEditMode = useCallback((message?: IAppChatMessage) => {
         console.info(message ? 'Enter edit mode: ' + message.text : 'Exit edit mode');
@@ -44,8 +49,10 @@ export const ConversationScreen = (props: IProps) => {
     const contextValue = useMemo(() => ({
         setEditMessage: enterEditMode,
         editMessage,
-        textInputRef
-    }), [enterEditMode, editMessage, textInputRef]);
+        textInputRef,
+        objectId,
+        objectInstanceId,
+    }), [enterEditMode, editMessage, textInputRef, objectId, objectInstanceId]);
 
     const inputContextValue = useMemo(() => ({
         setText,
@@ -77,6 +84,9 @@ const ConversationContent = React.memo((props: IProps) => {
         audioUri, isAudioModalVisible, setAudioModalVisible } = useOnMessagePressed(navigation);
     const key = useMemo(() => { return `${objectId}-${objectInstanceId}`; }, [objectId, objectInstanceId]);
     const user: UserModel | undefined = useSelector(selectProfile).data;
+    const displayName = useSelector(selectDisplayName);
+    const participants = useSelector(state => selectParticipantsByKey(state, key));
+    const userIds = useMemo(() => participants.map(item => `${item.id}`), [participants]);
     const messages = useSelector(state => selectMessagesByKey(state, key));
     const canLoadMore = useSelector(state => selectMessagesCanLoadMoreByKey(state, key));
     const isFetching = useSelector(selectMessagesFetchingState);
@@ -100,7 +110,16 @@ const ConversationContent = React.memo((props: IProps) => {
             });
             didmountRef.current = true;
         }
-    }, [dispatch, objectId, objectInstanceId]);
+
+        return () => {
+            ChatHelper.shared.sendTypingEvent(userIds, {
+                typingState: 'ended',
+                userName: displayName,
+                objectId,
+                objectInstanceId,
+            });
+        }
+    }, [dispatch, objectId, objectInstanceId, displayName, userIds]);
 
     useEffect(() => {
         if (editMessage) {
@@ -158,6 +177,10 @@ const ConversationContent = React.memo((props: IProps) => {
 
     }, [onSelectMediaPressed, onSelectFilePressed]);
 
+    const renderFooter = useCallback(() => {
+        return <TypingAnimation />;
+    }, []);
+
     const onSend = useCallback((sentMessages: IMessage[] = []) => {
         sendTextMessage(sentMessages).then(() => {
             console.info('Text Messages sent.');
@@ -191,7 +214,7 @@ const ConversationContent = React.memo((props: IProps) => {
                 onLongPress: undefined
             }}
             messagesContainerStyle={{
-                paddingBottom: theme.spacing.huge,
+                paddingBottom: theme.spacing.extraLarge,
             }}
             onPress={(context, message) => {
                 onMessagePressed(message);
@@ -212,6 +235,7 @@ const ConversationContent = React.memo((props: IProps) => {
             renderSystemMessage={MySystemMessage}
             renderCustomView={MyCustomMessage}
             scrollToBottomComponent={renderScrollToBottom}
+            renderFooter={renderFooter}
         />
         <View
             style={{

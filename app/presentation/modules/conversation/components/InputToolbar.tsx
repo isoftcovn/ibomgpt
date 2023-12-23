@@ -2,12 +2,16 @@ import { Box } from '@components/globals/view/Box';
 import { Dimensions } from '@theme/Dimensions';
 import { theme } from '@theme/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Composer, ComposerProps, InputToolbar, InputToolbarProps, Send, SendProps } from 'react-native-gifted-chat';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useInputText, useIsInEditMode } from '../hooks/CommonHooks';
 import { ConversationContext } from '../context/ConversationContext';
+import { selectParticipantsByKey } from '@redux/selectors/conversation';
+import { useSelector } from 'react-redux';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
+import { selectDisplayName } from '@redux/selectors/user';
 
 export interface IMyComposerProps extends ComposerProps {
     onSelectFilePressed: () => void;
@@ -64,8 +68,13 @@ export const MySend = (props: SendProps<IAppChatMessage>) => {
 };
 
 const MyInput = React.memo((props: IMyComposerProps) => {
+    const { objectId, objectInstanceId } = useContext(ConversationContext);
     const { setText, text } = useInputText();
     const { editMessage } = useIsInEditMode();
+    const key = `${objectId}-${objectInstanceId}`;
+    const participants = useSelector(state => selectParticipantsByKey(state, key));
+    const userIds = useMemo(() => participants.map(item => `${item.id}`), [participants]);
+    const displayName = useSelector(selectDisplayName);
 
     useEffect(() => {
         if (editMessage && editMessage.text) {
@@ -73,10 +82,29 @@ const MyInput = React.memo((props: IMyComposerProps) => {
         }
     }, [editMessage, setText]);
 
+    const onTextChanged = useCallback((input: string) => {
+        if (input.length > 0) {
+            ChatHelper.shared.sendTypingEvent(userIds, {
+                typingState: 'typing',
+                userName: displayName,
+                objectId,
+                objectInstanceId,
+            });
+        } else {
+            ChatHelper.shared.sendTypingEvent(userIds, {
+                typingState: 'ended',
+                userName: displayName,
+                objectId,
+                objectInstanceId,
+            });
+        }
+        setText(input);
+    }, [setText, userIds, displayName, objectId, objectInstanceId]);
+
     return <Composer
         {...props}
         textInputStyle={styles.textInput}
-        onTextChanged={setText}
+        onTextChanged={onTextChanged}
         text={text}
     />;
 });

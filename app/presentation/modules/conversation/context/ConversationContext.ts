@@ -5,7 +5,9 @@ import { TextInput } from 'react-native';
 export interface IConversationContext {
     editMessage?: IAppChatMessage;
     setEditMessage: (message: IAppChatMessage | undefined) => void;
-    textInputRef: React.RefObject<TextInput>
+    textInputRef: React.RefObject<TextInput>,
+    objectId: number,
+    objectInstanceId: number,
 }
 
 export interface IConversationInputContext {
@@ -16,7 +18,9 @@ export interface IConversationInputContext {
 export const ConversationContext = React.createContext<IConversationContext>({
     editMessage: undefined,
     setEditMessage: (message?: IAppChatMessage) => { },
-    textInputRef: React.createRef<TextInput>()
+    textInputRef: React.createRef<TextInput>(),
+    objectId: 0,
+    objectInstanceId: 0,
 });
 
 export const ConversationInputContext = React.createContext<IConversationInputContext>({

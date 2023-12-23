@@ -1,20 +1,7 @@
 import UserModel from '@models/user/response/UserModel';
-import { getMessagesType, updateConversationParticipantsActionTypes } from '@redux/actions/conversation';
-import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
+import { updateConversationParticipantsActionTypes } from '@redux/actions/conversation';
+import { IAction, IActionParams } from 'app/presentation/redux';
 import produce from 'immer';
-import { logoutActionTypes } from '../../../actions/auth';
-import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
-
-const reducerHandler = new BaseSectionListReducer<any, any>(getMessagesType);
-
-function extraProcess(state: IReducer<any>, action: IAction<any>) {
-    if (action.type === logoutActionTypes.success) {
-        return reducerHandler.initialState;
-    }
-    return state;
-}
-
-reducerHandler.extraProcess = extraProcess;
 
 interface IState {
     isFetching: boolean;

@@ -5,6 +5,7 @@ export type AppStackParamList = {
     Languages: undefined,
     AppTab: undefined,
     HomeTab: undefined,
+    HomeScreen: undefined,
     Conversation: {
         objectId: number,
         objectInstanceId: number,

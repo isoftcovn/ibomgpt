@@ -16,6 +16,14 @@ export const selectUserId = createSelector(
     (profile: IReducer<UserModel | undefined>) => profile?.data?.id
 );
 
+export const selectDisplayName = createSelector(
+    (state: any) => selectProfile(state),
+    (profile: IReducer<UserModel | undefined>) => {
+        const email = profile.data?.email ?? '';
+        return email.split('@')[0] ?? '';
+    }
+);
+
 export const selectUpdateProfile = createSelector(
     (state: any) => selectUserState(state),
     user => user.updateProfile

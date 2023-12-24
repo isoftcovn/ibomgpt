@@ -1,13 +1,12 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import { deleteMessageActionTypes, receiveNewMessagesActionTypes } from '@redux/actions/conversation';
+import { deleteMessageActionTypes, deleteMessageRealtimeActionTypes, editMessagesActionTypes, receiveNewMessagesActionTypes } from '@redux/actions/conversation';
 import { selectUserId } from '@redux/selectors/user';
 import { theme } from '@theme/index';
 import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Subscription } from 'rxjs';
 import { ConversationContext, ConversationInputContext } from '../context/ConversationContext';
 
 export const useOnMessageLongPress = (objectId: number, objectInstanceId: number) => {
@@ -19,12 +18,17 @@ export const useOnMessageLongPress = (objectId: number, objectInstanceId: number
     const onMessageLongPress = useCallback((context: any, currentMessage: IAppChatMessage) => {
         // eslint-disable-next-line eqeqeq
         const isMyMessage = currentMessage.user._id == userId;
+        let disabledEdit = false;
         const options: string[] = [];
         if (currentMessage.text) {
             options.push(t('copy'));
         }
+        // Messages with local id can not be editted
         if (isMyMessage && currentMessage.text) {
             options.push(t('edit'));
+            if (`${currentMessage._id}`.startsWith('local')) {
+                disabledEdit  = true;
+            }
         }
         if (isMyMessage) {
             options.push(t('delete'));
@@ -33,12 +37,20 @@ export const useOnMessageLongPress = (objectId: number, objectInstanceId: number
         options.push(t('close'));
         const cancelButtonIndex = options.length - 1;
         const destructiveButtonIndex = options.indexOf(t('delete'));
+        const disabledButtonIndices: number[] = [];
+        if (disabledEdit) {
+            const index = options.indexOf(t('edit'));
+            if (index !== -1) {
+                disabledButtonIndices.push(index);
+            }
+        }
         context.actionSheet().showActionSheetWithOptions(
             {
                 options,
                 cancelButtonIndex,
                 destructiveColor: theme.color.danger,
                 destructiveButtonIndex: isMyMessage ? destructiveButtonIndex : undefined,
+                disabledButtonIndices,
             },
             (buttonIndex: number) => {
                 const option: string | undefined = options[buttonIndex];
@@ -91,16 +103,43 @@ export const useInputText = () => {
 };
 
 export const useRealtimeMessage = () => {
-    const receiveMessageSubcription = useRef<Subscription | undefined>();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        receiveMessageSubcription.current = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
+        const receiveMessageSubcription = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
             dispatch(receiveNewMessagesActionTypes.startAction(messages));
         });
 
+        const editMessageSubscription = ChatManager.shared.editMessageEvent.subscribe(event => {
+            const {content, messageId, objectId, objectInstanceId} = event;
+            const editMessage: IAppChatMessage = {
+                _id: messageId,
+                text: content,
+                createdAt: new Date(),
+                user: {
+                    _id: 0,
+                },
+            };
+            dispatch(editMessagesActionTypes.startAction({
+                messages: [editMessage],
+                objectId,
+                objectInstanceId,
+            }));
+        });
+
+        const deleteMessageSubscription = ChatManager.shared.deleteMessageEvent.subscribe(event => {
+            const {messageId, objectId, objectInstanceId} = event;
+            dispatch(deleteMessageRealtimeActionTypes.startAction({
+                messageId,
+                objectId,
+                objectInstanceId,
+            }));
+        });
+
         return () => {
-            receiveMessageSubcription.current?.unsubscribe();
+            receiveMessageSubcription.unsubscribe();
+            editMessageSubscription.unsubscribe();
+            deleteMessageSubscription.unsubscribe();
         };
     }, [dispatch]);
 };

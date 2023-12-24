@@ -35,6 +35,9 @@ export const editMessagesActionTypes = createActionTypes<IEditMessagesPayload, v
 export const deleteMessageType = 'delete_message';
 export const deleteMessageActionTypes = createActionTypes<IDeleteMessagePayload, void>(deleteMessageType, DOMAIN);
 
+export const deleteMessageRealtimeType = 'delete_message_realtime';
+export const deleteMessageRealtimeActionTypes = createActionTypes<IDeleteMessagePayload, void>(deleteMessageRealtimeType, DOMAIN);
+
 export const updateLocalMessageIdsType = 'update_local_message_ids';
 export const updateLocalMessageIdsActionTypes = createActionTypes<IUpdateLocalMessageIdsPayload, void>(updateLocalMessageIdsType, DOMAIN);
 

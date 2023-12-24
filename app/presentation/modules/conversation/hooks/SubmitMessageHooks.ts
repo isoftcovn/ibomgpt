@@ -59,15 +59,22 @@ export const useSendTextMessage = (objectId: number, objectInstanceId: number) =
         for (const request of requestModels) {
             chatRepo.submitChatMessages(request).then(response => {
                 const messageId = response?.commentId;
+                const userIds = participants.map(item => `${item.id}`);
                 if (!isEdit && messageId) {
                     // @ts-ignore
                     localMessageIdAndRealIdMap[`${request._localMessageId ?? ''}`] = `${messageId}`;
 
-                    const userIds = participants.map(item => `${item.id}`);
                     const messageResponse = response?.commentInfo;
                     if (messageResponse) {
                         sendMessagesToHub(userIds, messageResponse);
                     }
+                } else if (isEdit && editMessage) {
+                    ChatHelper.shared.sendEditMessageEvent(userIds, {
+                        objectId,
+                        objectInstanceId,
+                        messageId: `${editMessage._id}`,
+                        content: request.comment_content,
+                    });
                 }
             }).catch(error => {
                 console.error('Send message failed: ', error);

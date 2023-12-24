@@ -1,6 +1,6 @@
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { ChatManager } from './ChatManager';
-import { IUsersTypingPayload } from './ChatManager.interfaces';
+import { IDeleteMessageSignalRPayload, IEditMessageSignalRPayload, IUsersTypingPayload } from './ChatManager.interfaces';
 
 export class ChatHelper {
     static shared = new ChatHelper();
@@ -25,5 +25,22 @@ export class ChatHelper {
             payload,
             sentDeviceUID: ChatManager.shared._deviceUID,
         });
-    }
+    };
+
+    sendEditMessageEvent = (userIds: string[], payload: IEditMessageSignalRPayload) => {
+        ChatManager.shared.sendMessageToUsers(userIds, {
+            event: 'edit-message',
+            payload,
+            sentDeviceUID: ChatManager.shared._deviceUID,
+        });
+        console.info('Send edit message event: ', userIds, payload);
+    };
+
+    sendDeleteMessageEvent = (userIds: string[], payload: IDeleteMessageSignalRPayload) => {
+        ChatManager.shared.sendMessageToUsers(userIds, {
+            event: 'delete-message',
+            payload,
+            sentDeviceUID: ChatManager.shared._deviceUID,
+        });
+    };
 }

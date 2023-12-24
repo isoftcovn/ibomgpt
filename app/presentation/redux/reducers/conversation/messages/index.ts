@@ -1,4 +1,4 @@
-import { IDeleteMessagePayload, IEditMessagesPayload, IUpdateLocalMessageIdsPayload, deleteMessageActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, receiveNewMessagesActionTypes, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, IEditMessagesPayload, IUpdateLocalMessageIdsPayload, deleteMessageActionTypes, deleteMessageRealtimeActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, receiveNewMessagesActionTypes, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
 import { logoutActionTypes } from '../../../actions/auth';
 import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
@@ -113,7 +113,7 @@ export default function (state = initialState, action: IAction<any>) {
             draft.data[sectionId] = [...data, ...currentData];
         });
     }
-    if (actionType === deleteMessageActionTypes.start) {
+    if (actionType === deleteMessageActionTypes.start || actionType === deleteMessageRealtimeActionTypes.start) {
         const { messageId, objectId, objectInstanceId } = action.payload! as IDeleteMessagePayload;
         return produce(state, draft => {
             const sectionId = `${objectId}-${objectInstanceId}`;
@@ -124,7 +124,7 @@ export default function (state = initialState, action: IAction<any>) {
             if (deletedIds.length > 0) {
                 currentData = [...currentData];
                 for (const id of deletedIds) {
-                    const index = currentData.findIndex(item => item._id === id);
+                    const index = currentData.findIndex(item => item._id == id);
                     if (index !== -1) {
                         currentData.splice(index, 1);
                     }
@@ -139,7 +139,7 @@ export default function (state = initialState, action: IAction<any>) {
             const sectionId = `${objectId}-${objectInstanceId}`;
             let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
             for (const editMessagge of messages) {
-                const message = currentData.find(item => editMessagge._id === item._id);
+                const message = currentData.find(item => editMessagge._id == item._id);
                 if (message) {
                     message.text = editMessagge.text;
                 }

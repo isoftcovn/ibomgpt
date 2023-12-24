@@ -4,7 +4,7 @@ import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IChatMessage } from 'react-native-gifted-chat';
 import { Subject } from 'rxjs';
 import DeviceInfo from 'react-native-device-info';
-import { ISignalRData, IUsersTypingPayload, TypingState } from './ChatManager.interfaces';
+import { ISignalRData, IUsersTypingPayload, IDeleteMessageSignalRPayload, IEditMessageSignalRPayload, TypingState } from './ChatManager.interfaces';
 
 export class ChatManager {
     static shared = new ChatManager();
@@ -17,9 +17,14 @@ export class ChatManager {
     connection?: signalR.HubConnection;
     receiveMessageEvent: Subject<IChatMessage[]>;
     userTypingEvent: Subject<IUsersTypingPayload>;
+    editMessageEvent: Subject<IEditMessageSignalRPayload>;
+    deleteMessageEvent: Subject<IDeleteMessageSignalRPayload>;
+
     private constructor() {
         this.receiveMessageEvent = new Subject<IChatMessage[]>();
         this.userTypingEvent = new Subject<IUsersTypingPayload>();
+        this.editMessageEvent = new Subject<IEditMessageSignalRPayload>();
+        this.deleteMessageEvent = new Subject<IDeleteMessageSignalRPayload>();
         this.channelTypingState = {};
 
         DeviceInfo.getUniqueId().then(id => {
@@ -41,6 +46,12 @@ export class ChatManager {
             case 'user-typing':
                 const typingData = data.payload as IUsersTypingPayload | undefined;
                 return typingData && typingData.userName && typingData.typingState && !isSentByThisDevice;
+            case 'edit-message':
+                const editEventData = data.payload as IEditMessageSignalRPayload | undefined;
+                return editEventData && editEventData.messageId && !isSentByThisDevice;
+            case 'delete-message':
+                const deleteEventData = data.payload as IDeleteMessageSignalRPayload | undefined;
+                return deleteEventData && deleteEventData.messageId && !isSentByThisDevice;
         }
         return false;
     };
@@ -60,6 +71,16 @@ export class ChatManager {
                     const typingData = data.payload as IUsersTypingPayload;
                     console.log('receive user typing: ', typingData);
                     this.userTypingEvent.next(typingData);
+                    break;
+                case 'edit-message':
+                    const editMessagegData = data.payload as IEditMessageSignalRPayload;
+                    console.log('edit mmessage event: ', editMessagegData);
+                    this.editMessageEvent.next(editMessagegData);
+                    break;
+                case 'delete-message':
+                    const deleteMessagegData = data.payload as IDeleteMessageSignalRPayload;
+                    console.log('delete mmessage event: ', deleteMessagegData);
+                    this.deleteMessageEvent.next(deleteMessagegData);
                     break;
             }
         }

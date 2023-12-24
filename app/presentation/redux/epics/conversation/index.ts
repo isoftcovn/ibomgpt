@@ -3,13 +3,14 @@ import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes, updateConversationParticipantsActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
-import { selectMessagesByKey } from '@redux/selectors/conversation';
+import { selectMessagesByKey, selectParticipantsByKey } from '@redux/selectors/conversation';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { StateObservable, combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -46,9 +47,18 @@ export const deleteMessageEpic = (action$: any, state$: any) =>
                 const request = new SubmitMessageRequestModel(objectId, objectInstanceId, 'delete', '');
                 request.comment_id = MessageHelper.shared.extractRealMessageId(messageId);
                 const chatRepo = new ChatRepository();
+                const state = state$.value;
                 chatRepo.submitChatMessages(request)
                     .then(() => {
+                        const key = `${objectId}-${objectInstanceId}`;
+                        const participants = selectParticipantsByKey(state, key);
+                        const userIds = participants.map(item => `${item.id}`);
                         obs.next(deleteMessageActionTypes.successAction());
+                        ChatHelper.shared.sendDeleteMessageEvent(userIds, {
+                            objectId, 
+                            objectInstanceId,
+                            messageId: `${request.comment_id}`,
+                        });
                         obs.complete();
                     })
                     .catch(error => {

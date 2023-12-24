@@ -42,7 +42,7 @@ export const TypingAnimation = React.memo((props: IProps) => {
                 }
                 currentNames.current = names;
             }
-            const display = currentNames.current.length > 0 ? `${currentNames.current.join(', ')} ${currentNames.current.length > 1 ? 'are' : 'is'} typing typing typing typing typing typing typing typing typing typing typing` : '';
+            const display = currentNames.current.length > 0 ? `${currentNames.current.join(', ')} ${currentNames.current.length > 1 ? 'are' : 'is'} typing` : '';
             setTypingName(display);
         });
 

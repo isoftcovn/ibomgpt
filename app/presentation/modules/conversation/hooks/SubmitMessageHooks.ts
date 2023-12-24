@@ -1,26 +1,21 @@
 import { ChatRepository } from '@data/repository/chat';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import UserModel from '@models/user/response/UserModel';
 import { editMessagesActionTypes, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
+import { selectParticipantsByKey } from '@redux/selectors/conversation';
 import { selectProfile } from '@redux/selectors/user';
 import { FileHelper } from '@shared/helper/FileHelper';
 import { MessageHelper } from '@shared/helper/MessageHelper';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IPickerAsset } from './MediaHooks';
 import { ConversationContext } from '../context/ConversationContext';
-import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
-import { ChatManager } from 'app/presentation/managers/ChatManager';
-import { selectParticipantsByKey } from '@redux/selectors/conversation';
+import { IPickerAsset } from './MediaHooks';
 
 const sendMessagesToHub = async (userIds: string[], message: ChatMessageResponse) => {
-    const sentMessage = message;
-    ChatManager.shared.sendMessageToUsers(userIds, {
-        event: 'new-messages',
-        payload: sentMessage,
-        sentDeviceUID: ChatManager.shared._deviceUID,
-    });
+    ChatHelper.shared.sendNewMessagesEvent(userIds, message);
 };
 
 export const useSendTextMessage = (objectId: number, objectInstanceId: number) => {

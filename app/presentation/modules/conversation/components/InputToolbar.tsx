@@ -83,7 +83,6 @@ const MyInput = React.memo((props: IMyComposerProps) => {
     }, [editMessage, setText]);
 
     useEffect(() => {
-        console.log('my input text changed: ', text);
         if (text.length > 0) {
             ChatHelper.shared.sendTypingEvent(userIds, {
                 typingState: 'typing',
@@ -158,7 +157,7 @@ export const MyComposer = (props: IMyComposerProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: theme.spacing.small,
+        paddingVertical: theme.spacing.tiny,
         justifyContent: 'center',
         alignItems: 'center'
     },

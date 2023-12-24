@@ -11,7 +11,7 @@ import { IAppChatMessage } from 'app/presentation/models/chat';
 import { theme } from 'app/presentation/theme';
 import React, { createRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, InteractionManager, Platform, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, InteractionManager, Platform, StyleSheet, TextInput, View, Keyboard } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
@@ -71,6 +71,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const insets = useSafeAreaInsets();
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
+    const [keyboardShown, setKeyboardShown] = useState(false);
     const { textInputRef, editMessage } = useContext(ConversationContext);
     const { setText } = useContext(ConversationInputContext);
     const { t } = useTranslation();
@@ -102,6 +103,21 @@ const ConversationContent = React.memo((props: IProps) => {
             title: name || `${t('detail')}:${route.params?.objectInstanceId ?? 0}`
         });
     }, [route.params, navigation, t]);
+
+    useEffect(() => {
+        const keyboardWillShowListener = Keyboard.addListener(
+            'keyboardWillShow',
+            () => setKeyboardShown(true),
+        );
+        const keyboardWillHideListener = Keyboard.addListener(
+            'keyboardWillHide',
+            () => setKeyboardShown(false),
+        );
+        return () => {
+            keyboardWillShowListener?.remove();
+            keyboardWillHideListener?.remove();
+        };
+    }, []);
 
     useEffect(() => {
         if (!didmountRef.current) {
@@ -205,7 +221,7 @@ const ConversationContent = React.memo((props: IProps) => {
             renderUsernameOnMessage
             showAvatarForEveryMessage={false}
             bottomOffset={Platform.select({
-                ios: 0,
+                ios: insets.bottom > 0 ? 18 : -8,
                 android: undefined
             })}
             listViewProps={{
@@ -216,7 +232,7 @@ const ConversationContent = React.memo((props: IProps) => {
                 onLongPress: undefined
             }}
             messagesContainerStyle={{
-                paddingBottom: theme.spacing.extraLarge,
+                paddingBottom: keyboardShown ? 0 : theme.spacing.medium,
             }}
             onPress={(context, message) => {
                 onMessagePressed(message);

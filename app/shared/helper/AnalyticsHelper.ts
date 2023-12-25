@@ -30,6 +30,7 @@ class AnalyticsHelper {
         OneSignal.login(`${user.id}`);
         if (user.email) {
             OneSignal.User.addEmail(user.email);
+            OneSignal.User.addTag('emailAddress', user.email);
         }
     };
 

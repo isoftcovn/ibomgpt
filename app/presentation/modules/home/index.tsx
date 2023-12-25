@@ -82,7 +82,7 @@ const HomeScreen = (props: IProps) => {
             setListState(isRefreshing ? ListState.refreshing : ListState.loading);
             chatListRequest.current = new ChatListRequestModel();
             if (searchTerm && searchTerm.length > 0) {
-                chatListRequest.current.keysearch = searchTerm;
+                chatListRequest.current.key_search = searchTerm;
             }
             const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
             const response = await usecase.execute();

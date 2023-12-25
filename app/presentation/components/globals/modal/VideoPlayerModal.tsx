@@ -31,10 +31,7 @@ export const VideoPlayerModal = React.memo((props: IProps) => {
     >
         <VideoPlayer
             source={{ uri: videoUri }}
-            style={[styles.videoPlayerContainer, {
-                paddingTop: insets.top + theme.spacing.large,
-                paddingBottom: insets.bottom + theme.spacing.large,
-            }]}
+            style={[styles.videoPlayerContainer]}
             videoStyle={styles.video}
             disableFullscreen
             onBack={onBack}

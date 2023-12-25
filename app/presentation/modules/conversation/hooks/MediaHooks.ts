@@ -68,7 +68,7 @@ export const usePickMediaAssets = (): IPickMediaResult => {
             const responses = await ImagePicker.openPicker({
                 multiple: true,
                 mediaType: 'any',
-                compressVideoPreset: '1280x720',
+                compressVideoPreset: '960x540',
                 compressImageQuality: 0.8,
                 compressImageMaxWidth: 1024,
             });

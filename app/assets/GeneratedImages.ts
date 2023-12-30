@@ -5,7 +5,6 @@
  */
  
 const GeneratedImages = {
-    app_logo: require('./images/resources/app_logo.png'),
     en: require('./images/resources/en.png'),
     ic_account: require('./images/resources/ic_account.png'),
     ic_back: require('./images/resources/ic_back.png'),

@@ -24,6 +24,8 @@ import { HomeHeader } from './components/HomeHeader';
 import { TextPrimary } from '@components/index';
 import { useTranslation } from 'react-i18next';
 import { useConversations } from './hooks';
+import AppManager from '@shared/managers/AppManager';
+import NotificationHelper from '@shared/helper/NotificationHelper';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -151,15 +153,37 @@ const HomeScreen = (props: IProps) => {
                 loadData();
             });
             didMountRef.current = true;
+
+            NotificationHelper.askPermissionAndRegisterDeviceToken({
+                onPermission: granted => {
+                    console.info('notification granted: ', granted);
+                }
+            }, {
+                onDeviceTokenReceived: deviceToken => {
+                    console.info('deviceToken: ', deviceToken);
+                }
+            });
         }
     }, [loadData]);
 
+    // Search term request
     useEffect(() => {
         const subscription = searchTermRef.current.pipe(skip(1), debounceTime(500))
             .subscribe(searchTerm => {
                 console.info('Debounce search term: ', searchTerm);
                 loadData(false, searchTerm);
             });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [loadData]);
+
+    // Refresh when app from background to foreground
+    useEffect(() => {
+        const subscription = AppManager.appFromBackgroundToForeground.subscribe(() => {
+            loadData(true, searchTermRef.current.value);
+        });
 
         return () => {
             subscription.unsubscribe();

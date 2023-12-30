@@ -132,10 +132,19 @@ const RootContainer = React.memo((props: Props) => {
     useEffect(() => {
         const appstateSubscription = AppState.addEventListener('change', nextAppState => {
             if (
-                AppManager.appStateStatus.value.match(/inactive|background/) &&
+                AppManager.appStateStatus.value.match(/background/) &&
                 nextAppState === 'active'
             ) {
+                AppManager.appFromBackgroundToForeground.next(new Date());
                 console.info('App has come to the foreground!');
+            }
+
+            if (
+                AppManager.appStateStatus.value.match(/active/) &&
+                (nextAppState === 'inactive' || nextAppState === 'background')
+            ) {
+                AppManager.appFromForegroundToBackground.next(new Date());
+                console.info('App has come to the background!');
             }
 
             AppManager.appStateStatus.next(nextAppState);

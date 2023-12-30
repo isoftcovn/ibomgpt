@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import { legacy_createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 import { createLogger } from 'redux-logger';
 import { rootEpic } from 'app/presentation/redux/epics';
@@ -11,7 +11,7 @@ if (__DEV__) {
     middlewares.push(createLogger());
 }
 
-export const store = createStore(rootReducer, compose(applyMiddleware(...middlewares)));
+export const store = legacy_createStore(rootReducer, compose(applyMiddleware(...middlewares)));
 
 epicMiddleware.run(rootEpic);
 

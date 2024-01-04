@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useConversations } from './hooks';
 import AppManager from '@shared/managers/AppManager';
 import NotificationHelper from '@shared/helper/NotificationHelper';
+import { OneSignal } from 'react-native-onesignal';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -153,7 +154,7 @@ const HomeScreen = (props: IProps) => {
                 loadData();
             });
             didMountRef.current = true;
-
+            OneSignal.User.pushSubscription.optIn();
             NotificationHelper.askPermissionAndRegisterDeviceToken({
                 onPermission: granted => {
                     console.info('notification granted: ', granted);
@@ -161,6 +162,7 @@ const HomeScreen = (props: IProps) => {
             }, {
                 onDeviceTokenReceived: deviceToken => {
                     console.info('deviceToken: ', deviceToken);
+
                 }
             });
         }

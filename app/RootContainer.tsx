@@ -16,6 +16,7 @@ import RNShake from 'react-native-shake';
 import DeeplinkHandler from './presentation/managers/DeeplinkHandler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { OneSignal, PushSubscriptionChangedState } from 'react-native-onesignal';
 
 interface Props {
 }
@@ -40,6 +41,18 @@ const RootContainer = React.memo((props: Props) => {
             deeplinkUrl.current = undefined;
         }
     }, [_setPendingDeeplink]);
+
+    const pushStateChanged = useCallback((subscription: PushSubscriptionChangedState) => {
+        console.log('OneSignal: subscription changed:', subscription);
+    }, []);
+
+    useEffect(() => {
+        OneSignal.User.pushSubscription.addEventListener('change', pushStateChanged);
+
+        return () => {
+            OneSignal.User.pushSubscription.removeEventListener('change', pushStateChanged);
+        };
+    }, [pushStateChanged]);
 
     // Subscribe deeplinks
     useEffect(() => {

@@ -16,9 +16,6 @@
     [FIRApp configure];
   }
 
-  UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-  center.delegate = self;
-
   for (NSString *familyName in [UIFont familyNames]){
     NSLog(@"Family name: %@", familyName);
     for (NSString *fontName in [UIFont fontNamesForFamilyName:familyName]) {

@@ -58,17 +58,18 @@ export default class DefaultNotificationHandler implements INotificationHandler 
         event.preventDefault();
         const notification = event.notification;
         console.log('display notification: ', notification);
-        const payload: any = notification.additionalData || {};
-        if (notification.body && notification.title) {
-            await Notifee.displayNotification({
-                id: uuidv4(),
-                body: notification.body,
-                title: notification.title,
-                data: payload,
-                android: {
-                    channelId: NOTIFICATION_CHANNEL,
-                },
-            });
-        }
+        event.getNotification().display();
+        // const payload: any = notification.additionalData || {};
+        // if (notification.body && notification.title) {
+        //     await Notifee.displayNotification({
+        //         id: uuidv4(),
+        //         body: notification.body,
+        //         title: notification.title,
+        //         data: payload,
+        //         android: {
+        //             channelId: NOTIFICATION_CHANNEL,
+        //         },
+        //     });
+        // }
     };
 }

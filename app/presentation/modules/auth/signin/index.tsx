@@ -1,6 +1,7 @@
 import { AuthRepository } from '@data/repository/auth';
 import { UserRepository } from '@data/repository/user';
 import { LoginEmailUseCase } from '@domain/auth/LoginEmailUseCase';
+import { IUserRepository } from '@domain/user';
 import LoginRequestModel from '@models/auth/request/LoginRequestModel';
 import { APIError } from '@models/error/APIError';
 import { AppStackParamList } from '@navigation/RouteParams';
@@ -9,6 +10,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getProfileActionTypes } from '@redux/actions/user';
 import DropDownHolder from '@shared/helper/DropdownHolder';
 import LoadingManager from '@shared/helper/LoadingManager';
+import NotificationHelper from '@shared/helper/NotificationHelper';
 import GeneratedImages from 'app/assets/GeneratedImages';
 import { Input, TextButton, TextPrimary } from 'app/presentation/components';
 import { Box } from 'app/presentation/components/globals/view/Box';
@@ -18,16 +20,14 @@ import { Dimensions } from 'app/presentation/theme/Dimensions';
 import { Formik, FormikProps } from 'formik';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Image, Platform, StyleSheet, TextInput, TouchableOpacity, View, StatusBar } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import { DeviceEventEmitter, Image, Platform, StatusBar, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { OneSignal } from 'react-native-onesignal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import { OneSignal } from 'react-native-onesignal';
-import { IUserRepository } from '@domain/user';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'SignIn'>;
@@ -62,9 +62,25 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
         });
     }, [t]);
 
+    const requestNotificationPermission = useCallback(() => {
+        return new Promise((resolve) => {
+            NotificationHelper.askPermissionAndRegisterDeviceToken({
+                onPermission: async granted => {
+                    console.info('notification granted: ', granted);
+                    resolve(granted);
+                }
+            }, {
+                onDeviceTokenReceived: deviceToken => {
+                    console.info('deviceToken: ', deviceToken);
+                }
+            });
+        });
+    }, []);
+
     useEffect(() => {
         DeviceEventEmitter.emit('credentialsReadyForUnauth');
         OneSignal.logout();
+        requestNotificationPermission();
 
         userRepository.current.getUserCreds().then(userCreds => {
             if (userCreds && userCreds.length >= 2) {
@@ -73,7 +89,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                 setInitialPass(password);
             }
         }).catch(() => { });
-    }, []);
+    }, [requestNotificationPermission]);
 
     const toHome = useCallback(() => {
         navigation.dispatch(MainUserNavigator);
@@ -87,7 +103,8 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
         try {
             LoadingManager.setLoading(true);
             const userAgent = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
-            const deviceId = await DeviceInfo.getUniqueId();
+            const deviceId = OneSignal.User.pushSubscription.getPushSubscriptionId();
+            console.info('onesignal subscriptionID: ', deviceId);
             const usecase = new LoginEmailUseCase({
                 authRepository: new AuthRepository(),
                 userRepository: new UserRepository(),

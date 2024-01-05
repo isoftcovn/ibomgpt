@@ -154,17 +154,6 @@ const HomeScreen = (props: IProps) => {
                 loadData();
             });
             didMountRef.current = true;
-            OneSignal.User.pushSubscription.optIn();
-            NotificationHelper.askPermissionAndRegisterDeviceToken({
-                onPermission: granted => {
-                    console.info('notification granted: ', granted);
-                }
-            }, {
-                onDeviceTokenReceived: deviceToken => {
-                    console.info('deviceToken: ', deviceToken);
-
-                }
-            });
         }
     }, [loadData]);
 

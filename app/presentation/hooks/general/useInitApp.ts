@@ -8,6 +8,8 @@ import DeviceInfo from 'react-native-device-info';
 import { AuthRepository } from '@data/repository/auth';
 import { UserRepository } from '@data/repository/user';
 import LoginRequestModel from '@models/auth/request/LoginRequestModel';
+import NotificationHelper from '@shared/helper/NotificationHelper';
+import { OneSignal } from 'react-native-onesignal';
 
 export enum InitAppStatus {
     initial,
@@ -26,13 +28,33 @@ export const useInitApp = (userRepository: IUserRepository, tryAgainTimestamp?: 
         // TODO: Fill the logic
     }, []);
 
+    const requestNotificationPermission = useCallback(() => {
+        return new Promise((resolve) => {
+            NotificationHelper.askPermissionAndRegisterDeviceToken({
+                onPermission: async granted => {
+                    console.info('notification granted: ', granted);
+                    resolve(granted);
+                }
+            }, {
+                onDeviceTokenReceived: deviceToken => {
+                    console.info('deviceToken: ', deviceToken);
+                }
+            });
+        });
+    }, []);
+
     const retrieveUserSession = useCallback(async () => {
         try {
             const userCreds = await userRepository.getUserCreds();
             if (userCreds && userCreds.length >= 2) {
                 const [username, password] = userCreds;
                 const userAgent = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
-                const deviceId = await DeviceInfo.getUniqueId();
+                let deviceId = '';
+                const notificationPermissionGranted = await requestNotificationPermission();
+                if (notificationPermissionGranted) {
+                    deviceId = OneSignal.User.pushSubscription.getPushSubscriptionId();
+                    console.info('onesignal subscriptionID: ', deviceId);
+                }
                 const usecase = new LoginEmailUseCase({
                     authRepository: new AuthRepository(),
                     userRepository: new UserRepository(),
@@ -48,7 +70,7 @@ export const useInitApp = (userRepository: IUserRepository, tryAgainTimestamp?: 
             console.info('Retrive user session failed: ', error);
             setStatus(InitAppStatus.unauthenicated);
         }
-    }, [userRepository, dispatch]);
+    }, [userRepository, dispatch, requestNotificationPermission]);
 
     const initApp = useCallback(async () => {
         setStatus(InitAppStatus.loading);

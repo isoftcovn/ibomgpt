@@ -12,6 +12,11 @@ export default class DefaultInterceptor extends Interceptor {
     }
 
     requestFulfilled = (config: InternalAxiosRequestConfig) => {
+        if (config.data instanceof FormData) {
+            const form = config.data as FormData;
+            form.append('app_type', 1);
+            config.data = form;
+        }
         return config;
     };
 

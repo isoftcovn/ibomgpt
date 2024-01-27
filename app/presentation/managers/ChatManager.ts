@@ -12,6 +12,11 @@ export class ChatManager {
     _chathubURI?: string;
     _deviceUID?: string;
 
+    currentConversationInfo = {
+        objectId: 0,
+        objectInstanceId: 0
+    };
+
     channelTypingState: Record<string, TypingState>;
 
     connection?: signalR.HubConnection;

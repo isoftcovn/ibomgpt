@@ -3,6 +3,7 @@ import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { IResource } from '../resource';
 import Interceptor from './interceptor';
+
 export default class DefaultInterceptor extends Interceptor {
 
     _requestID = uuidv4();
@@ -14,8 +15,11 @@ export default class DefaultInterceptor extends Interceptor {
     requestFulfilled = (config: InternalAxiosRequestConfig) => {
         if (config.data instanceof FormData) {
             const form = config.data as FormData;
-            form.append('app_type', 1); // Only for BE knows which app is
-            config.data = form;
+            const data = form.getParts();
+            const appTypeData = data.find(item => item.fieldName === 'app_type');
+            if (!appTypeData || !appTypeData.string) {
+                form.append('app_type', 1);
+            }
         }
         return config;
     };

@@ -15,7 +15,7 @@ import { ListState } from 'app/presentation/models/general';
 import { theme } from 'app/presentation/theme';
 import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { InteractionManager, ListRenderItemInfo, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { InteractionManager, ListRenderItemInfo, StyleSheet, View, ActivityIndicator, DeviceEventEmitter } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useDispatch, useSelector } from 'react-redux';
 import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
@@ -154,6 +154,7 @@ const HomeScreen = (props: IProps) => {
                 loadData();
             });
             didMountRef.current = true;
+            DeviceEventEmitter.emit('credentialsReadyForAuth');
         }
     }, [loadData]);
 

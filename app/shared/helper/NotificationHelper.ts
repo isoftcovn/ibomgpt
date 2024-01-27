@@ -1,5 +1,5 @@
 import DefaultNotificationHandler, { INotificationHandler } from 'app/shared/helper/NotificationHandler';
-import Notifee, { AuthorizationStatus } from '@notifee/react-native';
+import Notifee, { AndroidImportance, AuthorizationStatus } from '@notifee/react-native';
 import { NotificationWillDisplayEvent, OneSignal } from 'react-native-onesignal';
 import { NOTIFICATION_CHANNEL } from '../constants';
 
@@ -34,6 +34,7 @@ class NotificationHelper {
         const channelId = await Notifee.createChannel({
             id: NOTIFICATION_CHANNEL,
             name: NOTIFICATION_CHANNEL,
+            importance: AndroidImportance.HIGH
         });
         console.info(`Created channel ${NOTIFICATION_CHANNEL}: `, channelId);
     };

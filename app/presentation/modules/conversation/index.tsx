@@ -27,6 +27,7 @@ import { useSendMediaMessage, useSendTextMessage } from './hooks/SubmitMessageHo
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 import { TypingAnimation } from './components/TypingAninimation';
 import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -116,6 +117,10 @@ const ConversationContent = React.memo((props: IProps) => {
         return () => {
             keyboardWillShowListener?.remove();
             keyboardWillHideListener?.remove();
+            ChatManager.shared.currentConversationInfo = {
+                objectId: 0,
+                objectInstanceId: 0
+            };
         };
     }, []);
 
@@ -126,6 +131,10 @@ const ConversationContent = React.memo((props: IProps) => {
                 dispatch(getMessagesActionTypes.startAction(request));
             });
             didmountRef.current = true;
+            ChatManager.shared.currentConversationInfo = {
+                objectId,
+                objectInstanceId
+            };
         }
 
         return () => {

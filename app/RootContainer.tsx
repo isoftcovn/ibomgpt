@@ -171,6 +171,7 @@ const RootContainer = React.memo((props: Props) => {
     // Subscribe to events
     useEffect(() => {
         return notifee.onForegroundEvent(({ type, detail }) => {
+            console.info('notifee.onForegroundEvent', type, detail);
             switch (type) {
                 case EventType.DISMISSED:
                     console.info('User dismissed notification', detail.notification);

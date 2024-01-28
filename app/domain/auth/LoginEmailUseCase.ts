@@ -26,13 +26,13 @@ export class LoginEmailUseCase implements IUseCase<UserModel> {
     }
 
     execute = async (): Promise<UserModel> => {
+        await this.userRepository.saveUserCreds(this.body.username, this.body.password);
         const response = await this.authRepository.loginUserEmail(this.body);
         const user = new UserModel();
         user.id = response.userId;
         user.email = response.username;
         user.fullname = response.fullname;
         await this.userRepository.saveUserToken(response.token);
-        await this.userRepository.saveUserCreds(this.body.username, this.body.password);
         DataStore.shared.apiHost = response.hostApi;
         DataStore.shared.username = this.body.username;
         if (response.chathubURI) {

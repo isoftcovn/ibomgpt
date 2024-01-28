@@ -1,4 +1,7 @@
-import notifee, { EventType } from '@notifee/react-native';
+import { UserRepository } from '@data/repository/user';
+import LogoutUseCase from '@domain/user/LogoutUseCase';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { AuthNavigator } from '@navigation/helper/shortcut';
 import { NavigationContainer, NavigationState } from '@react-navigation/native';
 import AppManager from '@shared/managers/AppManager';
 import { DropdownAlert, LoadingIndicator } from 'app/presentation/components';
@@ -12,11 +15,10 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { AppState, DeviceEventEmitter, EmitterSubscription, Linking, Platform, StatusBar, StyleSheet } from 'react-native';
 import Config from 'react-native-config';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { OneSignal, PushSubscriptionChangedState } from 'react-native-onesignal';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import RNShake from 'react-native-shake';
 import DeeplinkHandler from './presentation/managers/DeeplinkHandler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { OneSignal, PushSubscriptionChangedState } from 'react-native-onesignal';
 
 interface Props {
 }
@@ -133,9 +135,19 @@ const RootContainer = React.memo((props: Props) => {
             }
         });
 
+        const forceSignoutSubscription = AppManager.forceSignout.subscribe(reason => {
+            console.warn('Force signout reason: ', reason);
+            const usecase = new LogoutUseCase(new UserRepository());
+            usecase.execute().catch(error => {
+                console.warn('Logout error: ', error);
+            });
+            NavigationService.topLevelNavigator?.dispatch(AuthNavigator);
+        });
+
         NotificationHelper.listenOnNotification(NotificationHelper.notificationHandler);
 
         return () => {
+            forceSignoutSubscription.unsubscribe();
             shakeSubscription.remove();
             NotificationHelper.detachListeners();
         };

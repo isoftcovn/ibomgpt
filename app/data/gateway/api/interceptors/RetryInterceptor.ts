@@ -1,10 +1,18 @@
+import AppManager from '@shared/managers/AppManager';
 import { IUserRepository } from 'app/domain/user';
 import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { IResource } from '../resource';
 import Interceptor from './interceptor';
 
-let maxRetries = 3;
+const maxRetries = 3;
 let retryCount = 0;
+
+const maxRefreshInPeriod = 5;
+let retryCountInPeriod = 0;
+
+setInterval(() => {
+    retryCountInPeriod = 0;
+}, 1000 * 60);
 
 type RefreshTokenCallback = (token?: string, refreshToken?: string, error?: AxiosError) => void
 
@@ -62,11 +70,17 @@ export default class RetryInterceptor extends Interceptor {
             if (!originalRequest) { return Promise.reject(error); }
             if (status === 401 || errorCode === '001') {
                 if (retryCount >= maxRetries) {
+                    AppManager.forceSignout.next(errorCode);
+                    return Promise.reject(error);
+                }
+                if (retryCountInPeriod >= maxRefreshInPeriod) {
+                    AppManager.forceSignout.next(errorCode);
                     return Promise.reject(error);
                 }
                 if (!isRefreshing) {
                     isRefreshing = true;
                     retryCount++;
+                    retryCountInPeriod++;
                     this.customerRepo.refreshToken()
                         .then(response => {
                             isRefreshing = false;

@@ -10,10 +10,13 @@ class AppManager {
     appFromBackgroundToForeground: Subject<Date>;
     appFromForegroundToBackground: Subject<Date>;
 
+    forceSignout: Subject<string>;
+
     constructor() {
         this.appStateStatus = new BehaviorSubject<AppStateStatus>('unknown');
         this.appFromBackgroundToForeground = new Subject<Date>();
         this.appFromForegroundToBackground = new Subject<Date>();
+        this.forceSignout = new Subject<string>();
     }
 }
 

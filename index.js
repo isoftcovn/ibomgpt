@@ -31,17 +31,6 @@ dayjs.extend(customParseFormat);
 
 configureLocalization('vi_VN');
 
-notifee.onBackgroundEvent(async ({ type, detail }) => {
-    const { notification, } = detail;
-    console.log('notifee.onBackgroundEvent: ', type, detail);
-    if (type === EventType.PRESS && notification) {
-        NotificationHelper.notificationHandler.onNotificationOpened?.(notification, false);
-
-        // Remove the notification
-        await notifee.cancelNotification(notification.id);
-    }
-});
-
 function HeadlessCheck({ isHeadless }) {
     if (isHeadless) {
         // App has been launched in the background by iOS, ignore

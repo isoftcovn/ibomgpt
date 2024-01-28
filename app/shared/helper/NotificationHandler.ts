@@ -1,16 +1,13 @@
-import Notifee, { Notification } from '@notifee/react-native';
 import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { DeviceEventEmitter, EmitterSubscription } from 'react-native';
-import { NotificationWillDisplayEvent } from 'react-native-onesignal';
-import { v4 as uuidv4 } from 'uuid';
-import { NOTIFICATION_CHANNEL } from '../constants';
+import { NotificationClickEvent, NotificationWillDisplayEvent } from 'react-native-onesignal';
 import AppManager from '../managers/AppManager';
 import NavigationService from './NavigationService';
 
 export interface INotificationHandler {
     onMessage: (message: NotificationWillDisplayEvent) => void;
     onNotificationDisplayed?: (notification: any) => void;
-    onNotificationOpened?: (notificationOpen: Notification, isForeground: boolean) => void;
+    onNotificationOpened?: (notificationOpen: NotificationClickEvent) => void;
 }
 
 export default class DefaultNotificationHandler implements INotificationHandler {
@@ -23,12 +20,11 @@ export default class DefaultNotificationHandler implements INotificationHandler 
         this.displayNotification(notification);
     };
 
-    handleOpenNotification = (notificationOpen: Notification) => {
-        const data = notificationOpen.data;
-        const customData = (data?.custom ?? {}) as any;
-        if (customData.a) {
+    handleOpenNotification = (notificationOpen: NotificationClickEvent) => {
+        const data = notificationOpen.notification.additionalData;
+        if (data) {
             // TODO: change the notification data field here
-            const payload = customData.a as any;
+            const payload = data as any;
             const objectId = payload.object_id ? parseInt(`${payload.object_id}`, 10) : undefined;
             const objectInstanceId = payload.object_instance_id ? parseInt(`${payload.object_instance_id}`, 10) : undefined;
             if (objectId && objectInstanceId) {
@@ -45,10 +41,8 @@ export default class DefaultNotificationHandler implements INotificationHandler 
         }
     };
 
-    onNotificationOpened = (notificationOpen: Notification, isForeground: boolean) => {
+    onNotificationOpened = (notificationOpen: NotificationClickEvent) => {
         console.info('Opened Notification: ', notificationOpen);
-        console.info('isForeground: ', isForeground);
-
 
         if (AppManager.appState.credentialsReadyForAuth) {
             this.handleOpenNotification(notificationOpen);
@@ -73,7 +67,7 @@ export default class DefaultNotificationHandler implements INotificationHandler 
         return true;
     };
 
-    displayNotification = async (event: NotificationWillDisplayEvent) => {        
+    displayNotification = async (event: NotificationWillDisplayEvent) => {
         event.preventDefault();
         const notification = event.notification;
         if (!this._shouldDisplayNotification(event)) {

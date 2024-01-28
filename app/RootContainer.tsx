@@ -170,19 +170,9 @@ const RootContainer = React.memo((props: Props) => {
 
     // Subscribe to events
     useEffect(() => {
-        return notifee.onForegroundEvent(({ type, detail }) => {
-            console.info('notifee.onForegroundEvent', type, detail);
-            switch (type) {
-                case EventType.DISMISSED:
-                    console.info('User dismissed notification', detail.notification);
-                    break;
-                case EventType.PRESS:
-                    console.info('User pressed notification', detail.notification);
-                    if (detail.notification) {
-                        NotificationHelper.notificationHandler.onNotificationOpened?.(detail.notification, true);
-                    }
-                    break;
-            }
+        OneSignal.Notifications.addEventListener('click', (event) => {
+            console.log('OneSignal: notification clicked:', event);
+            NotificationHelper.notificationHandler.onNotificationOpened?.(event);
         });
     }, []);
 

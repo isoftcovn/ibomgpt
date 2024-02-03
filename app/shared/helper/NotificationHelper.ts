@@ -17,7 +17,7 @@ class NotificationHelper {
 
     constructor() {
         this.notificationHandler = new DefaultNotificationHandler();
-        this.createDefaultChannel();
+        // this.createDefaultChannel();
     }
 
     hasPermission = async () => {

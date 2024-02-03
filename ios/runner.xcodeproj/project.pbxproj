@@ -10,6 +10,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		3973756B9DBF2961AC7DA934 /* libPods-runner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C40B720446126010FA406280 /* libPods-runner.a */; };
+		4F4812782B6DE6EE008FD905 /* default_sound.wav in Resources */ = {isa = PBXBuildFile; fileRef = 4F4812772B6DE6EE008FD905 /* default_sound.wav */; };
 		4F717F172858ED3C00B0B773 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F717F162858ED3C00B0B773 /* AppDelegate.mm */; };
 		4F7C3F32266FC48400104D09 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4F7C3F28266FC48300104D09 /* OpenSans-Regular.ttf */; };
 		4F7C3F33266FC48400104D09 /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4F7C3F29266FC48300104D09 /* OpenSans-Light.ttf */; };
@@ -67,6 +68,7 @@
 		4F1EA7A0266FC3C900144DE1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4F1EA7A2266FC3C900144DE1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4F1EA7A4266FC3C900144DE1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4F4812772B6DE6EE008FD905 /* default_sound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = default_sound.wav; sourceTree = "<group>"; };
 		4F717F162858ED3C00B0B773 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = runner/AppDelegate.mm; sourceTree = "<group>"; };
 		4F7C3F28266FC48300104D09 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		4F7C3F29266FC48300104D09 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Light.ttf"; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 		4F1EA79E266FC3C900144DE1 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				4F4812772B6DE6EE008FD905 /* default_sound.wav */,
 				4F7C3F2C266FC48400104D09 /* OpenSans-Bold.ttf */,
 				4F7C3F2D266FC48400104D09 /* OpenSans-BoldItalic.ttf */,
 				4F7C3F2A266FC48300104D09 /* OpenSans-ExtraBold.ttf */,
@@ -361,6 +364,7 @@
 				4F7C3F3B266FC48400104D09 /* OpenSans-SemiBold.ttf in Resources */,
 				4F7C3F39266FC48400104D09 /* OpenSans-LightItalic.ttf in Resources */,
 				4F7C3F33266FC48400104D09 /* OpenSans-Light.ttf in Resources */,
+				4F4812782B6DE6EE008FD905 /* default_sound.wav in Resources */,
 				4F7C3F35266FC48400104D09 /* OpenSans-Italic.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				4F7C3F3A266FC48400104D09 /* OpenSans-SemiBoldItalic.ttf in Resources */,
@@ -885,10 +889,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -1144,10 +1145,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -1331,10 +1329,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -1517,10 +1512,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -1960,10 +1952,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -2029,10 +2018,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

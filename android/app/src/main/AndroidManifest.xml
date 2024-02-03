@@ -51,5 +51,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data android:name="com.onesignal.NotificationAccentColor.DEFAULT" android:value="FF0000"/>
     </application>
 </manifest>

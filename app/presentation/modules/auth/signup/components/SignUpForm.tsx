@@ -43,7 +43,8 @@ export const SignUpEmailForm = React.memo((props: IProps) => {
             email: Yup.string()
                 .required(t('required') ?? '')
                 .email(t('invalidEmail') ?? ''),
-            name: Yup.string().required(),
+            name: Yup.string()
+                .required(t('required') ?? ''),
             password: Yup.string()
                 .required(t('required') ?? '')
                 .min(8, t('passwordTooShort')!),
@@ -58,15 +59,16 @@ export const SignUpEmailForm = React.memo((props: IProps) => {
 
     const onSubmit = useCallback(async (values: ISignInFormData) => {
         try {
-            const parts = values.name.split(' ');
-            const firstName = parts[0];
-            const lastName = parts.slice(1).join(' ');
+            // const parts = values.name.split(' ');
+            // const firstName = parts[0];
+            // const lastName = parts.slice(1).join(' ');
             const usecase = new SignupEmailUseCase({
                 authRepository: new AuthRepository(),
                 userRepository: new UserRepository(),
             });
             LoadingManager.setLoading(true);
             await usecase.execute();
+            DropDownHolder.showSuccessAlert(t('signupSuccessfully'));
             navigation.goBack();
         } catch (error) {
             const _error = error as APIError;
@@ -74,7 +76,7 @@ export const SignUpEmailForm = React.memo((props: IProps) => {
         } finally {
             LoadingManager.setLoading(false);
         }
-    }, [navigation]);
+    }, [navigation, t]);
 
     return <Formik<ISignInFormData>
         validateOnBlur={false}

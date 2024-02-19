@@ -45,7 +45,7 @@ const RootContainer = React.memo((props: Props) => {
     }, [_setPendingDeeplink]);
 
     const pushStateChanged = useCallback((subscription: PushSubscriptionChangedState) => {
-        console.log('OneSignal: subscription changed:', subscription);
+        console.info('OneSignal: subscription changed:', subscription);
     }, []);
 
     useEffect(() => {
@@ -183,7 +183,7 @@ const RootContainer = React.memo((props: Props) => {
     // Subscribe to events
     useEffect(() => {
         OneSignal.Notifications.addEventListener('click', (event) => {
-            console.log('OneSignal: notification clicked:', event);
+            console.info('OneSignal: notification clicked:', event);
             NotificationHelper.notificationHandler.onNotificationOpened?.(event);
         });
     }, []);

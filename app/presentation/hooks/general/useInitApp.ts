@@ -1,15 +1,14 @@
-import { LoginEmailUseCase } from '@domain/auth/LoginEmailUseCase';
-import { IUserRepository } from '@domain/user';
-import { getProfileActionTypes } from '@redux/actions/user';
-import { useCallback, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
-import { useDispatch } from 'react-redux';
-import DeviceInfo from 'react-native-device-info';
 import { AuthRepository } from '@data/repository/auth';
 import { UserRepository } from '@data/repository/user';
+import { LoginEmailUseCase } from '@domain/auth/LoginEmailUseCase';
+import { IUserRepository } from '@domain/user';
 import LoginRequestModel from '@models/auth/request/LoginRequestModel';
+import { getProfileActionTypes } from '@redux/actions/user';
 import NotificationHelper from '@shared/helper/NotificationHelper';
+import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { OneSignal } from 'react-native-onesignal';
+import { useDispatch } from 'react-redux';
 
 export enum InitAppStatus {
     initial,

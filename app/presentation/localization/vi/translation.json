@@ -38,7 +38,7 @@
     "home": "Home",
     "helpCenter": "Trung tâm trợ giúp",
 
-    "info": "Info",
+    "info": "Thông báo",
     "invalidEmail": "Email không hợp lệ",
 
     "korean": "Korean",
@@ -75,13 +75,13 @@
     "scan": "Scan",
     "search": "Search",
     "status": "Status",
-    "success": "SUCCESS",
-    "signupSuccessfully": "Đăng ký thành công",
+    "success": "Thành công",
+    "signupSuccessfully": "Đăng ký thành công.\nAdmin sẽ duyệt và email lại cho bạn.",
     "searchConversation": "Tìm kiến trao đổi",
     "send": "Gửi",
     "sentAnImage": "Đã gửi hình ảnh",
     "sentAVideo": "Đã gửi video",
-    "sentAFile": "Đã gửi tệp tin",
+    "sentAFile": "Đã gửi tệp tin",    
 
     "used": "Used",
     "useCamera": "Sử dụng máy ảnh",

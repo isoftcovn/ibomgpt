@@ -5,6 +5,7 @@ import { IChatMessage } from 'react-native-gifted-chat';
 import { Subject } from 'rxjs';
 import DeviceInfo from 'react-native-device-info';
 import { ISignalRData, IUsersTypingPayload, IDeleteMessageSignalRPayload, IEditMessageSignalRPayload, TypingState } from './ChatManager.interfaces';
+import { IAppChatMessage } from '../models/chat';
 
 export class ChatManager {
     static shared = new ChatManager();
@@ -45,7 +46,12 @@ export class ChatManager {
         const isSentByThisDevice = data?.sentDeviceUID === this._deviceUID;
         switch (event) {
             case 'new-messages':
-                const message = data.payload as ChatMessageResponse | undefined;
+                const payload = data.payload;
+                const isRawPayload = Boolean(payload?.comment_id);
+                let message = data.payload as ChatMessageResponse | undefined;
+                if (isRawPayload) {
+                    message = ChatMessageResponse.parseFromJson(payload);
+                }
                 const isValidMessagePayload = message && message.id && message.objectId && message.objectInstanceId;
                 return isValidMessagePayload && !isSentByThisDevice;
             case 'user-typing':
@@ -68,7 +74,13 @@ export class ChatManager {
             const event = data.event;
             switch (event) {
                 case 'new-messages':
-                    const messages = MessageHelper.shared.convertMessageResponseToChatMessage(data.payload);
+                    const isRawPayload = Boolean(data.payload.comment_id);
+                    let payload: ChatMessageResponse = data.payload;
+                    let messages: IAppChatMessage[] = [];
+                    if (isRawPayload) {
+                        payload = ChatMessageResponse.parseFromJson(payload);
+                    }
+                    messages = MessageHelper.shared.convertMessageResponseToChatMessage(payload);
                     console.log('receive converted messages: ', messages);
                     this.receiveMessageEvent.next(messages);
                     break;

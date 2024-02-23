@@ -114,7 +114,8 @@ export default function (state = initialState, action: IAction<any>) {
         });
     }
     if (actionType === deleteMessageActionTypes.start || actionType === deleteMessageRealtimeActionTypes.start) {
-        const { messageId, objectId, objectInstanceId } = action.payload! as IDeleteMessagePayload;
+        let { messageId, objectId, objectInstanceId } = action.payload! as IDeleteMessagePayload;
+        messageId = `${messageId}`;
         return produce(state, draft => {
             const sectionId = `${objectId}-${objectInstanceId}`;
             let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];

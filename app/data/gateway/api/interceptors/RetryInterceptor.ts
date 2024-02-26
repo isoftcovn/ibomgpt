@@ -1,7 +1,7 @@
 import AppManager from '@shared/managers/AppManager';
 import { IUserRepository } from 'app/domain/user';
 import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { IResource } from '../resource';
+import { AppResource, IResource } from '../resource';
 import Interceptor from './interceptor';
 
 const maxRetries = 3;
@@ -31,6 +31,8 @@ let refreshSubscribers: RefreshTokenCallback[] = [];
 export default class RetryInterceptor extends Interceptor {
     axiosInstance: AxiosInstance;
     customerRepo: IUserRepository;
+
+    URL_BLACKLIST = [AppResource.Auth.Login(), AppResource.Auth.Register()];
 
     constructor(resource: IResource, axiosInstance: AxiosInstance, customerRepo: IUserRepository) {
         super(resource);
@@ -69,6 +71,10 @@ export default class RetryInterceptor extends Interceptor {
             const originalRequest = error.config;
             if (!originalRequest) { return Promise.reject(error); }
             if (status === 401 || errorCode === '001') {
+                const url = originalRequest.url;
+                if (this.URL_BLACKLIST.some(item => url?.includes(item.Path) ?? false)) {
+                    return Promise.reject(error);
+                }
                 if (retryCount >= maxRetries) {
                     AppManager.forceSignout.next(errorCode);
                     return Promise.reject(error);

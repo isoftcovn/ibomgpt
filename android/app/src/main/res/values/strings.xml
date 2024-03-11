@@ -1,4 +1,4 @@
 <resources>
     <string name="default_notification_channel_id">app-notification</string>
-    <string name="onesignal_notification_accent_color">FF0000</string>
+    <string name="onesignal_notification_accent_color">FF0000</string>    
 </resources>

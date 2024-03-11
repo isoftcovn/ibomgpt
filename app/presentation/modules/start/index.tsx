@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
+import CodePush from 'react-native-code-push';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'SplashScreen'>;
@@ -24,7 +25,7 @@ export const StartScreen = React.memo((props: IProps) => {
     const { navigation } = props;
     const userRepositoryRef = useRef<IUserRepository>(new UserRepository());
     const [tryAgainTimestamp, setTryAgainTimestamp] = useState<number>();
-    const initAppStatus = useInitApp(userRepositoryRef.current, tryAgainTimestamp);
+    const { status: initAppStatus, updateProgressText, updateProgress, syncStatus } = useInitApp(userRepositoryRef.current, tryAgainTimestamp);
     const { t } = useTranslation();
     const insets = useSafeAreaInsets();
 
@@ -77,6 +78,11 @@ export const StartScreen = React.memo((props: IProps) => {
         }
     }, [initAppStatus, _showVersionUpgradePopup, _openUserHomeScreen, _openSignInScreen, _showTryAgainPopup]);
 
+    let updatingTextWithPercent = `${updateProgressText}`;
+    if (syncStatus === CodePush.SyncStatus.DOWNLOADING_PACKAGE) {
+        updatingTextWithPercent += ` (${updateProgress ?? 0}%)`;
+    }
+
     return (
         <View style={styles.container}>
             <Image
@@ -94,7 +100,7 @@ export const StartScreen = React.memo((props: IProps) => {
                 <TextPrimary style={{
                     ...theme.textVariants.body2,
                     marginLeft: theme.spacing.small,
-                }}>{t('loading')}</TextPrimary>
+                }}>{updatingTextWithPercent}</TextPrimary>
             </View>}
         </View>
     );
@@ -116,6 +122,15 @@ const styles = StyleSheet.create({
     },
     loadingContainer: {
         position: 'absolute',
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    updatingRow: {
+        position: 'absolute',
+        bottom: 0,
         left: 0,
         right: 0,
         justifyContent: 'center',

@@ -6,6 +6,7 @@ import Config from 'react-native-config';
 import { enableScreens } from 'react-native-screens';
 import { Provider } from 'react-redux';
 import RootContainer from './RootContainer';
+import codePush from 'react-native-code-push';
 
 enableScreens();
 
@@ -16,7 +17,7 @@ interface Props {
 LogBox.ignoreAllLogs();
 
 
-const App = React.memo((props: Props) => {
+const App = (props: Props) => {
 
     useEffect(() => {
         const subscription = DeviceEventEmitter.addListener('credentialsReadyForAuth', () => {
@@ -33,11 +34,16 @@ const App = React.memo((props: Props) => {
         };
     });
 
-    console.log('API_URL: ', Config.API_URL);
+    console.info('ENV: ', Config.ENV);
+    console.info('API_URL: ', Config.API_URL);
 
     return <Provider store={store}>
         <RootContainer />
     </Provider>;
-});
+};
 
-export default App;
+const codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
+
+const MyApp = codePush(codePushOptions)(App);
+
+export default MyApp;

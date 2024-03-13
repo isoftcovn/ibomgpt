@@ -9878,6 +9878,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-appsflyer@npm:^6.13.1":
+  version: 6.13.1
+  resolution: "react-native-appsflyer@npm:6.13.1"
+  checksum: 10c0/852e9e4638319db767b271fd04df3b01b02cea7f4b99e6b6a91c709ea04d608927ca369d66ada439a933982534c67c685f6a0626a06f26d7941f2308927a4601
+  languageName: node
+  linkType: hard
+
 "react-native-blob-util@npm:^0.19.6":
   version: 0.19.6
   resolution: "react-native-blob-util@npm:0.19.6"
@@ -10933,6 +10940,7 @@ __metadata:
     react: "npm:18.2.0"
     react-i18next: "npm:^12.2.0"
     react-native: "npm:0.73.6"
+    react-native-appsflyer: "npm:^6.13.1"
     react-native-blob-util: "npm:^0.19.6"
     react-native-code-push: "npm:^8.2.1"
     react-native-config: "npm:^1.5.1"

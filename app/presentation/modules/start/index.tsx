@@ -10,11 +10,10 @@ import { InitAppStatus, useInitApp } from 'app/presentation/hooks/general/useIni
 import { AuthNavigator, MainUserNavigator } from 'app/presentation/navigation/helper/shortcut';
 import { theme } from 'app/presentation/theme';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Image, StyleSheet, View } from 'react-native';
+import CodePush from 'react-native-code-push';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import CodePush from 'react-native-code-push';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'SplashScreen'>;
@@ -26,7 +25,6 @@ export const StartScreen = React.memo((props: IProps) => {
     const userRepositoryRef = useRef<IUserRepository>(new UserRepository());
     const [tryAgainTimestamp, setTryAgainTimestamp] = useState<number>();
     const { status: initAppStatus, updateProgressText, updateProgress, syncStatus } = useInitApp(userRepositoryRef.current, tryAgainTimestamp);
-    const { t } = useTranslation();
     const insets = useSafeAreaInsets();
 
     const _openUserHomeScreen = useCallback(() => {

@@ -7,6 +7,7 @@
 #import <Firebase.h>
 #import "RNSplashScreen.h"
 #import <CodePush/CodePush.h>
+#import <RNAppsFlyer.h>
 
 @implementation AppDelegate
 
@@ -38,10 +39,19 @@
 #endif
 }
 
+// Deep linking
+// Open URI-scheme for iOS 9 and above
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
 {
+  [[AppsFlyerAttribution shared] handleOpenUrl:url options:options];
   return [RCTLinkingManager application:app openURL:url options:options];
+}
+
+// Open Universal Links
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler {
+    [[AppsFlyerAttribution shared] continueUserActivity:userActivity restorationHandler:restorationHandler];
+    return YES;
 }
 
 @end

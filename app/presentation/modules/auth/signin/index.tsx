@@ -11,9 +11,11 @@ import { getProfileActionTypes } from '@redux/actions/user';
 import DropDownHolder from '@shared/helper/DropdownHolder';
 import LoadingManager from '@shared/helper/LoadingManager';
 import NotificationHelper from '@shared/helper/NotificationHelper';
+import AppManager from '@shared/managers/AppManager';
 import GeneratedImages from 'app/assets/GeneratedImages';
 import { Input, TextButton, TextPrimary } from 'app/presentation/components';
 import { Box } from 'app/presentation/components/globals/view/Box';
+import { AppRouteManager } from 'app/presentation/managers/AppRouteManager';
 import { MainUserNavigator } from 'app/presentation/navigation/helper/shortcut';
 import { theme } from 'app/presentation/theme';
 import { Dimensions } from 'app/presentation/theme/Dimensions';
@@ -81,6 +83,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
         DeviceEventEmitter.emit('credentialsReadyForUnauth');
         OneSignal.logout();
         requestNotificationPermission();
+        AppManager.appState.credentialsReadyForAuth = false;
 
         userRepository.current.getUserCreds().then(userCreds => {
             if (userCreds && userCreds.length >= 2) {
@@ -90,6 +93,18 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
             }
         }).catch(() => { });
     }, [requestNotificationPermission]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (AppRouteManager.shared.pendingRoute) {
+                const pendingRoute = AppRouteManager.shared.pendingRoute;
+                if (pendingRoute && pendingRoute.routeNeedAuthentication && pendingRoute.userEmail) {
+                    setInitialEmail(pendingRoute.userEmail);
+                    setInitialPass('');
+                }
+            }
+        }, 500);
+    }, []);
 
     const toHome = useCallback(() => {
         navigation.dispatch(MainUserNavigator);

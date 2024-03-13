@@ -7,6 +7,9 @@ import { enableScreens } from 'react-native-screens';
 import { Provider } from 'react-redux';
 import RootContainer from './RootContainer';
 import codePush from 'react-native-code-push';
+import appsFlyer from 'react-native-appsflyer';
+import { AppsflyerDeeplinkManager } from './presentation/managers/AppsflyerDeeplinkManager';
+import { AppRouteManager } from './presentation/managers/AppRouteManager';
 
 enableScreens();
 
@@ -22,15 +25,46 @@ const App = (props: Props) => {
     useEffect(() => {
         const subscription = DeviceEventEmitter.addListener('credentialsReadyForAuth', () => {
             AppManager.appState.credentialsReadyForAuth = true;
+            AppRouteManager.shared.executePendingRoute();
         });
 
         const unauthSubscription = DeviceEventEmitter.addListener('credentialsReadyForUnauth', () => {
             AppManager.appState.credentialsReadyForUnauth = true;
+            AppRouteManager.shared.executePendingRoute();
         });
+
+        const onDeepLinkCanceller = appsFlyer.onDeepLink(res => {
+            if (res?.deepLinkStatus !== 'NOT_FOUND') {
+                console.info('Is deferred deeplink: ', res?.isDeferred);
+                const appRoute = AppsflyerDeeplinkManager.shared.handleDeeplink(res);
+                console.log('appRoute: ', appRoute);
+                if (appRoute) {
+                    AppRouteManager.shared.handleRoute(appRoute);
+                }
+                console.info('Received deeplink data: ', JSON.stringify(res?.data));
+            }
+        });
+
+        appsFlyer.initSdk(
+            {
+                devKey: Config.APPSFLYER_DEV_KEY,
+                isDebug: __DEV__,
+                appId: Config.APPSFLYER_APP_ID,
+                onDeepLinkListener: true, //  -->  you must set the onDeepLinkListener to true to get onDeepLink callbacks
+                timeToWaitForATTUserAuthorization: 10 // for iOS 14.5
+            },
+            (result) => {
+                console.info('initialized appsFlyer: ', result);
+            },
+            (error) => {
+                console.error('initialized appsFlyer error: ', error);
+            }
+        );
 
         return () => {
             subscription.remove();
             unauthSubscription.remove();
+            onDeepLinkCanceller();
         };
     });
 

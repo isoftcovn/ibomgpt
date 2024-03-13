@@ -109,6 +109,7 @@ android {
         resValue "string", "build_config_package", "com.runner"
         resValue "string", "app_name", "IBOMGPT"
         resValue "string", "CodePushDeploymentKey", "dtYcIhRswj3QlaDsAZPJJbB9lldADCF3sWAsq"
+        manifestPlaceholders = [applinksHost: "ibomgpt.onelink.me"]
     }
 
     configurations.all {
@@ -121,6 +122,7 @@ android {
             applicationIdSuffix ".dev"
             resValue "string", "app_name", "DEV-IBOMGPT"
             resValue "string", "CodePushDeploymentKey", "aO3arSJLTNC20MH5n09NmQguzPd2i-qqk32UZ"
+            manifestPlaceholders = [applinksHost: "ibomgpt-dev.onelink.me"]
         }
 
         staging {
@@ -128,6 +130,7 @@ android {
             applicationIdSuffix ".staging"
             resValue "string", "app_name", "UAT-IBOMGPT"
             resValue "string", "CodePushDeploymentKey", "aO3arSJLTNC20MH5n09NmQguzPd2i-qqk32UZ"
+            manifestPlaceholders = [applinksHost: "ibomgpt-dev.onelink.me"]
         }
 
         production {

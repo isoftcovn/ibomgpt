@@ -1,3 +1,4 @@
+import { TextPrimary } from '@components/index';
 import { ChatRepository } from '@data/repository/chat';
 import { GetChatListUseCase } from '@domain/chat/GetChatListUseCase';
 import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
@@ -10,23 +11,20 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getProfileActionTypes } from '@redux/actions/user';
 import { selectProfile } from '@redux/selectors/user';
 import ListingHelper from '@shared/helper/ListingHelper';
+import AppManager from '@shared/managers/AppManager';
 import { ChatManager } from 'app/presentation/managers/ChatManager';
 import { ListState } from 'app/presentation/models/general';
 import { theme } from 'app/presentation/theme';
 import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { InteractionManager, ListRenderItemInfo, StyleSheet, View, ActivityIndicator, DeviceEventEmitter } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, DeviceEventEmitter, InteractionManager, ListRenderItemInfo, StyleSheet, View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useDispatch, useSelector } from 'react-redux';
 import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
 import { HomeHeader } from './components/HomeHeader';
-import { TextPrimary } from '@components/index';
-import { useTranslation } from 'react-i18next';
 import { useConversations } from './hooks';
-import AppManager from '@shared/managers/AppManager';
-import NotificationHelper from '@shared/helper/NotificationHelper';
-import { OneSignal } from 'react-native-onesignal';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
@@ -55,6 +53,11 @@ const HomeScreen = (props: IProps) => {
     const isLoadMore = useMemo(() => listState === ListState.loadingMore, [listState]);
     const refreshing = useMemo(() => listState === ListState.refreshing, [listState]);
     useRealtimeMessage();
+
+    useEffect(() => {
+        DeviceEventEmitter.emit('credentialsReadyForAuth');
+        DeviceEventEmitter.emit('credentialsReadyForUnauth');
+    }, []);
 
     useEffect(() => {
         if (user) {

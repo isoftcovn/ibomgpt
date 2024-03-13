@@ -6,13 +6,11 @@ import { AppRegistry } from 'react-native';
 import 'react-native-gesture-handler';
 import { name as appName } from './app.json';
 // import messaging from '@react-native-firebase/messaging';
+import dayjs from 'dayjs';
+import Config from 'react-native-config';
+import { LogLevel, OneSignal } from 'react-native-onesignal';
 import App from './app/App';
 import { configureLocalization } from './app/presentation/localization';
-import notifee, { EventType } from '@notifee/react-native';
-import NotificationHelper from '@shared/helper/NotificationHelper';
-import dayjs from 'dayjs';
-import { LogLevel, OneSignal } from 'react-native-onesignal';
-import Config from 'react-native-config';
 
 // Remove this method to stop OneSignal Debugging
 OneSignal.Debug.setLogLevel(LogLevel.Verbose);

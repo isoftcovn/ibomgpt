@@ -63,10 +63,10 @@ export const NavigationRoutes = {
     Languages: 'Languages',
 };
 
-export type PossibleDeepLinkRoutes = 'my-accounnt' | 'home';
+export type PossibleDeepLinkRoutes = 'conversation_detail' | 'home';
 
 export const DeepLinkRoutes: Record<PossibleDeepLinkRoutes, keyof AllRouteParamList> = {
-    'my-accounnt': 'AppTab',
+    'conversation_detail': 'Conversation',
     home: 'HomeTab',
 };
 
@@ -76,6 +76,20 @@ export const DeepLinkKeys: Record<string, string> = {
     transactionsbot: 'transactionsbot',
     cardbot: 'cardbot',
     'mini-courses': 'slug',
+};
+
+export const RouteAuthenticationRequires: Record<keyof AllRouteParamList, boolean> = {
+    SignIn: false,
+    SignUpEmail: false,
+    NetworkDebugger: false,
+    DeveloperConsole: false,
+    Languages: false,
+    SplashScreen: false,
+    AppTab: true,
+    HomeTab: true,
+    HomeScreen: true,
+    Conversation: true,
+    PdfViewer: true
 };
 
 export const LOCALE = '@language';

@@ -1,3 +1,4 @@
+import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import UserModel from '@models/user/response/UserModel';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { createSelector } from 'reselect';
@@ -5,6 +6,25 @@ import { createSelector } from 'reselect';
 export const selectConversationState = createSelector(
     (state: any) => state.conversation,
     conversation => conversation
+);
+
+export const selectConversationList = createSelector(
+    selectConversationState,
+    conversation => conversation.conversations?.data ?? []
+);
+
+export const selectConversationByKey = createSelector(
+    [
+        (state: any): ChatItemResponse[] => selectConversationList(state),
+        (state: any, key: string): string => key
+    ],
+    (conversations, key): ChatItemResponse | undefined => {
+        return conversations.find(item => {
+            const _key = `${item.objectId}-${item.objectInstanceId}`;
+
+            return _key === key;
+        });
+    }
 );
 
 export const selectMessagesState = createSelector(

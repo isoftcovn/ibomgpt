@@ -28,6 +28,7 @@ import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesReque
 import { TypingAnimation } from './components/TypingAninimation';
 import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
 import { ChatManager } from 'app/presentation/managers/ChatManager';
+import { ConversationHeaderMenu } from './components/HeaderMenu';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -101,9 +102,14 @@ const ConversationContent = React.memo((props: IProps) => {
     useEffect(() => {
         const name = route.params?.name ?? '';
         navigation.setOptions({
-            title: name || `${t('detail')}:${route.params?.objectInstanceId ?? 0}`
+            title: name || `${t('detail')}:${route.params?.objectInstanceId ?? 0}`,
+            headerRight: (props) => <ConversationHeaderMenu
+                navigation={navigation}
+                route={route}
+                tintColor={props.tintColor}
+            />
         });
-    }, [route.params, navigation, t]);
+    }, [route.params, navigation, route, t]);
 
     useEffect(() => {
         const keyboardWillShowListener = Keyboard.addListener(

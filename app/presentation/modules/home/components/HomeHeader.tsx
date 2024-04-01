@@ -1,22 +1,32 @@
 import { Box } from '@components/globals/view/Box';
-import { Dimensions } from '@theme/Dimensions';
+import { AllRouteParamList } from '@navigation/RouteParams';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { theme } from '@theme/index';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface IProps {
+    navigation: StackNavigationProp<AllRouteParamList, 'HomeScreen'>;
     onChangeText: (text: string) => void;
 }
 
 export const HomeHeader = React.memo((props: IProps) => {
-    const { onChangeText } = props;
+    const { navigation, onChangeText } = props;
     const inputRef = useRef<TextInput>();
 
     const insets = useSafeAreaInsets();
     const { t } = useTranslation();
+
+    const onFilterPress = useCallback(() => {
+        navigation.navigate('CommonFilter', {
+            title: t('filterObject'),
+        });
+    }, [navigation, t]);
+
     return <View
         style={[styles.container, {
             height: 45 + insets.top,
@@ -46,6 +56,23 @@ export const HomeHeader = React.memo((props: IProps) => {
                     onChangeText={onChangeText}
                 />
             </View>
+            <TouchableOpacity
+                style={{ marginLeft: theme.spacing.medium }}
+                activeOpacity={0.7}
+                hitSlop={{
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10
+                }}
+                onPress={onFilterPress}
+            >
+                <Ionicons
+                    name="filter"
+                    size={24}
+                    color={theme.color.navigationTintColor}
+                />
+            </TouchableOpacity>
         </Box>
     </View>;
 });
@@ -53,14 +80,16 @@ export const HomeHeader = React.memo((props: IProps) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.color.navigationBackgroundColor,
-        paddingHorizontal: theme.spacing.huge,
+        paddingLeft: theme.spacing.huge,
+        paddingRight: theme.spacing.large
     },
     contentContainer: {
         flex: 1,
-        alignItems: 'stretch',
-        justifyContent: 'center'
+        alignItems: 'center',
+        flexDirection: 'row'
     },
     searchContainer: {
+        flex: 1,
         height: 30,
         borderRadius: 5,
         backgroundColor: theme.color.navigationTintColor,

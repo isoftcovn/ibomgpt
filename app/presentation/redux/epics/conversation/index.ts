@@ -2,7 +2,7 @@ import { ChatRepository } from '@data/repository/chat';
 import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
-import { IDeleteMessagePayload, deleteMessageActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes, updateConversationParticipantsActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
+import { IDeleteMessagePayload, deleteMessageActionTypes, getConversationsActionTypes, getMessagesActionTypes, receiveNewMessagesActionTypes, updateConversationParticipantsActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
 import { selectMessagesByKey, selectParticipantsByKey } from '@redux/selectors/conversation';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
 import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
+import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -55,7 +56,7 @@ export const deleteMessageEpic = (action$: any, state$: any) =>
                         const userIds = participants.map(item => `${item.id}`);
                         obs.next(deleteMessageActionTypes.successAction());
                         ChatHelper.shared.sendDeleteMessageEvent(userIds, {
-                            objectId, 
+                            objectId,
                             objectInstanceId,
                             messageId: `${request.comment_id}`,
                         });

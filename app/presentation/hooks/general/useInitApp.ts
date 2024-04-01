@@ -133,7 +133,7 @@ export const useInitApp = (userRepository: IUserRepository, tryAgainTimestamp?: 
                 let deviceId = '';
                 const notificationPermissionGranted = await requestNotificationPermission();
                 if (notificationPermissionGranted) {
-                    deviceId = OneSignal.User.pushSubscription.getPushSubscriptionId();
+                    deviceId = (await OneSignal.User.pushSubscription.getIdAsync() ?? '');
                     console.info('onesignal subscriptionID: ', deviceId);
                 }
                 const usecase = new LoginEmailUseCase({

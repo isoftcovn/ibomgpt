@@ -2,6 +2,8 @@ import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesReque
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { createActionTypes } from '../helper';
 import UserModel from '@models/user/response/UserModel';
+import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
+import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 
 const DOMAIN = 'conversation';
 
@@ -46,3 +48,6 @@ export const receiveNewMessagesActionTypes = createActionTypes<IAppChatMessage[]
 
 export const updateConversationParticipantsType = 'update_participants';
 export const updateConversationParticipantsActionTypes = createActionTypes<UserModel[], void>(updateConversationParticipantsType, DOMAIN);
+
+export const getConversationsType = 'get_conversations';
+export const getConversationsActionTypes = createActionTypes<ChatListRequestModel, ChatItemResponse[]>(getConversationsType, DOMAIN);

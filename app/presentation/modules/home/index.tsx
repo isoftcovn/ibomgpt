@@ -25,10 +25,12 @@ import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
 import { ChatListItem } from './components/ChatListItem';
 import { HomeHeader } from './components/HomeHeader';
 import { useConversations } from './hooks';
+import { getConversationsActionTypes } from '@redux/actions/conversation';
+import { selectConversationList } from '@redux/selectors/conversation';
 
 interface IProps {
-    navigation: StackNavigationProp<AppStackParamList, 'HomeTab'>;
-    route: RouteProp<AppStackParamList, 'HomeTab'>;
+    navigation: StackNavigationProp<AppStackParamList, 'HomeScreen'>;
+    route: RouteProp<AppStackParamList, 'HomeScreen'>;
 }
 
 const ListSeparator = React.memo(() => {
@@ -43,7 +45,8 @@ const HomeScreen = (props: IProps) => {
     const didMountRef = useRef(false);
     const receiveMessageSubcription = useRef<Subscription | undefined>();
     const [listState, setListState] = useState<ListState>(ListState.initial);
-    const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
+    // const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
+    const conversations: ChatItemResponse[] = useSelector(selectConversationList);
     const sortedConversations = useConversations(conversations);
     const user: UserModel | undefined = useSelector(selectProfile).data;
     const userId = useMemo(() => user?.id, [user]);
@@ -92,8 +95,11 @@ const HomeScreen = (props: IProps) => {
             }
             const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
             const response = await usecase.execute();
-            setConversations(response.items);
             canLoadMore.current = response.items.length >= chatListRequest.current.limit;
+            dispatch(getConversationsActionTypes.successAction(response.items, {
+                canLoadMore: canLoadMore.current
+            }));
+            // setConversations(response.items);            
 
             if (response.avatar && user) {
                 dispatch(getProfileActionTypes.successAction({
@@ -121,19 +127,23 @@ const HomeScreen = (props: IProps) => {
             const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
             const response = await usecase.execute();
             const items = response.items;
-            setConversations(prevState => {
-                return [
-                    ...prevState,
-                    ...items
-                ];
-            });
             canLoadMore.current = items.length >= chatListRequest.current.limit;
+            dispatch(getConversationsActionTypes.successAction(items, {
+                canLoadMore: canLoadMore.current,
+                isAppend: true,
+            }));
+            // setConversations(prevState => {
+            //     return [
+            //         ...prevState,
+            //         ...items
+            //     ];
+            // });
         } catch (error) {
             console.info('Load conversations error: ', error);
         } finally {
             setListState(ListState.done);
         }
-    }, [listState, conversations]);
+    }, [listState, dispatch, conversations]);
 
     const onItemPress = useCallback((data: ChatItemResponse) => {
         navigation.navigate('Conversation', {
@@ -208,6 +218,7 @@ const HomeScreen = (props: IProps) => {
     return <View style={styles.container}
     >
         <HomeHeader
+            navigation={navigation}
             onChangeText={onChangeText}
         />
         {!isLoading ? <Animated.FlatList

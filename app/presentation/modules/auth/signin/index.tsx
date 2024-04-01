@@ -118,7 +118,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
         try {
             LoadingManager.setLoading(true);
             const userAgent = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
-            const deviceId = OneSignal.User.pushSubscription.getPushSubscriptionId();
+            const deviceId = (await OneSignal.User.pushSubscription.getIdAsync() ?? '');
             console.info('onesignal subscriptionID: ', deviceId);
             const usecase = new LoginEmailUseCase({
                 authRepository: new AuthRepository(),

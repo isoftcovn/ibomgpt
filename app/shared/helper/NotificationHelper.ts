@@ -57,7 +57,7 @@ class NotificationHelper {
             }
 
             if (enabled) {
-                const pushToken = OneSignal.User.pushSubscription.getPushSubscriptionToken();
+                const pushToken = await OneSignal.User.pushSubscription.getTokenAsync();
                 console.info('pushToken: ', pushToken);
                 if (pushToken && deviceTokenCallBack) {
                     // user has a device token

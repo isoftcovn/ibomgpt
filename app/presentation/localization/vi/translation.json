@@ -3,6 +3,7 @@
     "alertChangeLanguage": "Do you want to change language?",
     "alreadyHaveAccount": "Bạn đã có tài khoản?",
     "aboutUs": "Về iBOM",
+    "allMemberNumber": "Tổng số thành viên",
 
     "clearAll": "Clear All",
     "change": "Change",
@@ -31,9 +32,13 @@
 
     "female": "Female",
     "from": "From",
+    "filter": "Lọc",
+    "filterObject": "Lọc đối tượng",
 
     "gender": "Gender",
     "getFromlibrary": "Mở thư viện",
+    "groupInfo": "Thông tin nhóm",
+    "groupList": "Danh sách nhóm",
 
     "home": "Home",
     "helpCenter": "Trung tâm trợ giúp",
@@ -67,6 +72,7 @@
     "passwordTooShort": "Mật khẩu quá ngắn",
     "passwordMustMatch": "Xác nhận mật khẩu không trùng khớp",
     "personal": "Cá nhân",
+    "participantList": "Danh sách thành viên",
 
     "required": "Không thể bỏ trống",
 
@@ -85,6 +91,9 @@
 
     "used": "Used",
     "useCamera": "Sử dụng máy ảnh",
+
+    "objectType": "Loại đối tượng",
+    "objectName": "Tên đối tượng",
 
     "warning": "Waring",
 

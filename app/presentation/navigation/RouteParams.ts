@@ -11,6 +11,17 @@ export type AppStackParamList = {
         objectInstanceId: number,
         name?: string,
     },
+    ParticipantList: {
+        objectId: number,
+        objectInstanceId: number,
+    },
+    ConversationInfo: {
+        objectId: number,
+        objectInstanceId: number,
+    },
+    CommonFilter: {
+        title?: string,
+    },
     PdfViewer: {
         url: string
     },

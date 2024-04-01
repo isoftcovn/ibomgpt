@@ -10,6 +10,9 @@ import codePush from 'react-native-code-push';
 import appsFlyer from 'react-native-appsflyer';
 import { AppsflyerDeeplinkManager } from './presentation/managers/AppsflyerDeeplinkManager';
 import { AppRouteManager } from './presentation/managers/AppRouteManager';
+import { DefaultTheme, MD3Theme, PaperProvider } from 'react-native-paper';
+import { theme } from '@theme/index';
+import { FontNames } from '@theme/ThemeDefault';
 
 enableScreens();
 
@@ -18,6 +21,26 @@ interface Props {
 }
 
 LogBox.ignoreAllLogs();
+
+const paperTheme: MD3Theme = {
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        primary: theme.color.colorPrimary,
+        secondary: theme.color.colorSecondary,
+        onPrimary: theme.color.onPrimary,
+        onSecondary: theme.color.onPrimary,
+        background: theme.color.backgroundColorPrimary,
+        onBackground: theme.color.onBackground,
+    },
+    fonts: {
+        ...DefaultTheme.fonts,
+        default: {
+            ...DefaultTheme.fonts.default,
+            fontFamily: FontNames.Normal,
+        }
+    }
+};
 
 
 const App = (props: Props) => {
@@ -72,7 +95,9 @@ const App = (props: Props) => {
     console.info('API_URL: ', Config.API_URL);
 
     return <Provider store={store}>
-        <RootContainer />
+        <PaperProvider theme={paperTheme}>
+            <RootContainer />
+        </PaperProvider>
     </Provider>;
 };
 

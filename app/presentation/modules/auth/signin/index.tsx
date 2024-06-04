@@ -216,7 +216,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                             disabled={!isValid}
                             onPress={() => handleSubmit()}
                         />
-                        <Box
+                        {/* <Box
                             direction="row"
                             justifyContent="center"
                             marginTop={theme.spacing.medium}
@@ -235,7 +235,7 @@ const SignInAndSignUpScreen = React.memo((props: IProps) => {
                                     }}
                                 > {t('signup')}</TextPrimary>
                             </TouchableOpacity>
-                        </Box>
+                        </Box> */}
                     </View>
                     <Image
                         style={{

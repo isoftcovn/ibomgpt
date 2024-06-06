@@ -596,7 +596,7 @@
 			baseConfigurationReference = E25D88754F89CF889635102C /* Pods-runner.debug.xcconfig */;
 			buildSettings = {
 				ALLOW_CLEARTEXT_REQUEST = NO;
-				APP_BASE_NAME = IBOMGPT;
+				APP_BASE_NAME = iBomBOT;
 				APP_DISPLAY_NAME = "$(APP_BASE_NAME)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = "";
@@ -715,7 +715,7 @@
 			baseConfigurationReference = 7045F67B597A4D197179091B /* Pods-runner.release.xcconfig */;
 			buildSettings = {
 				ALLOW_CLEARTEXT_REQUEST = NO;
-				APP_BASE_NAME = IBOMGPT;
+				APP_BASE_NAME = iBomBOT;
 				APP_DISPLAY_NAME = "$(APP_BASE_NAME)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = "";
@@ -905,7 +905,7 @@
 			baseConfigurationReference = BFA5A023B5A0477A79AB1106 /* Pods-runner.debug.dev.xcconfig */;
 			buildSettings = {
 				ALLOW_CLEARTEXT_REQUEST = YES;
-				APP_BASE_NAME = IBOMGPT;
+				APP_BASE_NAME = iBomBOT;
 				APP_DISPLAY_NAME = "DEV-$(APP_BASE_NAME)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = .dev;
@@ -1163,7 +1163,7 @@
 			baseConfigurationReference = 2299BD9C49F3476DA4FF60F4 /* Pods-runner.debug.staging.xcconfig */;
 			buildSettings = {
 				ALLOW_CLEARTEXT_REQUEST = YES;
-				APP_BASE_NAME = IBOMGPT;
+				APP_BASE_NAME = iBomBOT;
 				APP_DISPLAY_NAME = "UAT-$(APP_BASE_NAME)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = .staging;
@@ -1350,7 +1350,7 @@
 			baseConfigurationReference = 2E9E4BAA7AAF4A60AA2191ED /* Pods-runner.release.dev.xcconfig */;
 			buildSettings = {
 				ALLOW_CLEARTEXT_REQUEST = YES;
-				APP_BASE_NAME = IBOMGPT;
+				APP_BASE_NAME = iBomBOT;
 				APP_DISPLAY_NAME = "DEV-$(APP_BASE_NAME)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = .dev;
@@ -1535,7 +1535,7 @@
 			baseConfigurationReference = C729DE8887627239887755E3 /* Pods-runner.release.staging.xcconfig */;
 			buildSettings = {
 				ALLOW_CLEARTEXT_REQUEST = YES;
-				APP_BASE_NAME = IBOMGPT;
+				APP_BASE_NAME = iBomBOT;
 				APP_DISPLAY_NAME = "UAT-$(APP_BASE_NAME)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = .staging;

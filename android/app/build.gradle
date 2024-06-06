@@ -107,7 +107,7 @@ android {
         vectorDrawables.useSupportLibrary = true
         resConfigs "en"
         resValue "string", "build_config_package", "com.runner"
-        resValue "string", "app_name", "IBOMGPT"
+        resValue "string", "app_name", "iBomBOT"
         resValue "string", "CodePushDeploymentKey", "dtYcIhRswj3QlaDsAZPJJbB9lldADCF3sWAsq"
         manifestPlaceholders = [applinksHost: "ibomgpt.onelink.me"]
     }
@@ -120,7 +120,7 @@ android {
         dev {
             dimension "app"
             applicationIdSuffix ".dev"
-            resValue "string", "app_name", "DEV-IBOMGPT"
+            resValue "string", "app_name", "DEV-iBomBOT"
             resValue "string", "CodePushDeploymentKey", "aO3arSJLTNC20MH5n09NmQguzPd2i-qqk32UZ"
             manifestPlaceholders = [applinksHost: "ibomgpt-dev.onelink.me"]
         }
@@ -128,7 +128,7 @@ android {
         staging {
             dimension "app"
             applicationIdSuffix ".staging"
-            resValue "string", "app_name", "UAT-IBOMGPT"
+            resValue "string", "app_name", "UAT-iBomBOT"
             resValue "string", "CodePushDeploymentKey", "aO3arSJLTNC20MH5n09NmQguzPd2i-qqk32UZ"
             manifestPlaceholders = [applinksHost: "ibomgpt-dev.onelink.me"]
         }

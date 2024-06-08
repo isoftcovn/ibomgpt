@@ -1,16 +1,16 @@
-import { AllRouteParamList } from '@navigation/RouteParams';
+import {AllRouteParamList} from '@navigation/RouteParams';
 
 /**
  * ===================================================SHARED SECTION======================================================
  */
 export enum CurrencyCode {
     Vietnam = 'vnd',
-    Dollar = 'usd'
+    Dollar = 'usd',
 }
 
 export enum SortDirections {
     Ascending = 'ASC',
-    Descending = 'DESC'
+    Descending = 'DESC',
 }
 
 export const PageSize = {
@@ -65,8 +65,11 @@ export const NavigationRoutes = {
 
 export type PossibleDeepLinkRoutes = 'conversation_detail' | 'home';
 
-export const DeepLinkRoutes: Record<PossibleDeepLinkRoutes, keyof AllRouteParamList> = {
-    'conversation_detail': 'Conversation',
+export const DeepLinkRoutes: Record<
+    PossibleDeepLinkRoutes,
+    keyof AllRouteParamList
+> = {
+    conversation_detail: 'Conversation',
     home: 'HomeTab',
 };
 
@@ -78,7 +81,10 @@ export const DeepLinkKeys: Record<string, string> = {
     'mini-courses': 'slug',
 };
 
-export const RouteAuthenticationRequires: Record<keyof AllRouteParamList, boolean> = {
+export const RouteAuthenticationRequires: Record<
+    keyof AllRouteParamList,
+    boolean
+> = {
     SignIn: false,
     SignUpEmail: false,
     NetworkDebugger: false,
@@ -89,7 +95,11 @@ export const RouteAuthenticationRequires: Record<keyof AllRouteParamList, boolea
     HomeTab: true,
     HomeScreen: true,
     Conversation: true,
-    PdfViewer: true
+    PdfViewer: true,
+};
+
+export const Links = {
+    toIBomProApp: 'https://ibom.onelink.me/Ydm1/3lety9nj',
 };
 
 export const LOCALE = '@language';
@@ -101,11 +111,11 @@ export const LOADMORE_ACTION_PREFIX = 'loadmore';
 export const SUCCESS_ACTION_SUFFIX = 'success';
 export const FAILED_ACTION_SUFFIX = 'failed';
 
-export const YOUTUBE_ID_REGEX = '^(?:https?:)?//[^/]*(?:youtube(?:-nocookie)?\.com|youtu\.be).*[=/]([-\\w]{11})(?:\\?|=|&|$)';
+export const YOUTUBE_ID_REGEX =
+    '^(?:https?:)?//[^/]*(?:youtube(?:-nocookie)?.com|youtu.be).*[=/]([-\\w]{11})(?:\\?|=|&|$)';
 /**
  * ===================================================PRESENTATION SECTION======================================================
  */
-
 
 /**
  * ===================================================DATA SECTION======================================================

@@ -1,19 +1,28 @@
-import { AllRouteParamList } from '@navigation/RouteParams';
-import { PossibleDeepLinkRoutes, RouteAuthenticationRequires, DeepLinkRoutes } from '@shared/constants';
+import {AllRouteParamList} from '@navigation/RouteParams';
+import {
+    PossibleDeepLinkRoutes,
+    RouteAuthenticationRequires,
+    DeepLinkRoutes,
+} from '@shared/constants';
 import NavigationService from '@shared/helper/NavigationService';
 import AppManager from '@shared/managers/AppManager';
 
 export class AppRoute {
     route: PossibleDeepLinkRoutes;
     params?: AllRouteParamList[keyof AllRouteParamList];
-    userEmail?: string;
+    extras?: Record<string, any>;
     routeNeedAuthentication: boolean;
 
-    constructor(route: PossibleDeepLinkRoutes, params?: AllRouteParamList[keyof AllRouteParamList], userEmail?: string) {
+    constructor(
+        route: PossibleDeepLinkRoutes,
+        params?: AllRouteParamList[keyof AllRouteParamList],
+        extras?: Record<string, any>,
+    ) {
         this.route = route;
         this.params = params;
-        this.userEmail = userEmail;
-        this.routeNeedAuthentication = RouteAuthenticationRequires[DeepLinkRoutes[route]];
+        this.extras = extras;
+        this.routeNeedAuthentication =
+            RouteAuthenticationRequires[DeepLinkRoutes[route]];
     }
 }
 
@@ -22,7 +31,7 @@ export class AppRouteManager {
 
     pendingRoute?: AppRoute;
 
-    private constructor() { }
+    private constructor() {}
 
     executeRoute = (route: AppRoute) => {
         const routeName = DeepLinkRoutes[route.route];
@@ -36,6 +45,14 @@ export class AppRouteManager {
     };
 
     handleRoute = (route: AppRoute) => {
+        const extras = route.extras;
+        // Request reauthorize
+        if (extras?._u && extras?._p) {
+            route.extras = undefined;
+            this.saveRoute(route);
+            return;
+        }
+
         let canExecuteRoute = false;
         if (route.routeNeedAuthentication) {
             canExecuteRoute = AppManager.appState.credentialsReadyForAuth;
@@ -51,6 +68,7 @@ export class AppRouteManager {
     };
 
     executePendingRoute = () => {
+        console.log('pendingRoute: ', this.pendingRoute);
         if (this.pendingRoute) {
             this.handleRoute(this.pendingRoute);
         }

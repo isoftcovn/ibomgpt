@@ -1,5 +1,6 @@
-import { IUserRepository } from '.';
-import { IUseCase } from '../index';
+import AppManager from '@shared/managers/AppManager';
+import {IUserRepository} from '.';
+import {IUseCase} from '../index';
 
 export default class LogoutUseCase implements IUseCase<boolean> {
     userRepository: IUserRepository;
@@ -10,6 +11,10 @@ export default class LogoutUseCase implements IUseCase<boolean> {
 
     execute = async () => {
         await this.userRepository.logoutUser();
+        AppManager.appState = {
+            credentialsReadyForAuth: false,
+            credentialsReadyForUnauth: true,
+        };
         // await Promise.all([this.userRepository.removeSavedToken()]);
         return true;
     };

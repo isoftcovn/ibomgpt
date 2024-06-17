@@ -96,6 +96,9 @@ export const RouteAuthenticationRequires: Record<
     HomeScreen: true,
     Conversation: true,
     PdfViewer: true,
+    ParticipantList: true,
+    ConversationInfo: true,
+    CommonFilter: true
 };
 
 export const Links = {

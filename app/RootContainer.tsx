@@ -1,58 +1,93 @@
-import { UserRepository } from '@data/repository/user';
+import {UserRepository} from '@data/repository/user';
 import LogoutUseCase from '@domain/user/LogoutUseCase';
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { AuthNavigator } from '@navigation/helper/shortcut';
-import { NavigationContainer, NavigationState } from '@react-navigation/native';
+import {ActionSheetProvider} from '@expo/react-native-action-sheet';
+import {AuthNavigator, RestartNavigator} from '@navigation/helper/shortcut';
+import {NavigationContainer, NavigationState} from '@react-navigation/native';
 import AppManager from '@shared/managers/AppManager';
-import { DropdownAlert, LoadingIndicator } from 'app/presentation/components';
+import {DropdownAlert, LoadingIndicator} from 'app/presentation/components';
 import ViewConnectionStatus from 'app/presentation/components/globals/view/ViewConnectionStatus';
-import { RootStack } from 'app/presentation/navigation';
+import {RootStack} from 'app/presentation/navigation';
 import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
 import LoadingManager from 'app/shared/helper/LoadingManager';
 import NavigationService from 'app/shared/helper/NavigationService';
 import NotificationHelper from 'app/shared/helper/NotificationHelper';
-import React, { useCallback, useEffect, useRef } from 'react';
-import { AppState, DeviceEventEmitter, EmitterSubscription, Linking, Platform, StatusBar, StyleSheet } from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {
+    AppState,
+    DeviceEventEmitter,
+    EmitterSubscription,
+    Linking,
+    Platform,
+    StatusBar,
+    StyleSheet,
+} from 'react-native';
 import Config from 'react-native-config';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { OneSignal, PushSubscriptionChangedState } from 'react-native-onesignal';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {OneSignal, PushSubscriptionChangedState} from 'react-native-onesignal';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import RNShake from 'react-native-shake';
 import DeeplinkHandler from './presentation/managers/DeeplinkHandler';
 
-interface Props {
-}
+interface Props {}
 
 const RootContainer = React.memo((props: Props) => {
     const currentNavigationState = useRef<NavigationState>();
     const deeplinkUrl = useRef<string>();
 
     const _setPendingDeeplink = useCallback((url: string) => {
-        if (DeeplinkHandler.shouldIgnoreDeeplink(url)) { return; }
+        if (DeeplinkHandler.shouldIgnoreDeeplink(url)) {
+            return;
+        }
         deeplinkUrl.current = url;
     }, []);
 
-    const handleLinkParams = useCallback((url: string, saveDeeplink = false) => {
-        const consumed = DeeplinkHandler.handleDeeplinkUrl(url);
+    const handleLinkParams = useCallback(
+        (url: string, saveDeeplink = false) => {
+            const consumed = DeeplinkHandler.handleDeeplinkUrl(url);
 
-        if (saveDeeplink && !consumed) {
-            _setPendingDeeplink(url);
-        }
+            if (saveDeeplink && !consumed) {
+                _setPendingDeeplink(url);
+            }
 
-        if (consumed) {
-            deeplinkUrl.current = undefined;
-        }
-    }, [_setPendingDeeplink]);
+            if (consumed) {
+                deeplinkUrl.current = undefined;
+            }
+        },
+        [_setPendingDeeplink],
+    );
 
-    const pushStateChanged = useCallback((subscription: PushSubscriptionChangedState) => {
-        console.info('OneSignal: subscription changed:', subscription);
+    const pushStateChanged = useCallback(
+        (subscription: PushSubscriptionChangedState) => {
+            console.info('OneSignal: subscription changed:', subscription);
+        },
+        [],
+    );
+
+    useEffect(() => {
+        const reauthorizedSubscription = AppManager.forceReauthoirze.subscribe(
+            () => {
+                setTimeout(() => {
+                    NavigationService.topLevelNavigator?.dispatch(RestartNavigator);
+                }, 500);
+            },
+        );
+
+        return () => {
+            reauthorizedSubscription.unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
-        OneSignal.User.pushSubscription.addEventListener('change', pushStateChanged);
+        OneSignal.User.pushSubscription.addEventListener(
+            'change',
+            pushStateChanged,
+        );
 
         return () => {
-            OneSignal.User.pushSubscription.removeEventListener('change', pushStateChanged);
+            OneSignal.User.pushSubscription.removeEventListener(
+                'change',
+                pushStateChanged,
+            );
         };
     }, [pushStateChanged]);
 
@@ -61,17 +96,22 @@ const RootContainer = React.memo((props: Props) => {
         let authSubscription: EmitterSubscription | undefined;
         let unauthSubscription: EmitterSubscription | undefined;
 
-        Linking.getInitialURL().then((ev) => {
-            if (ev) {
-                if (AppManager.appState.credentialsReadyForAuth || AppManager.appState.credentialsReadyForUnauth) {
-                    handleLinkParams(ev);
-                } else {
-                    _setPendingDeeplink(ev);
+        Linking.getInitialURL()
+            .then(ev => {
+                if (ev) {
+                    if (
+                        AppManager.appState.credentialsReadyForAuth ||
+                        AppManager.appState.credentialsReadyForUnauth
+                    ) {
+                        handleLinkParams(ev);
+                    } else {
+                        _setPendingDeeplink(ev);
+                    }
                 }
-            }
-        }).catch(err => {
-            console.warn('An error occurred', err);
-        });
+            })
+            .catch(err => {
+                console.warn('An error occurred', err);
+            });
 
         // dynamicLinks().getInitialLink().then(link => {
         //     if (link) {
@@ -85,10 +125,13 @@ const RootContainer = React.memo((props: Props) => {
         //     console.warn('An error occurred', err);
         // });
 
-        const linkingSubcription = Linking.addListener('url', (res) => {
+        const linkingSubcription = Linking.addListener('url', res => {
             const url = res.url;
             if (url) {
-                if (AppManager.appState.credentialsReadyForAuth || AppManager.appState.credentialsReadyForUnauth) {
+                if (
+                    AppManager.appState.credentialsReadyForAuth ||
+                    AppManager.appState.credentialsReadyForUnauth
+                ) {
                     handleLinkParams(url, true);
                 } else {
                     _setPendingDeeplink(url);
@@ -107,17 +150,26 @@ const RootContainer = React.memo((props: Props) => {
         //     }
         // });
 
-        if (!AppManager.appState.credentialsReadyForAuth && !AppManager.appState.credentialsReadyForUnauth) {
-            authSubscription = DeviceEventEmitter.addListener('credentialsReadyForAuth', () => {
-                if (deeplinkUrl.current) {
-                    handleLinkParams(deeplinkUrl.current);
-                }
-            });
-            unauthSubscription = DeviceEventEmitter.addListener('credentialsReadyForUnauth', () => {
-                if (deeplinkUrl.current) {
-                    handleLinkParams(deeplinkUrl.current);
-                }
-            });
+        if (
+            !AppManager.appState.credentialsReadyForAuth &&
+            !AppManager.appState.credentialsReadyForUnauth
+        ) {
+            authSubscription = DeviceEventEmitter.addListener(
+                'credentialsReadyForAuth',
+                () => {
+                    if (deeplinkUrl.current) {
+                        handleLinkParams(deeplinkUrl.current);
+                    }
+                },
+            );
+            unauthSubscription = DeviceEventEmitter.addListener(
+                'credentialsReadyForUnauth',
+                () => {
+                    if (deeplinkUrl.current) {
+                        handleLinkParams(deeplinkUrl.current);
+                    }
+                },
+            );
         }
 
         return () => {
@@ -135,16 +187,20 @@ const RootContainer = React.memo((props: Props) => {
             }
         });
 
-        const forceSignoutSubscription = AppManager.forceSignout.subscribe(reason => {
-            console.warn('Force signout reason: ', reason);
-            const usecase = new LogoutUseCase(new UserRepository());
-            usecase.execute().catch(error => {
-                console.warn('Logout error: ', error);
-            });
-            NavigationService.topLevelNavigator?.dispatch(AuthNavigator);
-        });
+        const forceSignoutSubscription = AppManager.forceSignout.subscribe(
+            reason => {
+                console.warn('Force signout reason: ', reason);
+                const usecase = new LogoutUseCase(new UserRepository());
+                usecase.execute().catch(error => {
+                    console.warn('Logout error: ', error);
+                });
+                NavigationService.topLevelNavigator?.dispatch(AuthNavigator);
+            },
+        );
 
-        NotificationHelper.listenOnNotification(NotificationHelper.notificationHandler);
+        NotificationHelper.listenOnNotification(
+            NotificationHelper.notificationHandler,
+        );
 
         return () => {
             forceSignoutSubscription.unsubscribe();
@@ -155,25 +211,29 @@ const RootContainer = React.memo((props: Props) => {
 
     // Subscribe appstate
     useEffect(() => {
-        const appstateSubscription = AppState.addEventListener('change', nextAppState => {
-            if (
-                AppManager.appStateStatus.value.match(/background/) &&
-                nextAppState === 'active'
-            ) {
-                AppManager.appFromBackgroundToForeground.next(new Date());
-                console.info('App has come to the foreground!');
-            }
+        const appstateSubscription = AppState.addEventListener(
+            'change',
+            nextAppState => {
+                if (
+                    AppManager.appStateStatus.value.match(/background/) &&
+                    nextAppState === 'active'
+                ) {
+                    AppManager.appFromBackgroundToForeground.next(new Date());
+                    console.info('App has come to the foreground!');
+                }
 
-            if (
-                AppManager.appStateStatus.value.match(/active/) &&
-                (nextAppState === 'inactive' || nextAppState === 'background')
-            ) {
-                AppManager.appFromForegroundToBackground.next(new Date());
-                console.info('App has come to the background!');
-            }
+                if (
+                    AppManager.appStateStatus.value.match(/active/) &&
+                    (nextAppState === 'inactive' ||
+                        nextAppState === 'background')
+                ) {
+                    AppManager.appFromForegroundToBackground.next(new Date());
+                    console.info('App has come to the background!');
+                }
 
-            AppManager.appStateStatus.next(nextAppState);
-        });
+                AppManager.appStateStatus.next(nextAppState);
+            },
+        );
 
         return () => {
             appstateSubscription.remove();
@@ -182,43 +242,54 @@ const RootContainer = React.memo((props: Props) => {
 
     // Subscribe to events
     useEffect(() => {
-        OneSignal.Notifications.addEventListener('click', (event) => {
+        OneSignal.Notifications.addEventListener('click', event => {
             console.info('OneSignal: notification clicked:', event);
-            NotificationHelper.notificationHandler.onNotificationOpened?.(event);
+            NotificationHelper.notificationHandler.onNotificationOpened?.(
+                event,
+            );
         });
     }, []);
 
-    const getActiveRouteName = useCallback((
-        navigationState: NavigationState | undefined
-    ): string | undefined => {
-        if (!navigationState) {
-            return '';
-        }
-        const route = navigationState.routes[navigationState.index];
-        return route.name;
-    }, []);
+    const getActiveRouteName = useCallback(
+        (navigationState: NavigationState | undefined): string | undefined => {
+            if (!navigationState) {
+                return '';
+            }
+            const route = navigationState.routes[navigationState.index];
+            return route.name;
+        },
+        [],
+    );
 
-    const onNavigationStateChange = useCallback((navigationState: NavigationState | undefined) => {
-        if (navigationState) {
-            const previousNavigationState = currentNavigationState.current;
-            currentNavigationState.current = navigationState;
-            const previousRouteName = getActiveRouteName(previousNavigationState);
-            const currentRouteName = getActiveRouteName(navigationState);
-
-            if (currentRouteName && previousRouteName !== currentRouteName) {
-                AnalyticsHelper.setCurrentScreen(
-                    currentRouteName,
-                    currentRouteName
+    const onNavigationStateChange = useCallback(
+        (navigationState: NavigationState | undefined) => {
+            if (navigationState) {
+                const previousNavigationState = currentNavigationState.current;
+                currentNavigationState.current = navigationState;
+                const previousRouteName = getActiveRouteName(
+                    previousNavigationState,
                 );
-                if (!__DEV__) {
-                    AnalyticsHelper.logEvent('navigation_change', {
-                        from: previousRouteName,
-                        to: currentRouteName,
-                    });
+                const currentRouteName = getActiveRouteName(navigationState);
+
+                if (
+                    currentRouteName &&
+                    previousRouteName !== currentRouteName
+                ) {
+                    AnalyticsHelper.setCurrentScreen(
+                        currentRouteName,
+                        currentRouteName,
+                    );
+                    if (!__DEV__) {
+                        AnalyticsHelper.logEvent('navigation_change', {
+                            from: previousRouteName,
+                            to: currentRouteName,
+                        });
+                    }
                 }
             }
-        }
-    }, [getActiveRouteName]);
+        },
+        [getActiveRouteName],
+    );
 
     return (
         <GestureHandlerRootView style={styles.container}>
@@ -228,12 +299,13 @@ const RootContainer = React.memo((props: Props) => {
                         ref={(ref: any) =>
                             NavigationService.setTopLevelNavigator(ref)
                         }
-                        onStateChange={onNavigationStateChange}
-                    >
-                        <StatusBar barStyle={Platform.select({
-                            android: 'light-content',
-                            ios: 'dark-content',
-                        })} />
+                        onStateChange={onNavigationStateChange}>
+                        <StatusBar
+                            barStyle={Platform.select({
+                                android: 'light-content',
+                                ios: 'dark-content',
+                            })}
+                        />
                         <RootStack />
                         <DropdownAlert />
                         <ViewConnectionStatus />

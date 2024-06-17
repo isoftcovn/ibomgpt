@@ -17,3 +17,10 @@ export const MainUserNavigator = CommonActions.reset({
         { name: 'AppTab' },
     ],
 });
+
+export const RestartNavigator = CommonActions.reset({
+    index: 0,
+    routes: [
+        { name: 'SplashScreen' },
+    ],
+});

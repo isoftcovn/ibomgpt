@@ -58,7 +58,6 @@ const HomeScreen = (props: IProps) => {
     useRealtimeMessage();
 
     useEffect(() => {
-        DeviceEventEmitter.emit('credentialsReadyForAuth');
         DeviceEventEmitter.emit('credentialsReadyForUnauth');
     }, []);
 

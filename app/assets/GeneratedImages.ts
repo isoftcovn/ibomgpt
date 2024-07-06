@@ -17,6 +17,7 @@ const GeneratedImages = {
     ic_playjumpright: require('./images/resources/ic_playjumpright.png'),
     ic_shopping_bag: require('./images/resources/ic_shopping_bag.png'),
     ic_speaker: require('./images/resources/ic_speaker.png'),
+    ic_x: require('./images/resources/ic_x.png'),
     img_chatgpt: require('./images/resources/img_chatgpt.png'),
     korean: require('./images/resources/korean.png'),
     logo_ibom: require('./images/resources/logo_ibom.png'),

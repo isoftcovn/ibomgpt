@@ -36,7 +36,7 @@ export const FormFieldGenerator = React.memo((props: IProps) => {
         return <FormFieldDateBox template={'row'} {...props} />;
     }
 
-    if (input_type === 'selectbox') {
+    if (input_type === 'selectbox' || input_type === 'select') {
         return <FormFieldSelectBox {...props} />;
     }
 

@@ -5,3 +5,8 @@ export enum ListState {
     loadingMore,
     done
 }
+
+export interface IPickerItemModel {
+    text: string;
+    value: string;
+}

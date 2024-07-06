@@ -15,8 +15,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dimensions } from '@theme/Dimensions';
 import { View } from 'react-native';
 import { ParticipantList } from '@modules/participants';
-import { ConversationInfo } from '@modules/conversationinfo';
 import { CommonFilter } from '@modules/commonfilter';
+import { IBomPicker } from '@modules/common/IBomPicker';
+import { RichTextEditor } from '@components/globals/RichTextEditor';
 
 const Stack = createStackNavigator<AppStackParamList>();
 
@@ -44,6 +45,8 @@ export const RootStack = (props: IProps) => {
         <Stack.Screen name="SignUpEmail" component={SignUpEmailScreen} options={{ headerShown: true }} />
         <Stack.Screen name="Languages" component={LanguageScreen} />
         <Stack.Screen name="Conversation" component={ConversationScreen} />
+        <Stack.Screen name="IBomPicker" component={IBomPicker} />
+        <Stack.Screen name="RichTextEditor" component={RichTextEditor} />
         <Stack.Screen
             name="ParticipantList"
             component={ParticipantList}

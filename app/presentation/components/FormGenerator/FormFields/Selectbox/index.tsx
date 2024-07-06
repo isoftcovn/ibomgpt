@@ -75,7 +75,7 @@ export const FormFieldSelectBox = React.memo((props: IProps) => {
                     width: menuWidth,
                 }}
                 contentStyle={{
-                    backgroundColor: theme.color.backgroundColorVariant,
+                    backgroundColor: theme.color.backgroundColorPrimary,
                 }}
                 visible={pickerVisible}
                 onDismiss={() => setPickerVisible(false)}

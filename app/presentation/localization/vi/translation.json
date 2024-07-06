@@ -75,6 +75,7 @@
     "participantList": "Danh sách thành viên",
 
     "required": "Không thể bỏ trống",
+    "reset": "Cài đặt lại",
 
     "signup": "Đăng ký",
     "submit": "Submit",
@@ -87,7 +88,8 @@
     "send": "Gửi",
     "sentAnImage": "Đã gửi hình ảnh",
     "sentAVideo": "Đã gửi video",
-    "sentAFile": "Đã gửi tệp tin",    
+    "sentAFile": "Đã gửi tệp tin",  
+    "select": "Chọn",  
 
     "used": "Used",
     "useCamera": "Sử dụng máy ảnh",

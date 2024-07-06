@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.color.colorPrimary,
     },
     submitText: {
-        ...theme.textVariants.body1,
+        ...theme.textVariants.subtitle1,
         color: '#fff',
     },
 });

@@ -1,32 +1,43 @@
-import { TextPrimary } from '@components/index';
-import { ChatRepository } from '@data/repository/chat';
-import { GetChatListUseCase } from '@domain/chat/GetChatListUseCase';
-import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
-import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
+import {TextPrimary} from '@components/index';
+import {ChatRepository} from '@data/repository/chat';
+import {GetChatListUseCase} from '@domain/chat/GetChatListUseCase';
+import {ChatListRequestModel} from '@models/chat/request/ChatListRequestModel';
+import {ChatItemResponse} from '@models/chat/response/ChatItemResponse';
 import UserModel from '@models/user/response/UserModel';
-import { useRealtimeMessage } from '@modules/conversation/hooks/CommonHooks';
-import { AppStackParamList } from '@navigation/RouteParams';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { getProfileActionTypes } from '@redux/actions/user';
-import { selectProfile } from '@redux/selectors/user';
+import {useRealtimeMessage} from '@modules/conversation/hooks/CommonHooks';
+import {AppStackParamList} from '@navigation/RouteParams';
+import {RouteProp} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {getProfileActionTypes} from '@redux/actions/user';
+import {selectProfile} from '@redux/selectors/user';
 import ListingHelper from '@shared/helper/ListingHelper';
 import AppManager from '@shared/managers/AppManager';
-import { ChatManager } from 'app/presentation/managers/ChatManager';
-import { ListState } from 'app/presentation/models/general';
-import { theme } from 'app/presentation/theme';
+import {ChatManager} from 'app/presentation/managers/ChatManager';
+import {ListState} from 'app/presentation/models/general';
+import {theme} from 'app/presentation/theme';
 import AnalyticsHelper from 'app/shared/helper/AnalyticsHelper';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, DeviceEventEmitter, InteractionManager, ListRenderItemInfo, StyleSheet, View } from 'react-native';
-import Animated, { LinearTransition } from 'react-native-reanimated';
-import { useDispatch, useSelector } from 'react-redux';
-import { BehaviorSubject, Subscription, debounceTime, skip } from 'rxjs';
-import { ChatListItem } from './components/ChatListItem';
-import { HomeHeader } from './components/HomeHeader';
-import { useConversations } from './hooks';
-import { getConversationsActionTypes } from '@redux/actions/conversation';
-import { selectConversationList } from '@redux/selectors/conversation';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {
+    ActivityIndicator,
+    DeviceEventEmitter,
+    InteractionManager,
+    ListRenderItemInfo,
+    StyleSheet,
+    View,
+} from 'react-native';
+import Animated, {LinearTransition} from 'react-native-reanimated';
+import {useDispatch, useSelector} from 'react-redux';
+import {BehaviorSubject, Subscription, debounceTime, skip} from 'rxjs';
+import {ChatListItem} from './components/ChatListItem';
+import {HomeHeader} from './components/HomeHeader';
+import {useConversations} from './hooks';
+import {getConversationsActionTypes} from '@redux/actions/conversation';
+import {selectConversationList} from '@redux/selectors/conversation';
+import {IFieldValues} from '@components/FormGenerator/model';
+import ApiGateway from '@data/gateway/api';
+import {ApiType} from '@data/gateway/api/type';
+import DropDownHolder from '@shared/helper/DropdownHolder';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeScreen'>;
@@ -38,23 +49,38 @@ const ListSeparator = React.memo(() => {
 });
 
 const HomeScreen = (props: IProps) => {
-    const { navigation } = props;
+    const {navigation} = props;
     const dispatch = useDispatch();
-    const { t } = useTranslation();
-    const searchTermRef = useRef<BehaviorSubject<string>>(new BehaviorSubject(''));
+    const {t} = useTranslation();
+    const searchTermRef = useRef<BehaviorSubject<string>>(
+        new BehaviorSubject(''),
+    );
     const didMountRef = useRef(false);
     const receiveMessageSubcription = useRef<Subscription | undefined>();
     const [listState, setListState] = useState<ListState>(ListState.initial);
     // const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
-    const conversations: ChatItemResponse[] = useSelector(selectConversationList);
+    const conversations: ChatItemResponse[] = useSelector(
+        selectConversationList,
+    );
     const sortedConversations = useConversations(conversations);
     const user: UserModel | undefined = useSelector(selectProfile).data;
     const userId = useMemo(() => user?.id, [user]);
-    const chatListRequest = useRef<ChatListRequestModel>(new ChatListRequestModel());
+    const chatListRequest = useRef<ChatListRequestModel>(
+        new ChatListRequestModel(),
+    );
     const canLoadMore = useRef<boolean>(false);
-    const isLoading = useMemo(() => listState === ListState.loading, [listState]);
-    const isLoadMore = useMemo(() => listState === ListState.loadingMore, [listState]);
-    const refreshing = useMemo(() => listState === ListState.refreshing, [listState]);
+    const isLoading = useMemo(
+        () => listState === ListState.loading,
+        [listState],
+    );
+    const isLoadMore = useMemo(
+        () => listState === ListState.loadingMore,
+        [listState],
+    );
+    const refreshing = useMemo(
+        () => listState === ListState.refreshing,
+        [listState],
+    );
     useRealtimeMessage();
 
     useEffect(() => {
@@ -70,9 +96,10 @@ const HomeScreen = (props: IProps) => {
     useEffect(() => {
         if (userId) {
             ChatManager.shared.startConnection(`${userId}`);
-            receiveMessageSubcription.current = ChatManager.shared.receiveMessageEvent.subscribe(messages => {
-
-            });
+            receiveMessageSubcription.current =
+                ChatManager.shared.receiveMessageEvent.subscribe(
+                    messages => {},
+                );
         }
 
         return () => {
@@ -85,33 +112,77 @@ const HomeScreen = (props: IProps) => {
         searchTermRef.current.next(text);
     }, []);
 
-    const loadData = useCallback(async (isRefreshing: boolean = false, searchTerm: string = '') => {
-        try {
-            setListState(isRefreshing ? ListState.refreshing : ListState.loading);
-            chatListRequest.current = new ChatListRequestModel();
-            if (searchTerm && searchTerm.length > 0) {
-                chatListRequest.current.key_search = searchTerm;
-            }
-            const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
-            const response = await usecase.execute();
-            canLoadMore.current = response.items.length >= chatListRequest.current.limit;
-            dispatch(getConversationsActionTypes.successAction(response.items, {
-                canLoadMore: canLoadMore.current
-            }));
-            // setConversations(response.items);            
+    const onFilterChange = useCallback(
+        (values: Record<string, IFieldValues>, refAPI: string) => {
+            const payload = new FormData();
 
-            if (response.avatar && user) {
-                dispatch(getProfileActionTypes.successAction({
-                    ...user,
-                    avatar: response.avatar
-                }));
+            if (values) {
+                Object.keys(values).forEach(key => {
+                    if (values[key]?.value) {
+                        payload.append(key, values[key].value);
+                    }
+                });
             }
-        } catch (error) {
-            console.info('Load conversations error: ', error);
-        } finally {
-            setListState(ListState.done);
-        }
-    }, [user, dispatch]);
+            const apiGateway = new ApiGateway({
+                method: 'POST',
+                resource: {
+                    Path: refAPI,
+                    Type: ApiType.Customer,
+                },
+                body: payload,
+            });
+            apiGateway
+                .execute()
+                .then(resp => {
+                    console.log('filter result: ', resp);
+                })
+                .catch(error => {
+                    DropDownHolder.showErrorAlert(error?.toString() ?? '');
+                });
+        },
+        [],
+    );
+
+    const loadData = useCallback(
+        async (isRefreshing: boolean = false, searchTerm: string = '') => {
+            try {
+                setListState(
+                    isRefreshing ? ListState.refreshing : ListState.loading,
+                );
+                chatListRequest.current = new ChatListRequestModel();
+                if (searchTerm && searchTerm.length > 0) {
+                    chatListRequest.current.key_search = searchTerm;
+                }
+                const usecase = new GetChatListUseCase(
+                    new ChatRepository(),
+                    chatListRequest.current,
+                );
+                const response = await usecase.execute();
+                canLoadMore.current =
+                    response.items.length >= chatListRequest.current.limit;
+                dispatch(
+                    getConversationsActionTypes.successAction(response.items, {
+                        canLoadMore: canLoadMore.current,
+                    }),
+                );
+                // setConversations(response.items);
+
+                if (response.avatar && user) {
+                    dispatch(
+                        getProfileActionTypes.successAction({
+                            ...user,
+                            avatar: response.avatar,
+                        }),
+                    );
+                }
+            } catch (error) {
+                console.info('Load conversations error: ', error);
+            } finally {
+                setListState(ListState.done);
+            }
+        },
+        [user, dispatch],
+    );
 
     const loadMoreData = useCallback(async () => {
         if (!canLoadMore.current) {
@@ -122,15 +193,24 @@ const HomeScreen = (props: IProps) => {
         }
         try {
             setListState(ListState.loadingMore);
-            chatListRequest.current.page = ListingHelper.shared.getNextPageBasedOnDataLength(conversations.length, chatListRequest.current.limit) ?? chatListRequest.current.page + 1;
-            const usecase = new GetChatListUseCase(new ChatRepository(), chatListRequest.current);
+            chatListRequest.current.page =
+                ListingHelper.shared.getNextPageBasedOnDataLength(
+                    conversations.length,
+                    chatListRequest.current.limit,
+                ) ?? chatListRequest.current.page + 1;
+            const usecase = new GetChatListUseCase(
+                new ChatRepository(),
+                chatListRequest.current,
+            );
             const response = await usecase.execute();
             const items = response.items;
             canLoadMore.current = items.length >= chatListRequest.current.limit;
-            dispatch(getConversationsActionTypes.successAction(items, {
-                canLoadMore: canLoadMore.current,
-                isAppend: true,
-            }));
+            dispatch(
+                getConversationsActionTypes.successAction(items, {
+                    canLoadMore: canLoadMore.current,
+                    isAppend: true,
+                }),
+            );
             // setConversations(prevState => {
             //     return [
             //         ...prevState,
@@ -144,20 +224,23 @@ const HomeScreen = (props: IProps) => {
         }
     }, [listState, dispatch, conversations]);
 
-    const onItemPress = useCallback((data: ChatItemResponse) => {
-        navigation.navigate('Conversation', {
-            objectId: data.objectId,
-            objectInstanceId: data.objectInstanceId,
-            name: data.name,
-        });
-    }, [navigation]);
+    const onItemPress = useCallback(
+        (data: ChatItemResponse) => {
+            navigation.navigate('Conversation', {
+                objectId: data.objectId,
+                objectInstanceId: data.objectInstanceId,
+                name: data.name,
+            });
+        },
+        [navigation],
+    );
 
-    const renderItem = useCallback((info: ListRenderItemInfo<ChatItemResponse>) => {
-        return <ChatListItem
-            data={info.item}
-            onPress={onItemPress}
-        />;
-    }, [onItemPress]);
+    const renderItem = useCallback(
+        (info: ListRenderItemInfo<ChatItemResponse>) => {
+            return <ChatListItem data={info.item} onPress={onItemPress} />;
+        },
+        [onItemPress],
+    );
 
     // Did mount
     useEffect(() => {
@@ -172,7 +255,8 @@ const HomeScreen = (props: IProps) => {
 
     // Search term request
     useEffect(() => {
-        const subscription = searchTermRef.current.pipe(skip(1), debounceTime(500))
+        const subscription = searchTermRef.current
+            .pipe(skip(1), debounceTime(500))
             .subscribe(searchTerm => {
                 console.info('Debounce search term: ', searchTerm);
                 loadData(false, searchTerm);
@@ -185,9 +269,11 @@ const HomeScreen = (props: IProps) => {
 
     // Refresh when app from background to foreground
     useEffect(() => {
-        const subscription = AppManager.appFromBackgroundToForeground.subscribe(() => {
-            loadData(true, searchTermRef.current.value);
-        });
+        const subscription = AppManager.appFromBackgroundToForeground.subscribe(
+            () => {
+                loadData(true, searchTermRef.current.value);
+            },
+        );
 
         return () => {
             subscription.unsubscribe();
@@ -214,30 +300,38 @@ const HomeScreen = (props: IProps) => {
         return null;
     }, [isLoadMore]);
 
-    return <View style={styles.container}
-    >
-        <HomeHeader
-            navigation={navigation}
-            onChangeText={onChangeText}
-        />
-        {!isLoading ? <Animated.FlatList
-            style={styles.list}
-            contentContainerStyle={styles.contentContainer}
-            data={sortedConversations}
-            refreshing={refreshing}
-            ItemSeparatorComponent={ListSeparator}
-            ListEmptyComponent={renderEmpty}
-            ListFooterComponent={renderLoadMore}
-            renderItem={renderItem}
-            keyExtractor={(item: ChatItemResponse) => `${item.objectId}-${item.objectInstanceId}`}
-            onRefresh={() => loadData(true)}
-            onEndReached={loadMoreData}
-            onEndReachedThreshold={0.7}
-            itemLayoutAnimation={LinearTransition.springify()}
-        /> : <View style={styles.viewCenter}>
-            <ActivityIndicator animating size={'large'} />
-        </View>}
-    </View>;
+    return (
+        <View style={styles.container}>
+            <HomeHeader
+                navigation={navigation}
+                onChangeText={onChangeText}
+                onFilterChange={onFilterChange}
+            />
+            {!isLoading ? (
+                <Animated.FlatList
+                    style={styles.list}
+                    contentContainerStyle={styles.contentContainer}
+                    data={sortedConversations}
+                    refreshing={refreshing}
+                    ItemSeparatorComponent={ListSeparator}
+                    ListEmptyComponent={renderEmpty}
+                    ListFooterComponent={renderLoadMore}
+                    renderItem={renderItem}
+                    keyExtractor={(item: ChatItemResponse) =>
+                        `${item.objectId}-${item.objectInstanceId}`
+                    }
+                    onRefresh={() => loadData(true)}
+                    onEndReached={loadMoreData}
+                    onEndReachedThreshold={0.7}
+                    itemLayoutAnimation={LinearTransition.springify()}
+                />
+            ) : (
+                <View style={styles.viewCenter}>
+                    <ActivityIndicator animating size={'large'} />
+                </View>
+            )}
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -246,7 +340,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.color.backgroundColorPrimary,
     },
     list: {
-        flex: 1
+        flex: 1,
     },
     contentContainer: {
         paddingHorizontal: theme.spacing.large,
@@ -261,7 +355,7 @@ const styles = StyleSheet.create({
         paddingVertical: theme.spacing.medium,
         paddingHorizontal: theme.spacing.large,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     label: {
         color: theme.color.labelColor,
@@ -271,8 +365,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: theme.spacing.medium,
         paddingVertical: theme.spacing.medium,
         justifyContent: 'center',
-        alignItems: 'center'
-    }
+        alignItems: 'center',
+    },
 });
 
 export default HomeScreen;

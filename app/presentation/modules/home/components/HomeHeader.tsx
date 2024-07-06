@@ -1,6 +1,6 @@
+import { IFieldValues } from '@components/FormGenerator/model';
 import { Box } from '@components/globals/view/Box';
 import { AllRouteParamList } from '@navigation/RouteParams';
-import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { theme } from '@theme/index';
 import React, { useCallback, useRef } from 'react';
@@ -11,82 +11,86 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface IProps {
     navigation: StackNavigationProp<AllRouteParamList, 'HomeScreen'>;
+    onFilterChange: (values: Record<string, IFieldValues>, refAPI: string) => void;
     onChangeText: (text: string) => void;
 }
 
 export const HomeHeader = React.memo((props: IProps) => {
-    const { navigation, onChangeText } = props;
+    const {navigation, onChangeText, onFilterChange} = props;
     const inputRef = useRef<TextInput>();
 
     const insets = useSafeAreaInsets();
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     const onFilterPress = useCallback(() => {
         navigation.navigate('CommonFilter', {
             title: t('filterObject'),
+            onSubmit: onFilterChange,
         });
-    }, [navigation, t]);
+    }, [navigation, t, onFilterChange]);
 
-    return <View
-        style={[styles.container, {
-            height: 45 + insets.top,
-            paddingTop: insets.top,
-        }]}
-    >
-        <Box style={styles.contentContainer}>
-            <View style={styles.searchContainer}>
+    return (
+        <View
+            style={[
+                styles.container,
+                {
+                    height: 45 + insets.top,
+                    paddingTop: insets.top,
+                },
+            ]}>
+            <Box style={styles.contentContainer}>
+                <View style={styles.searchContainer}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            inputRef.current?.focus();
+                        }}>
+                        <Ionicons
+                            name="search-outline"
+                            size={20}
+                            color={theme.color.onBackground}
+                        />
+                    </TouchableOpacity>
+                    <TextInput
+                        ref={(ref: any) => (inputRef.current = ref)}
+                        style={styles.searchInput}
+                        underlineColorAndroid={'transparent'}
+                        placeholder={t('searchConversation') ?? ''}
+                        placeholderTextColor={theme.color.labelColor}
+                        returnKeyType="search"
+                        onChangeText={onChangeText}
+                    />
+                </View>
                 <TouchableOpacity
-                    onPress={() => {
-                        inputRef.current?.focus();
+                    style={{marginLeft: theme.spacing.medium}}
+                    activeOpacity={0.7}
+                    hitSlop={{
+                        top: 10,
+                        right: 10,
+                        bottom: 10,
+                        left: 10,
                     }}
-                >
+                    onPress={onFilterPress}>
                     <Ionicons
-                        name="search-outline"
-                        size={20}
-                        color={theme.color.onBackground}
+                        name="filter"
+                        size={24}
+                        color={theme.color.navigationTintColor}
                     />
                 </TouchableOpacity>
-                <TextInput
-                    ref={(ref: any) => inputRef.current = ref}
-                    style={styles.searchInput}
-                    underlineColorAndroid={'transparent'}
-                    placeholder={t('searchConversation') ?? ''}
-                    placeholderTextColor={theme.color.labelColor}
-                    returnKeyType="search"
-                    onChangeText={onChangeText}
-                />
-            </View>
-            <TouchableOpacity
-                style={{ marginLeft: theme.spacing.medium }}
-                activeOpacity={0.7}
-                hitSlop={{
-                    top: 10,
-                    right: 10,
-                    bottom: 10,
-                    left: 10
-                }}
-                onPress={onFilterPress}
-            >
-                <Ionicons
-                    name="filter"
-                    size={24}
-                    color={theme.color.navigationTintColor}
-                />
-            </TouchableOpacity>
-        </Box>
-    </View>;
+            </Box>
+        </View>
+    );
 });
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.color.navigationBackgroundColor,
         paddingLeft: theme.spacing.huge,
-        paddingRight: theme.spacing.large
+        paddingRight: theme.spacing.large,
     },
     contentContainer: {
         flex: 1,
         alignItems: 'center',
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     searchContainer: {
         flex: 1,
@@ -103,5 +107,5 @@ const styles = StyleSheet.create({
         flex: 1,
         ...theme.textVariants.body2,
         color: theme.color.textColor,
-    }
+    },
 });

@@ -1,3 +1,4 @@
+import { IFieldValues } from '@components/FormGenerator/model';
 import {IPickerItemModel} from '../models/general';
 
 export interface IRichTextEditorNavigationParams {
@@ -40,6 +41,8 @@ export type AppStackParamList = {
     };
     CommonFilter: {
         title?: string;
+        initialFilters?: Record<string, IFieldValues>;
+        onSubmit: (values: Record<string, IFieldValues>, refAPI: string) => void;
     };
     PdfViewer: {
         url: string;

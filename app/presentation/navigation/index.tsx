@@ -18,6 +18,8 @@ import {ParticipantList} from '@modules/participants';
 import {CommonFilter} from '@modules/commonfilter';
 import {IBomPicker} from '@modules/common/IBomPicker';
 import {RichTextEditor} from '@components/globals/RichTextEditor';
+import {ObjectList} from '@modules/objectlist';
+import {useTranslation} from 'react-i18next';
 
 const Stack = createStackNavigator<AppStackParamList>();
 
@@ -26,6 +28,7 @@ interface IProps {}
 // Only use one Stack for further auto testing. React Navigation deeply nested view on ios
 export const RootStack = (props: IProps) => {
     const defaultOptions = createDefaultStackNavigationOptions();
+    const {t} = useTranslation();
     return (
         <Stack.Navigator
             initialRouteName={'SplashScreen'}
@@ -61,6 +64,13 @@ export const RootStack = (props: IProps) => {
             <Stack.Screen name="Conversation" component={ConversationScreen} />
             <Stack.Screen name="IBomPicker" component={IBomPicker} />
             <Stack.Screen name="RichTextEditor" component={RichTextEditor} />
+            <Stack.Screen
+                name="ObjectList"
+                component={ObjectList}
+                options={{
+                    title: t('objectList'),
+                }}
+            />
             <Stack.Screen
                 name="ParticipantList"
                 component={ParticipantList}

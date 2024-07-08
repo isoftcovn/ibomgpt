@@ -3,7 +3,10 @@ import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesReque
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
+import { ObjectItemResponse } from '@models/chat/response/ObjectItemResponse';
 import { SubmitChatResponse } from '@models/chat/response/SubmitChatResponse';
+import BaseQueryModel from '@models/general/request/BaseQueryModel';
+import { PaginationModel } from '@models/general/response/PaginationModel';
 import UserModel from '@models/user/response/UserModel';
 
 export interface IChatRepository {
@@ -11,4 +14,5 @@ export interface IChatRepository {
     getChatMessages: (body: ChatMessagesRequestModel) => Promise<[ChatMessageResponse[], UserModel[]]>;
     submitChatMessages: (body: SubmitMessageRequestModel) => Promise<SubmitChatResponse | undefined>;
     getChatSearchForm: () => Promise<any>;
+    getObjectList: (refAPI: string, body: BaseQueryModel) => Promise<PaginationModel<ObjectItemResponse>>;
 }

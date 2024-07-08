@@ -31,6 +31,10 @@ export type AppStackParamList = {
         objectInstanceId: number;
         name?: string;
     };
+    ObjectList: {
+        refAPI?: string;
+        values: Record<string, IFieldValues>;
+    }
     ParticipantList: {
         objectId: number;
         objectInstanceId: number;

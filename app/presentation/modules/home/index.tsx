@@ -114,33 +114,15 @@ const HomeScreen = (props: IProps) => {
 
     const onFilterChange = useCallback(
         (values: Record<string, IFieldValues>, refAPI: string) => {
-            const payload = new FormData();
-
-            if (values) {
-                Object.keys(values).forEach(key => {
-                    if (values[key]?.value) {
-                        payload.append(key, values[key].value);
-                    }
+            setTimeout(() => {
+                console.log('values: ', values);
+                navigation.navigate('ObjectList', {
+                    values,
+                    refAPI,
                 });
-            }
-            const apiGateway = new ApiGateway({
-                method: 'POST',
-                resource: {
-                    Path: refAPI,
-                    Type: ApiType.Customer,
-                },
-                body: payload,
-            });
-            apiGateway
-                .execute()
-                .then(resp => {
-                    console.log('filter result: ', resp);
-                })
-                .catch(error => {
-                    DropDownHolder.showErrorAlert(error?.toString() ?? '');
-                });
+            }, 200);
         },
-        [],
+        [navigation],
     );
 
     const loadData = useCallback(

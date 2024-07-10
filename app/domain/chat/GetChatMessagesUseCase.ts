@@ -5,7 +5,7 @@ import { IChatRepository } from '.';
 import { IUseCase } from '../index';
 import UserModel from '@models/user/response/UserModel';
 
-export class GetChatMessagesUseCase implements IUseCase<[IAppChatMessage[], UserModel[]]> {
+export class GetChatMessagesUseCase implements IUseCase<[IAppChatMessage[], UserModel[], string]> {
     chatRepository: IChatRepository;
     body: ChatMessagesRequestModel;
 
@@ -14,13 +14,13 @@ export class GetChatMessagesUseCase implements IUseCase<[IAppChatMessage[], User
         this.body = body;
     }
 
-    execute = async (): Promise<[IAppChatMessage[], UserModel[]]> => {
+    execute = async (): Promise<[IAppChatMessage[], UserModel[], string]> => {
         const response = await this.chatRepository.getChatMessages(this.body);
-        const [messages, users] = response;
+        const [messages, users, name] = response;
         let appMessages: IAppChatMessage[] = [];
         for (const message of messages) {
             appMessages = appMessages.concat(MessageHelper.shared.convertMessageResponseToChatMessage(message));
         }
-        return [appMessages, users];
+        return [appMessages, users, name];
     };
 }

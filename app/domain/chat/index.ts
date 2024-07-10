@@ -11,7 +11,7 @@ import UserModel from '@models/user/response/UserModel';
 
 export interface IChatRepository {
     getChatList: (body: ChatListRequestModel) => Promise<{items: ChatItemResponse[], avatar?: string}>;
-    getChatMessages: (body: ChatMessagesRequestModel) => Promise<[ChatMessageResponse[], UserModel[]]>;
+    getChatMessages: (body: ChatMessagesRequestModel) => Promise<[ChatMessageResponse[], UserModel[], string]>;
     submitChatMessages: (body: SubmitMessageRequestModel) => Promise<SubmitChatResponse | undefined>;
     getChatSearchForm: () => Promise<any>;
     getObjectList: (refAPI: string, body: BaseQueryModel) => Promise<PaginationModel<ObjectItemResponse>>;

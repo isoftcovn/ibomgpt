@@ -10,7 +10,6 @@ import {theme} from '@theme/index';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ObjectListItem} from './components/ObjectListItem';
-import produce from 'immer';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {

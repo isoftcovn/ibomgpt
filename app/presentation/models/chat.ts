@@ -7,4 +7,5 @@ export interface IAppChatMessage extends IMessage {
     parentMessageId?: string | number;
     objectId?: number;
     objectInstanceId?: number;
+    conversationName: string;
 }

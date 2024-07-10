@@ -28,6 +28,7 @@ export class MessageHelper {
                 },
                 objectId: data.objectId,
                 objectInstanceId: data.objectInstanceId,
+                conversationName: data.conversationName,
             });
         }
         if (data.fileList.length > 0) {
@@ -46,6 +47,7 @@ export class MessageHelper {
                     },
                     objectId: data.objectId,
                     objectInstanceId: data.objectInstanceId,
+                    conversationName: data.conversationName,
                 };
                 switch (fileType) {
                     case FileType.image:
@@ -87,6 +89,7 @@ export class MessageHelper {
             },
             objectId: request.object_id,
             objectInstanceId: request.object_instance_id,
+            conversationName: '',
         };
         messages.push(parentMessage);
 
@@ -108,6 +111,7 @@ export class MessageHelper {
                         },
                         objectId: request.object_id,
                         objectInstanceId: request.object_instance_id,
+                        conversationName: '',
                     };
                     switch (fileType) {
                         case FileType.image:

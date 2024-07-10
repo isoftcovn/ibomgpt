@@ -94,7 +94,7 @@ export class ChatRepository implements IChatRepository {
 
     getChatMessages = async (
         body: ChatMessagesRequestModel,
-    ): Promise<[ChatMessageResponse[], UserModel[]]> => {
+    ): Promise<[ChatMessageResponse[], UserModel[], string]> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         Object.entries(body).forEach(([key, value]) => {
@@ -109,6 +109,7 @@ export class ChatRepository implements IChatRepository {
         const response = await apiGateway.execute();
         const itemList: any[] = response.itemList ?? [];
         const userList: any[] = response.userList ?? [];
+        const name = response.OBJECT_INSTANCE_NAME ?? '';
 
         const messages = itemList.map(item =>
             ChatMessageResponse.parseFromJson(item),
@@ -117,7 +118,7 @@ export class ChatRepository implements IChatRepository {
             UserModel.parseFromChatResponse(item),
         );
 
-        return [messages, users];
+        return [messages, users, name];
     };
 
     getChatList = async (

@@ -115,10 +115,10 @@ const HomeScreen = (props: IProps) => {
     const onFilterChange = useCallback(
         (values: Record<string, IFieldValues>, refAPI: string) => {
             setTimeout(() => {
-                console.log('values: ', values);
                 navigation.navigate('ObjectList', {
                     values,
                     refAPI,
+                    title: values.object_id?.text ?? '',
                 });
             }, 200);
         },

@@ -19,12 +19,13 @@ export const getMessagesEpic = (action$: any, state$: any) =>
             new Observable(obs => {
                 const usecase = new GetChatMessagesUseCase(new ChatRepository(), action.payload!);
                 usecase.execute().then(response => {
-                    const [messages, users] = response;
+                    const [messages, users, roomName] = response;
                     const sectionId = `${action.payload!.object_id}-${action.payload!.object_instance_id}`;
                     obs.next(getMessagesActionTypes.successAction(messages, {
                         sectionId: sectionId,
                         isAppend: (action.payload!.last_id ?? 0) > 0,
                         canLoadMore: messages.length > 0,
+                        roomName
                     }));
                     obs.next(updateConversationParticipantsActionTypes.startAction(users, {
                         sectionId

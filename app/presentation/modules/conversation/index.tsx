@@ -10,6 +10,7 @@ import {
     selectMessagesCanLoadMoreByKey,
     selectMessagesFetchingState,
     selectParticipantsByKey,
+    selectRoomNameByKey,
 } from '@redux/selectors/conversation';
 import {selectDisplayName, selectProfile} from '@redux/selectors/user';
 import {IAppChatMessage} from 'app/presentation/models/chat';
@@ -169,6 +170,7 @@ const ConversationContent = React.memo((props: IProps) => {
         [participants],
     );
     const messages = useSelector(state => selectMessagesByKey(state, key));
+    const roomName = useSelector(state => selectRoomNameByKey(state, key));
     const canLoadMore = useSelector(state =>
         selectMessagesCanLoadMoreByKey(state, key),
     );
@@ -188,8 +190,8 @@ const ConversationContent = React.memo((props: IProps) => {
 
     useEffect(() => {
         let name = route.params?.name ?? '';
-        if (messages && messages.length > 0) {
-            name = messages[0].conversationName ?? '';
+        if (roomName) {
+            name = roomName;
         }
         if (!conversationName.current || conversationName.current !== name) {
             navigation.setOptions({
@@ -207,7 +209,7 @@ const ConversationContent = React.memo((props: IProps) => {
 
             conversationName.current = name;
         }
-    }, [route.params, navigation, route, t, messages]);
+    }, [route.params, navigation, route, t, roomName]);
 
     useEffect(() => {
         const keyboardWillShowListener = Keyboard.addListener(

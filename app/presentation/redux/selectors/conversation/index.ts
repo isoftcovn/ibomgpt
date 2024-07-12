@@ -1,5 +1,6 @@
 import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import UserModel from '@models/user/response/UserModel';
+import { IReducer } from '@redux/index';
 import { IAppChatMessage } from 'app/presentation/models/chat';
 import { createSelector } from 'reselect';
 
@@ -32,6 +33,11 @@ export const selectMessagesState = createSelector(
     (conversation: any) => conversation.messages
 );
 
+export const selectConversationNameState = createSelector(
+    (state: any) => selectConversationState(state),
+    (conversation: any): IReducer<Record<string, string>> => conversation.conversationName
+);
+
 export const selectParticipantsState = createSelector(
     (state: any) => selectConversationState(state),
     (conversation: any) => conversation.participants
@@ -55,6 +61,17 @@ export const selectLatestMessageByKey = createSelector(
     (groupMessages, key): IAppChatMessage | undefined => {
         const messages = groupMessages?.[key] ?? [];
         return messages[0];
+    }
+);
+
+export const selectRoomNameByKey = createSelector(
+    [
+        (state: any) => selectConversationNameState(state).data,
+        (state: any, key: string): string => key,
+    ],
+    (conversationName, key): string | undefined => {
+        const name = conversationName?.[key] ?? '';
+        return name;
     }
 );
 

@@ -87,7 +87,7 @@ export const ObjectListItem = React.memo((props: IProps) => {
                 <HTML
                     contentWidth={width - 32}
                     baseFontStyle={{
-                        ...theme.textVariants.body2,
+                        ...theme.textVariants.body3,
                         color: '#000',
                     }}
                     tagsStyles={{
@@ -115,7 +115,6 @@ export const ObjectListItem = React.memo((props: IProps) => {
                     }}
                 />
             </TouchableOpacity>
-            <View style={styles.bottomLine} />
         </View>
     );
 });
@@ -124,14 +123,10 @@ const styles = StyleSheet.create({
     flatList: {
         backgroundColor: '#fff',
     },
-    contentContainer: {
-        paddingBottom: 100,
-    },
     flatListItem: {
         justifyContent: 'space-between',
         backgroundColor: '#fff',
-        paddingHorizontal: 16,
-        paddingTop: 0,
+        paddingTop: 12,
         paddingBottom: 16,
     },
     Title: {

@@ -170,9 +170,9 @@ const spacing = {
 };
 
 export const FontNames = {
-    Bold: 'OpenSans-Bold',
-    SemiBold: 'OpenSans-SemiBold',
-    Normal: 'OpenSans-Regular',
+    Bold: 'Roboto-Bold',
+    SemiBold: 'Roboto-SemiBold',
+    Normal: 'Roboto-Regular',
 };
 
 export const themeDefault: ITheme = {

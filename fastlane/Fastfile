@@ -131,7 +131,7 @@ lane :firebaseDistributionAndroid do |options|
     testers_file: ENV["TESTER_FILE"],
     release_notes: changelog,
     apk_path: ENV["APK_PATH"],
-    service_credentials_file: ENV['GOOGLE_APPLICATION_CREDENTIALS']
+    #service_credentials_file: ENV['GOOGLE_APPLICATION_CREDENTIALS']
   )
 end
 
@@ -143,7 +143,7 @@ lane :firebaseDistributionIOS do |options|
     testers_file: ENV["TESTER_FILE"],
     release_notes: changelog,
     ipa_path: ENV["IPA_PATH"],
-    service_credentials_file: ENV['GOOGLE_APPLICATION_CREDENTIALS']
+    #service_credentials_file: ENV['GOOGLE_APPLICATION_CREDENTIALS']
   )
 end
 

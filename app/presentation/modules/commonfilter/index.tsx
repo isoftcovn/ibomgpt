@@ -47,9 +47,8 @@ export const CommonFilter = (props: IProps) => {
         (values: Record<string, IFieldValues>) => {
             const _onSubmit = route.params.onSubmit;
             _onSubmit(values, refAPI.current);
-            navigation.goBack();
         },
-        [route, navigation],
+        [route],
     );
 
     return (
@@ -63,7 +62,8 @@ export const CommonFilter = (props: IProps) => {
                     route={route}
                     initialValues={initialFilters.current}
                     showResetButton
-                    submitTitle={t('filter')}
+                    submitTitle={t('search')}
+                    resetButtonTitle={t('cancel')}
                     onSubmit={onSubmit}
                 />
             </KeyboardAwareScrollView>

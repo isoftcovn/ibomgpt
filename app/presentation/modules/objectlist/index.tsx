@@ -26,6 +26,12 @@ export const ObjectList = React.memo((props: IProps) => {
     const data = useMemo(() => pagination?.items ?? [], [pagination]);
     const {t} = useTranslation();
 
+    useEffect(() => {
+        navigation.setOptions({
+            title: route.params.title,
+        });
+    }, [navigation, route]);
+
     const refreshData = useCallback(() => {
         if (route.params.refAPI) {
             const query = new BaseQueryModel();
@@ -131,9 +137,13 @@ export const ObjectList = React.memo((props: IProps) => {
             </View>
             <MyFlatList
                 style={styles.container}
+                contentContainerStyle={{
+                    paddingHorizontal: theme.spacing.medium,
+                }}
                 data={data}
                 refreshing={isLoading}
                 renderItem={renderItem}
+                separatorType="line"
                 keyExtractor={(item: ObjectItemResponse) =>
                     `${item.objectId}-${item.objectInstanceId}`
                 }

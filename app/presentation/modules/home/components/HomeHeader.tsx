@@ -1,17 +1,22 @@
-import { IFieldValues } from '@components/FormGenerator/model';
-import { Box } from '@components/globals/view/Box';
-import { AllRouteParamList } from '@navigation/RouteParams';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { theme } from '@theme/index';
-import React, { useCallback, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {IFieldValues} from '@components/FormGenerator/model';
+import {Box} from '@components/globals/view/Box';
+import {AllRouteParamList} from '@navigation/RouteParams';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {theme} from '@theme/index';
+import React, {useCallback, useRef} from 'react';
+import {useTranslation} from 'react-i18next';
+import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Feather from 'react-native-vector-icons/Feather';
+import {TextPrimary} from '@components/index';
 
 interface IProps {
     navigation: StackNavigationProp<AllRouteParamList, 'HomeScreen'>;
-    onFilterChange: (values: Record<string, IFieldValues>, refAPI: string) => void;
+    onFilterChange: (
+        values: Record<string, IFieldValues>,
+        refAPI: string,
+    ) => void;
     onChangeText: (text: string) => void;
 }
 
@@ -24,7 +29,7 @@ export const HomeHeader = React.memo((props: IProps) => {
 
     const onFilterPress = useCallback(() => {
         navigation.navigate('CommonFilter', {
-            title: t('filterObject'),
+            title: t('searchObject'),
             onSubmit: onFilterChange,
         });
     }, [navigation, t, onFilterChange]);
@@ -61,7 +66,12 @@ export const HomeHeader = React.memo((props: IProps) => {
                     />
                 </View>
                 <TouchableOpacity
-                    style={{marginLeft: theme.spacing.medium}}
+                    style={{
+                        marginLeft: theme.spacing.medium,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: theme.spacing.tiny,
+                    }}
                     activeOpacity={0.7}
                     hitSlop={{
                         top: 10,
@@ -70,11 +80,12 @@ export const HomeHeader = React.memo((props: IProps) => {
                         left: 10,
                     }}
                     onPress={onFilterPress}>
-                    <Ionicons
+                    <Feather
                         name="filter"
                         size={24}
                         color={theme.color.navigationTintColor}
                     />
+                    <TextPrimary color="#fff">{t('filter')}</TextPrimary>
                 </TouchableOpacity>
             </Box>
         </View>

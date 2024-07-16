@@ -15,7 +15,7 @@ import { ConversationContext } from '../context/ConversationContext';
 import { IPickerAsset } from './MediaHooks';
 
 const sendMessagesToHub = async (userIds: string[], message: ChatMessageResponse) => {
-    ChatHelper.shared.sendNewMessagesEvent(userIds, message);
+    ChatHelper.shared.sendNewMessagesEvent(userIds, message.rawData);
 };
 
 export const useSendTextMessage = (objectId: number, objectInstanceId: number) => {

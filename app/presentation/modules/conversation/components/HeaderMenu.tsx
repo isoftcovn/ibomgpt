@@ -60,7 +60,7 @@ export const ConversationHeaderMenu = React.memo((props: IProps) => {
         <Menu.Item
             onPress={() => {
                 closeMenu();
-                navigation.goBack();
+                navigation.popToTop();
             }}
             title={t('groupList')}
         />

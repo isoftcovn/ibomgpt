@@ -31,6 +31,7 @@ export class ChatMessageResponse {
     content?: string;
     fileList: ChatMessageFileResponse[];
     conversationName: string;
+    rawData?: any;
 
     constructor() {
         this.id = 0;
@@ -60,6 +61,7 @@ export class ChatMessageResponse {
         if (fileList && Array.isArray(fileList)) {
             obj.fileList = fileList.map((item: any) => ChatMessageFileResponse.parseFromJson(item));
         }
+        obj.rawData = data;
         return obj;
     };
 }

@@ -8,4 +8,6 @@ export interface IAppChatMessage extends IMessage {
     objectId?: number;
     objectInstanceId?: number;
     conversationName: string;
+    allowDelete?: boolean;
+    allowEdit?: boolean;
 }

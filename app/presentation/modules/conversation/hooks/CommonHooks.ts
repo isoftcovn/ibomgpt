@@ -18,7 +18,8 @@ export const useOnMessageLongPress = (objectId: number, objectInstanceId: number
     const onMessageLongPress = useCallback((context: any, currentMessage: IAppChatMessage) => {
         // eslint-disable-next-line eqeqeq
         const isMyMessage = currentMessage.user._id == userId;
-        let disabledEdit = false;
+        let disabledEdit = !(currentMessage.allowEdit ?? false);
+        const disabledDelete = !(currentMessage.allowDelete ?? false);
         const options: string[] = [];
         if (currentMessage.text) {
             options.push(t('copy'));
@@ -40,6 +41,12 @@ export const useOnMessageLongPress = (objectId: number, objectInstanceId: number
         const disabledButtonIndices: number[] = [];
         if (disabledEdit) {
             const index = options.indexOf(t('edit'));
+            if (index !== -1) {
+                disabledButtonIndices.push(index);
+            }
+        }
+        if (disabledDelete) {
+            const index = options.indexOf(t('delete'));
             if (index !== -1) {
                 disabledButtonIndices.push(index);
             }

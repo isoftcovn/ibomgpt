@@ -31,6 +31,8 @@ export class ChatMessageResponse {
     content?: string;
     fileList: ChatMessageFileResponse[];
     conversationName: string;
+    allowEdit?: boolean;
+    allowDelete?: boolean;
     rawData?: any;
 
     constructor() {
@@ -46,7 +48,7 @@ export class ChatMessageResponse {
 
     static parseFromJson = (data: any): ChatMessageResponse => {
         const { created_by, comment_content, comment_id, user_created_name, updated_date_view,
-            object_id, created_date_view, object_instance_id, fileList, avatar, OBJECT_INSTANCE_NAME } = data;
+            object_id, created_date_view, object_instance_id, fileList, avatar, OBJECT_INSTANCE_NAME, allow_del, allow_edit } = data;
         const obj = new ChatMessageResponse();
         obj.id = comment_id ?? 0;
         obj.senderId = created_by ?? 0;
@@ -58,6 +60,8 @@ export class ChatMessageResponse {
         obj.content = comment_content;
         obj.avatar = avatar;
         obj.conversationName = OBJECT_INSTANCE_NAME ?? '';
+        obj.allowEdit = Boolean(allow_edit);
+        obj.allowDelete = Boolean(allow_del);
         if (fileList && Array.isArray(fileList)) {
             obj.fileList = fileList.map((item: any) => ChatMessageFileResponse.parseFromJson(item));
         }

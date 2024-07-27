@@ -75,6 +75,8 @@ import {TypingAnimation} from './components/TypingAninimation';
 import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
 import {ChatManager} from 'app/presentation/managers/ChatManager';
 import {ConversationHeaderMenu} from './components/HeaderMenu';
+import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
+import {ChatRepository} from '@data/repository/chat';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -85,6 +87,7 @@ export const ConversationScreen = (props: IProps) => {
     const {route} = props;
     const [editMessage, setEditMessage] = useState<IAppChatMessage>();
     const [text, setText] = useState('');
+    const [options, setOptions] = useState<ChatRoomsOptions>();
     const textInputRef = createRef<TextInput>();
     const objectId = useMemo(() => {
         return route.params.objectId;
@@ -92,6 +95,15 @@ export const ConversationScreen = (props: IProps) => {
     const objectInstanceId = useMemo(() => {
         return route.params.objectInstanceId;
     }, [route.params]);
+
+    useEffect(() => {
+        const repo = new ChatRepository();
+        repo.getChatRoomOptions(objectId, objectInstanceId)
+            .then(setOptions)
+            .catch(error => {
+                //
+            });
+    }, [objectId, objectInstanceId]);
 
     const enterEditMode = useCallback((message?: IAppChatMessage) => {
         console.info(
@@ -107,8 +119,17 @@ export const ConversationScreen = (props: IProps) => {
             textInputRef,
             objectId,
             objectInstanceId,
+            options,
+            setOptions,
         }),
-        [enterEditMode, editMessage, textInputRef, objectId, objectInstanceId],
+        [
+            enterEditMode,
+            editMessage,
+            textInputRef,
+            objectId,
+            objectInstanceId,
+            options,
+        ],
     );
 
     const inputContextValue = useMemo(
@@ -134,7 +155,8 @@ const ConversationContent = React.memo((props: IProps) => {
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
     const [keyboardShown, setKeyboardShown] = useState(false);
-    const {textInputRef, editMessage} = useContext(ConversationContext);
+    const {textInputRef, editMessage} =
+        useContext(ConversationContext);
     const {setText} = useContext(ConversationInputContext);
     const {t} = useTranslation();
     const dispatch = useDispatch();

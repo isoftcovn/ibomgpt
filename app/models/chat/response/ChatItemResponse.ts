@@ -13,6 +13,8 @@ export class ChatItemResponse {
     objectId: number;
     objectInstanceId: number;
     companyId?: number;
+    allowEdit?: boolean;
+    allowDelete?: boolean;
 
     constructor() {
         this.name = '';
@@ -22,7 +24,7 @@ export class ChatItemResponse {
 
     static parseFromJson = (data: any): ChatItemResponse => {
         const { comment_content, OBJECT_INSTANCE_NAME, comment_id, updated_date_view, object_id,
-            avatar, created_date_view, company_id, object_instance_id, user_created_name } = data;
+            avatar, created_date_view, company_id, object_instance_id, user_created_name, allow_del, allow_edit } = data;
         const dateFormat = 'DD/MM/YYYY h:mmA';
         const obj = new ChatItemResponse();
         obj.objectId = object_id ?? 0;
@@ -32,6 +34,8 @@ export class ChatItemResponse {
         obj.lastCommentId = comment_id;
         obj.lastCommentCreatedDateDisplay = created_date_view;
         obj.lastCommentUpdatedDateDisplay = updated_date_view;
+        obj.allowEdit = Boolean(allow_edit);
+        obj.allowDelete = Boolean(allow_del);
         if (created_date_view) {
             const createdDateDisplay = created_date_view.trim().split(' ').filter((item: string) => item.trim().length > 0).join(' ').toUpperCase();
             const createdDate = dayjs(createdDateDisplay, dateFormat);

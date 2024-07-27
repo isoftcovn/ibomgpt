@@ -29,6 +29,8 @@ export class MessageHelper {
                 objectId: data.objectId,
                 objectInstanceId: data.objectInstanceId,
                 conversationName: data.conversationName,
+                allowDelete: data.allowDelete,
+                allowEdit: data.allowEdit,
             });
         }
         if (data.fileList.length > 0) {
@@ -48,6 +50,8 @@ export class MessageHelper {
                     objectId: data.objectId,
                     objectInstanceId: data.objectInstanceId,
                     conversationName: data.conversationName,
+                    allowDelete: data.allowDelete,
+                    allowEdit: data.allowEdit,
                 };
                 switch (fileType) {
                     case FileType.image:

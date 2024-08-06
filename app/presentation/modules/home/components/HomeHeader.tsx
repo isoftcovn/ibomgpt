@@ -10,6 +10,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {TextPrimary} from '@components/index';
+import LinkingHelper from '@shared/helper/LinkingHelper';
+import { Links } from '@shared/constants';
 
 interface IProps {
     navigation: StackNavigationProp<AllRouteParamList, 'HomeScreen'>;
@@ -34,6 +36,10 @@ export const HomeHeader = React.memo((props: IProps) => {
         });
     }, [navigation, t, onFilterChange]);
 
+    const comebackToiBomPro = useCallback(() => {
+        LinkingHelper.openIBomProApp();
+    }, []);
+
     return (
         <View
             style={[
@@ -44,6 +50,33 @@ export const HomeHeader = React.memo((props: IProps) => {
                 },
             ]}>
             <Box style={styles.contentContainer}>
+                <TouchableOpacity
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginRight: theme.spacing.small,
+                    }}
+                    activeOpacity={0.7}
+                    hitSlop={{
+                        top: 10,
+                        right: 10,
+                        bottom: 10,
+                        left: 10,
+                    }}
+                    onPress={comebackToiBomPro}>
+                    <Ionicons
+                        name="chevron-back"
+                        size={24}
+                        color={theme.color.navigationTintColor}
+                    />
+                    <TextPrimary
+                        style={{
+                            fontWeight: '500',
+                        }}
+                        color={theme.color.navigationTintColor}>
+                        Pro
+                    </TextPrimary>
+                </TouchableOpacity>
                 <View style={styles.searchContainer}>
                     <TouchableOpacity
                         onPress={() => {
@@ -95,7 +128,7 @@ export const HomeHeader = React.memo((props: IProps) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.color.navigationBackgroundColor,
-        paddingLeft: theme.spacing.huge,
+        paddingLeft: theme.spacing.small,
         paddingRight: theme.spacing.large,
     },
     contentContainer: {

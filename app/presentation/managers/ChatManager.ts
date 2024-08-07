@@ -26,12 +26,15 @@ export class ChatManager {
     editMessageEvent: Subject<IEditMessageSignalRPayload>;
     deleteMessageEvent: Subject<IDeleteMessageSignalRPayload>;
 
+    messageSentEvent: Subject<IAppChatMessage[]>;
+
     private constructor() {
         this.receiveMessageEvent = new Subject<IChatMessage[]>();
         this.userTypingEvent = new Subject<IUsersTypingPayload>();
         this.editMessageEvent = new Subject<IEditMessageSignalRPayload>();
         this.deleteMessageEvent = new Subject<IDeleteMessageSignalRPayload>();
         this.channelTypingState = {};
+        this.messageSentEvent = new Subject<IAppChatMessage[]>();
 
         DeviceInfo.getUniqueId().then(id => {
             this._deviceUID = id;

@@ -1,3 +1,4 @@
+import {IFieldValues} from '@components/FormGenerator/model';
 import {TextPrimary} from '@components/index';
 import {ChatRepository} from '@data/repository/chat';
 import {GetChatListUseCase} from '@domain/chat/GetChatListUseCase';
@@ -8,7 +9,9 @@ import {useRealtimeMessage} from '@modules/conversation/hooks/CommonHooks';
 import {AppStackParamList} from '@navigation/RouteParams';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {getConversationsActionTypes} from '@redux/actions/conversation';
 import {getProfileActionTypes} from '@redux/actions/user';
+import {selectConversationList} from '@redux/selectors/conversation';
 import {selectProfile} from '@redux/selectors/user';
 import ListingHelper from '@shared/helper/ListingHelper';
 import AppManager from '@shared/managers/AppManager';
@@ -28,16 +31,10 @@ import {
 } from 'react-native';
 import Animated, {LinearTransition} from 'react-native-reanimated';
 import {useDispatch, useSelector} from 'react-redux';
-import {BehaviorSubject, Subscription, debounceTime, skip} from 'rxjs';
+import {BehaviorSubject, debounceTime, skip} from 'rxjs';
 import {ChatListItem} from './components/ChatListItem';
 import {HomeHeader} from './components/HomeHeader';
 import {useConversations} from './hooks';
-import {getConversationsActionTypes} from '@redux/actions/conversation';
-import {selectConversationList} from '@redux/selectors/conversation';
-import {IFieldValues} from '@components/FormGenerator/model';
-import ApiGateway from '@data/gateway/api';
-import {ApiType} from '@data/gateway/api/type';
-import DropDownHolder from '@shared/helper/DropdownHolder';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'HomeScreen'>;
@@ -55,10 +52,9 @@ const HomeScreen = (props: IProps) => {
     const searchTermRef = useRef<BehaviorSubject<string>>(
         new BehaviorSubject(''),
     );
+    const needToRefreshData = useRef(false);
     const didMountRef = useRef(false);
-    const receiveMessageSubcription = useRef<Subscription | undefined>();
     const [listState, setListState] = useState<ListState>(ListState.initial);
-    // const [conversations, setConversations] = useState<ChatItemResponse[]>([]);
     const conversations: ChatItemResponse[] = useSelector(
         selectConversationList,
     );
@@ -96,15 +92,10 @@ const HomeScreen = (props: IProps) => {
     useEffect(() => {
         if (userId) {
             ChatManager.shared.startConnection(`${userId}`);
-            receiveMessageSubcription.current =
-                ChatManager.shared.receiveMessageEvent.subscribe(
-                    messages => {},
-                );
         }
 
         return () => {
             ChatManager.shared.stopConnection();
-            receiveMessageSubcription.current?.unsubscribe();
         };
     }, [userId]);
 
@@ -261,6 +252,26 @@ const HomeScreen = (props: IProps) => {
             subscription.unsubscribe();
         };
     }, [loadData]);
+
+    useEffect(() => {
+        const subscription = ChatManager.shared.messageSentEvent.subscribe(
+            () => {
+                needToRefreshData.current = true;
+            },
+        );
+
+        const focusSubscription = navigation.addListener('focus', () => {
+            if (needToRefreshData.current) {
+                loadData(true, searchTermRef.current.value);
+                needToRefreshData.current = false;
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+            focusSubscription();
+        };
+    }, [navigation, loadData]);
 
     const renderEmpty = useCallback(() => {
         return (

@@ -110,6 +110,7 @@ export const ObjectList = React.memo((props: IProps) => {
                 <ObjectListItem
                     item={item}
                     onPress={() => {
+                        navigation.popToTop();
                         navigation.navigate('Conversation', {
                             objectId: item.objectId,
                             objectInstanceId: item.objectInstanceId,

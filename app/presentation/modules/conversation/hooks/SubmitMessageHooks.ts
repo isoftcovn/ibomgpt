@@ -13,6 +13,7 @@ import { useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ConversationContext } from '../context/ConversationContext';
 import { IPickerAsset } from './MediaHooks';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
 
 const sendMessagesToHub = async (userIds: string[], message: ChatMessageResponse) => {
     ChatHelper.shared.sendNewMessagesEvent(userIds, message.rawData);
@@ -86,6 +87,8 @@ export const useSendTextMessage = (objectId: number, objectInstanceId: number) =
                         objectId,
                         objectInstanceId
                     }));
+
+                    ChatManager.shared.messageSentEvent.next(messages);
                 }
             });
         }
@@ -183,6 +186,8 @@ export const useSendMediaMessage = (objectId: number, objectInstanceId: number) 
                         objectId,
                         objectInstanceId
                     }));
+
+                    ChatManager.shared.messageSentEvent.next(messages);
                 }
             });
         });

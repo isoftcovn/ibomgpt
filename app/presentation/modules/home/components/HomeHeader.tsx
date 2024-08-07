@@ -11,7 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {TextPrimary} from '@components/index';
 import LinkingHelper from '@shared/helper/LinkingHelper';
-import { Links } from '@shared/constants';
+import {Links} from '@shared/constants';
 
 interface IProps {
     navigation: StackNavigationProp<AllRouteParamList, 'HomeScreen'>;
@@ -69,13 +69,6 @@ export const HomeHeader = React.memo((props: IProps) => {
                         size={24}
                         color={theme.color.navigationTintColor}
                     />
-                    <TextPrimary
-                        style={{
-                            fontWeight: '500',
-                        }}
-                        color={theme.color.navigationTintColor}>
-                        Pro
-                    </TextPrimary>
                 </TouchableOpacity>
                 <View style={styles.searchContainer}>
                     <TouchableOpacity

@@ -24,12 +24,20 @@ class AppManager {
     }
 
     reauthorizeUser = async (user: string, pass: string) => {
+        const userRepo = new UserRepository();
+        const [currentUsername] = (await userRepo.getUserCreds()) ?? [];
+        if (
+            currentUsername &&
+            currentUsername.trim().toLowerCase() === user.trim().toLowerCase()
+        ) {
+            return;
+        }
         this.appState = {
             credentialsReadyForAuth: false,
             credentialsReadyForUnauth: false,
         };
-        const userRepo = new UserRepository();
         await userRepo.saveUserCreds(user, pass);
+        console.info('Request reauthorize with another account');
         this.forceReauthoirze.next(new Date());
     };
 }

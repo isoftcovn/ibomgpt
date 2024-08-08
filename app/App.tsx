@@ -67,10 +67,7 @@ const App = (props: Props) => {
                 if (appRoute) {
                     AppRouteManager.shared.handleRoute(appRoute);
                 }
-                console.info(
-                    'Received deeplink data: ',
-                    JSON.stringify(res?.data),
-                );
+                console.info('Received deeplink data: ', res?.data);
             }
         });
 

@@ -248,8 +248,14 @@ const HomeScreen = (props: IProps) => {
             },
         );
 
+        const refreshListSubscription =
+            AppManager.forceRefreshConversationList.subscribe(() => {
+                needToRefreshData.current = true;
+            });
+
         return () => {
             subscription.unsubscribe();
+            refreshListSubscription.unsubscribe();
         };
     }, [loadData]);
 

@@ -1,4 +1,4 @@
-import {Linking} from 'react-native';
+import {Alert, Linking} from 'react-native';
 import Config from 'react-native-config';
 
 export const MESSENGER_URI = 'fb-messenger://';
@@ -12,7 +12,7 @@ export default class LinkingHelper {
                     if (canOpen) {
                         Linking.openURL(url).then(resolve).catch(reject);
                     } else {
-                        reject('Can\'t open url.');
+                        reject("Can't open url.");
                     }
                 })
                 .catch(reject);
@@ -85,6 +85,8 @@ export default class LinkingHelper {
                 break;
         }
 
-        LinkingHelper.openUrl(url);
+        LinkingHelper.openUrl(url).catch(error => {
+            Alert.alert('Error!!!', `url: ${url}\n${error.toString()}`);
+        });
     };
 }

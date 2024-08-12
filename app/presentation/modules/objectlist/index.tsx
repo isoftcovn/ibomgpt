@@ -11,6 +11,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ObjectListItem} from './components/ObjectListItem';
 import {useTranslation} from 'react-i18next';
+import AppManager from '@shared/managers/AppManager';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'ObjectList'>;
@@ -115,6 +116,7 @@ export const ObjectList = React.memo((props: IProps) => {
                             objectId: item.objectId,
                             objectInstanceId: item.objectInstanceId,
                         });
+                        AppManager.forceRefreshConversationList.next(new Date());
                     }}
                 />
             );

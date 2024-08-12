@@ -123,7 +123,7 @@ export const FormFieldSelectBox = React.memo((props: IProps) => {
                     );
                 })}
             </Menu>
-            {meta.error && meta.touched ? <TextPrimary style={[styles.error]}>{meta.error}</TextPrimary> : null}
+            {meta.error ? <TextPrimary style={[styles.error]}>{meta.error}</TextPrimary> : null}
         </View>
     );
 });

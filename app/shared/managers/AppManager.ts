@@ -11,6 +11,8 @@ class AppManager {
     appFromBackgroundToForeground: Subject<Date>;
     appFromForegroundToBackground: Subject<Date>;
 
+    forceRefreshConversationList: Subject<Date>;
+
     forceSignout: Subject<string>;
 
     forceReauthoirze: Subject<Date>;
@@ -21,6 +23,7 @@ class AppManager {
         this.appFromForegroundToBackground = new Subject<Date>();
         this.forceSignout = new Subject<string>();
         this.forceReauthoirze = new Subject<Date>();
+        this.forceRefreshConversationList = new Subject<Date>();
     }
 
     reauthorizeUser = async (user: string, pass: string) => {

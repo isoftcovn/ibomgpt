@@ -85,8 +85,8 @@ export default class LinkingHelper {
                 break;
         }
 
-        LinkingHelper.openUrl(url).catch(error => {
-            Alert.alert('Error!!!', `url: ${url}\n${error.toString()}`);
+        Linking.openURL(url).catch(error => {
+            console.info('Error: ', error);
         });
     };
 }

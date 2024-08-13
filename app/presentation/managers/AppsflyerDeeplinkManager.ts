@@ -12,11 +12,11 @@ export class AppsflyerDeeplinkManager {
     getIBomOneLinkTemplateId = (): string => {
         switch (Config.ENV) {
             case 'dev':
-                return '';
+                return 'yMRF';
             case 'uat':
-                return '';
+                return 'yMRF';
             case 'production':
-                return '';
+                return 'Ydm1';
         }
     };
 

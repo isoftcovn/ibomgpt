@@ -12,6 +12,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {TextPrimary} from '@components/index';
 import LinkingHelper from '@shared/helper/LinkingHelper';
 import {Links} from '@shared/constants';
+import {UserRepository} from '@data/repository/user';
 
 interface IProps {
     navigation: StackNavigationProp<AllRouteParamList, 'HomeScreen'>;
@@ -37,7 +38,7 @@ export const HomeHeader = React.memo((props: IProps) => {
     }, [navigation, t, onFilterChange]);
 
     const comebackToiBomPro = useCallback(() => {
-        LinkingHelper.openIBomProApp();
+        LinkingHelper.openIBomProApp(new UserRepository());
     }, []);
 
     return (

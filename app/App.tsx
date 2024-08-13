@@ -87,7 +87,9 @@ const App = (props: Props) => {
             },
         );
 
-        // FIXME: Store template ID in more proper way
+        appsFlyer.setAppInviteOneLinkID(
+            AppsflyerDeeplinkManager.shared.getIBomOneLinkTemplateId(),
+        );
 
         return () => {
             subscription.remove();

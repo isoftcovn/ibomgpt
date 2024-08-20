@@ -25,6 +25,11 @@ export interface IUpdateLocalMessageIdsPayload {
     messageIdsToReplace: Record<string, string>;
 }
 
+export interface IMarkReadConversationPayload {
+    objectId: number;
+    objectInstanceId: number;
+}
+
 export const getMessagesType = 'get_messages';
 export const getMessagesActionTypes = createActionTypes<ChatMessagesRequestModel, IAppChatMessage[]>(getMessagesType, DOMAIN);
 
@@ -51,3 +56,9 @@ export const updateConversationParticipantsActionTypes = createActionTypes<UserM
 
 export const getConversationsType = 'get_conversations';
 export const getConversationsActionTypes = createActionTypes<ChatListRequestModel, ChatItemResponse[]>(getConversationsType, DOMAIN);
+
+export const updateUnreadConversation = 'unread_conversation';
+export const updateUnreadConversationActionTypes = createActionTypes<IMarkReadConversationPayload, void>(updateUnreadConversation, DOMAIN);
+
+export const updateReadConversation = 'read_conversation';
+export const updateReadConversationActionTypes = createActionTypes<IMarkReadConversationPayload, void>(updateReadConversation, DOMAIN);

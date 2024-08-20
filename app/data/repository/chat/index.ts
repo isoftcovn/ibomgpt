@@ -7,7 +7,7 @@ import {ChatMessagesRequestModel} from '@models/chat/request/ChatMessagesRequest
 import {SubmitMessageRequestModel} from '@models/chat/request/SubmitMessageRequestModel';
 import {ChatItemResponse} from '@models/chat/response/ChatItemResponse';
 import {ChatMessageResponse} from '@models/chat/response/ChatMessageResponse';
-import { ChatRoomsOptions } from '@models/chat/response/ChatRoomOptions';
+import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
 import {ObjectItemResponse} from '@models/chat/response/ObjectItemResponse';
 import {SubmitChatResponse} from '@models/chat/response/SubmitChatResponse';
 import BaseQueryModel from '@models/general/request/BaseQueryModel';
@@ -15,7 +15,29 @@ import {PaginationModel} from '@models/general/response/PaginationModel';
 import UserModel from '@models/user/response/UserModel';
 
 export class ChatRepository implements IChatRepository {
-    getChatRoomOptions = async (objectId: number, objectInstanceId: number): Promise<ChatRoomsOptions> => {
+    markAsReadConversation = async (
+        objectId: number,
+        objectInstanceId: number,
+    ): Promise<boolean> => {
+        const resource = AppResource.Chat.ReadConversation();
+        const formData = new FormData();
+        formData.append('object_id', objectId);
+        formData.append('object_instance_id', objectInstanceId);
+        const apiGateway = new ApiGateway({
+            method: 'POST',
+            resource: resource,
+            body: formData,
+        });
+
+        await apiGateway.execute();
+
+        return true;
+    };
+
+    getChatRoomOptions = async (
+        objectId: number,
+        objectInstanceId: number,
+    ): Promise<ChatRoomsOptions> => {
         const resource = AppResource.Chat.ChatList();
         const formData = new FormData();
         formData.append('object_id', objectId);

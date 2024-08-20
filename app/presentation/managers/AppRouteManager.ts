@@ -45,20 +45,13 @@ export class AppRouteManager {
     };
 
     handleRoute = (route: AppRoute) => {
-        const extras = route.extras;
-        // Request reauthorize
-        if (extras?._u && extras?._p) {
-            route.extras = undefined;
-            this.saveRoute(route);
-            return;
-        }
-
         let canExecuteRoute = false;
         if (route.routeNeedAuthentication) {
             canExecuteRoute = AppManager.appState.credentialsReadyForAuth;
         } else if (AppManager.appState.credentialsReadyForUnauth) {
             canExecuteRoute = true;
         }
+        console.log('canExecuteRoute: ', canExecuteRoute);
         if (canExecuteRoute) {
             this.executeRoute(route);
             this.pendingRoute = undefined;

@@ -11,7 +11,13 @@ const ChatSearchForm = (): IResource => ({
     Path: `${getApiController()}comment/form_search.do`,
 });
 
+const ReadConversation = (): IResource => ({
+    Type: ApiType.Customer,
+    Path: `${getApiController()}comment/read.do`,
+});
+
 export default {
     ChatList,
     ChatSearchForm,
+    ReadConversation,
 };

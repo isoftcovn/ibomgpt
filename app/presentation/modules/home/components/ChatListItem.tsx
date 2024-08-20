@@ -3,6 +3,7 @@ import {TextPrimary} from '@components/index';
 import {ChatItemResponse} from '@models/chat/response/ChatItemResponse';
 import {selectLatestMessageByKey} from '@redux/selectors/conversation';
 import {Dimensions} from '@theme/Dimensions';
+import { FontNames } from '@theme/ThemeDefault';
 import {theme} from '@theme/index';
 import {useLatestMessageContent} from 'app/presentation/hooks/conversation/ConversationCommonHooks';
 import dayjs from 'dayjs';
@@ -69,6 +70,8 @@ export const ChatListItem = React.memo((props: IProps) => {
         return `${lastSenderName}: ${lastCommentContent}`;
     }, [data.lastCommentContent, data.lastSenderName, latestMessageContent]);
 
+    const isRead = data.isRead;
+
     return (
         <TouchableOpacity
             style={styles.container}
@@ -92,7 +95,10 @@ export const ChatListItem = React.memo((props: IProps) => {
                     size={Dimensions.moderateScale(32)}
                     title={avatarTitle}
                 />
-                <TextPrimary style={styles.lastComment} numberOfLines={5}>
+                <TextPrimary style={[styles.lastComment, !isRead && {
+                    fontFamily: FontNames.SemiBold,
+                    fontWeight: '600',
+                }]} numberOfLines={5}>
                     {lastComment}
                 </TextPrimary>
             </Box>

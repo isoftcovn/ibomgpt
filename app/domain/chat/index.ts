@@ -17,4 +17,5 @@ export interface IChatRepository {
     getChatSearchForm: () => Promise<any>;
     getObjectList: (refAPI: string, body: BaseQueryModel) => Promise<PaginationModel<ObjectItemResponse>>;
     getChatRoomOptions: (objectId: number, objectInstanceId: number) => Promise<ChatRoomsOptions>;
+    markAsReadConversation: (objectId: number, objectInstanceId: number) => Promise<boolean>;
 }

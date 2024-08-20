@@ -59,7 +59,10 @@ import {
     ConversationContext,
     ConversationInputContext,
 } from './context/ConversationContext';
-import {useOnMessageLongPress} from './hooks/CommonHooks';
+import {
+    useMarkAsReadConversation,
+    useOnMessageLongPress,
+} from './hooks/CommonHooks';
 import {
     IPickerAsset,
     useOnMessagePressed,
@@ -155,8 +158,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
     const [keyboardShown, setKeyboardShown] = useState(false);
-    const {textInputRef, editMessage} =
-        useContext(ConversationContext);
+    const {textInputRef, editMessage} = useContext(ConversationContext);
     const {setText} = useContext(ConversationInputContext);
     const {t} = useTranslation();
     const dispatch = useDispatch();
@@ -179,6 +181,7 @@ const ConversationContent = React.memo((props: IProps) => {
         isAudioModalVisible,
         setAudioModalVisible,
     } = useOnMessagePressed(navigation);
+    const {markAsRead} = useMarkAsReadConversation(objectId, objectInstanceId);
     const key = useMemo(() => {
         return `${objectId}-${objectInstanceId}`;
     }, [objectId, objectInstanceId]);
@@ -278,6 +281,11 @@ const ConversationContent = React.memo((props: IProps) => {
             });
         };
     }, [dispatch, objectId, objectInstanceId, displayName, userIds]);
+
+    // Mark as read when enter screen
+    useEffect(() => {
+        markAsRead();
+    }, [markAsRead]);
 
     useEffect(() => {
         if (editMessage) {

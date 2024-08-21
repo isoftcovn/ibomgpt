@@ -97,7 +97,7 @@ export const ChatListItem = React.memo((props: IProps) => {
                 />
                 <TextPrimary style={[styles.lastComment, !isRead && {
                     fontFamily: FontNames.SemiBold,
-                    fontWeight: '600',
+                    fontWeight: '700',
                 }]} numberOfLines={5}>
                     {lastComment}
                 </TextPrimary>

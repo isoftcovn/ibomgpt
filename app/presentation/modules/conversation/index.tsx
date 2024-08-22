@@ -4,7 +4,10 @@ import UserModel from '@models/user/response/UserModel';
 import {AppStackParamList} from '@navigation/RouteParams';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {getMessagesActionTypes} from '@redux/actions/conversation';
+import {
+    getMessagesActionTypes,
+    updateConversationParticipantsActionTypes,
+} from '@redux/actions/conversation';
 import {
     selectMessagesByKey,
     selectMessagesCanLoadMoreByKey,
@@ -98,15 +101,29 @@ export const ConversationScreen = (props: IProps) => {
     const objectInstanceId = useMemo(() => {
         return route.params.objectInstanceId;
     }, [route.params]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const repo = new ChatRepository();
         repo.getChatRoomOptions(objectId, objectInstanceId)
-            .then(setOptions)
+            .then(options => {
+                setOptions(options);
+                const key = `${objectId}-${objectInstanceId}`;
+                if (options.participants) {
+                    dispatch(
+                        updateConversationParticipantsActionTypes.startAction(
+                            options.participants,
+                            {
+                                sectionId: key,
+                            },
+                        ),
+                    );
+                }
+            })
             .catch(error => {
                 //
             });
-    }, [objectId, objectInstanceId]);
+    }, [objectId, objectInstanceId, dispatch]);
 
     const enterEditMode = useCallback((message?: IAppChatMessage) => {
         console.info(

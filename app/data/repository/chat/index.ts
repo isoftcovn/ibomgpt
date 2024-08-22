@@ -42,6 +42,7 @@ export class ChatRepository implements IChatRepository {
         const formData = new FormData();
         formData.append('object_id', objectId);
         formData.append('object_instance_id', objectInstanceId);
+        formData.append('mode', 'info');
         const apiGateway = new ApiGateway({
             method: 'POST',
             resource: resource,

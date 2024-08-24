@@ -36,6 +36,8 @@ export class AppRouteManager {
     executeRoute = (route: AppRoute) => {
         const routeName = DeepLinkRoutes[route.route];
         if (routeName) {
+            console.log('NavigationService: ', NavigationService.topLevelNavigator?.getState());
+            NavigationService.popRoute(routeName);
             NavigationService.push(routeName, route.params);
         }
     };

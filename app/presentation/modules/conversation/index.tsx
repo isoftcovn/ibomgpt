@@ -175,7 +175,8 @@ const ConversationContent = React.memo((props: IProps) => {
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
     const [keyboardShown, setKeyboardShown] = useState(false);
-    const {textInputRef, editMessage} = useContext(ConversationContext);
+    const {textInputRef, editMessage, options} =
+        useContext(ConversationContext);
     const {setText} = useContext(ConversationInputContext);
     const {t} = useTranslation();
     const dispatch = useDispatch();
@@ -235,23 +236,21 @@ const ConversationContent = React.memo((props: IProps) => {
         if (roomName) {
             name = roomName;
         }
-        if (!conversationName.current || conversationName.current !== name) {
-            navigation.setOptions({
-                title:
-                    name ||
-                    `${t('detail')}:${route.params?.objectInstanceId ?? 0}`,
-                headerRight: props => (
-                    <ConversationHeaderMenu
-                        navigation={navigation}
-                        route={route}
-                        tintColor={props.tintColor}
-                    />
-                ),
-            });
+        navigation.setOptions({
+            title:
+                name || `${t('detail')}:${route.params?.objectInstanceId ?? 0}`,
+            headerRight: props => (
+                <ConversationHeaderMenu
+                    navigation={navigation}
+                    route={route}
+                    tintColor={props.tintColor}
+                    options={options}
+                />
+            ),
+        });
 
-            conversationName.current = name;
-        }
-    }, [route.params, navigation, route, t, roomName]);
+        conversationName.current = name;
+    }, [route.params, navigation, route, t, roomName, options]);
 
     useEffect(() => {
         const keyboardWillShowListener = Keyboard.addListener(

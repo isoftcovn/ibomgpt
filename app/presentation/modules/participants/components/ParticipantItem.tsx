@@ -27,6 +27,7 @@ export const ParticipantItemView = React.memo((props: IProps) => {
 const styles = StyleSheet.create({
     container: {
         paddingVertical: theme.spacing.medium,
+        paddingHorizontal: theme.spacing.medium,
     },
     title: {
         fontWeight: '600'

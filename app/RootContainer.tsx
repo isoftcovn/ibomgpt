@@ -301,10 +301,7 @@ const RootContainer = React.memo((props: Props) => {
                         }
                         onStateChange={onNavigationStateChange}>
                         <StatusBar
-                            barStyle={Platform.select({
-                                android: 'light-content',
-                                ios: 'dark-content',
-                            })}
+                            barStyle={'light-content'}
                         />
                         <RootStack />
                         <DropdownAlert />

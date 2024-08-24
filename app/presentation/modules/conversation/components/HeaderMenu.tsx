@@ -1,3 +1,4 @@
+import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
 import {AppStackParamList} from '@navigation/RouteParams';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -11,10 +12,11 @@ interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
     route: RouteProp<AppStackParamList, 'Conversation'>;
     tintColor?: string;
+    options?: ChatRoomsOptions;
 }
 
 export const ConversationHeaderMenu = React.memo((props: IProps) => {
-    const {tintColor, navigation, route} = props;
+    const {tintColor, navigation, route, options} = props;
     const [visible, setVisible] = useState(false);
     const objectId = useMemo(() => {
         return route.params.objectId;
@@ -59,12 +61,14 @@ export const ConversationHeaderMenu = React.memo((props: IProps) => {
             <Menu.Item
                 onPress={() => {
                     closeMenu();
+                    console.log('options: ', options);
                     navigation.navigate('ParticipantList', {
                         objectId,
                         objectInstanceId,
+                        info: options,
                     });
                 }}
-                title={t('participantList')}
+                title={t('info2')}
             />
             <Menu.Item
                 onPress={() => {

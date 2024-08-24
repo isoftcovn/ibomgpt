@@ -1,14 +1,12 @@
-import { MyFlatList, TextButton, TextPrimary } from '@components/index';
-import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
-import UserModel from '@models/user/response/UserModel';
+import { TextButton, TextPrimary } from '@components/index';
 import { AppStackParamList } from '@navigation/RouteParams';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { selectConversationByKey, selectParticipantsByKey } from '@redux/selectors/conversation';
+import { selectConversationByKey } from '@redux/selectors/conversation';
 import { theme } from '@theme/index';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ListRenderItemInfo, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 
 interface IProps {

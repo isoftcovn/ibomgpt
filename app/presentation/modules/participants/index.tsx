@@ -56,7 +56,7 @@ export const ParticipantList = (props: IProps) => {
         return (
             <View style={styles.infoContainer}>
                 <TextPrimary variant="body1" style={styles.infoText}>
-                    {t('name')}: {options.name}
+                    {options.name}
                 </TextPrimary>
                 {options?.infoHTML && (
                     <HTMLRenderer

@@ -6,6 +6,12 @@ const MiddlewareTracking = (): IResource => ({
     Path: `${getApiController()}detailed-activities`,
 });
 
+const CheckVersion = (): IResource => ({
+    Type: ApiType.Public,
+    Path: `${getApiController()}ibot/version.do`,
+});
+
 export default {
     MiddlewareTracking,
+    CheckVersion,
 };

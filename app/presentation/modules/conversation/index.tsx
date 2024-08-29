@@ -52,6 +52,7 @@ import {
     MyAvatar,
     MyBubble,
     MyCustomMessage,
+    MyDayMessage,
     MySystemMessage,
     MyTextMessage,
     RenderMessage,
@@ -213,7 +214,7 @@ const ConversationContent = React.memo((props: IProps) => {
         [participants],
     );
     const messages = useSelector(state => selectMessagesByKey(state, key));
-    const roomName = useSelector(state => selectRoomNameByKey(state, key));
+    const roomName = useMemo(() => options?.name ?? '', [options]);
     const canLoadMore = useSelector(state =>
         selectMessagesCanLoadMoreByKey(state, key),
     );
@@ -441,6 +442,7 @@ const ConversationContent = React.memo((props: IProps) => {
                 renderMessageAudio={MyAudioMessage}
                 renderMessageImage={RenderImageMessage}
                 renderSystemMessage={MySystemMessage}
+                renderDay={MyDayMessage}
                 renderCustomView={MyCustomMessage}
                 scrollToBottomComponent={renderScrollToBottom}
                 renderFooter={renderFooter}

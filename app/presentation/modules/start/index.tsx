@@ -1,18 +1,25 @@
 import GeneratedImages from '@assets/GeneratedImages';
-import { TextPrimary } from '@components/index';
-import { UserRepository } from '@data/repository/user';
-import { IUserRepository } from '@domain/user';
-import { AppStackParamList } from '@navigation/RouteParams';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Dimensions } from '@theme/Dimensions';
-import { InitAppStatus, useInitApp } from 'app/presentation/hooks/general/useInitApp';
-import { AuthNavigator, MainUserNavigator } from 'app/presentation/navigation/helper/shortcut';
-import { theme } from 'app/presentation/theme';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Image, StyleSheet, View } from 'react-native';
+import {TextPrimary} from '@components/index';
+import {UserRepository} from '@data/repository/user';
+import {IUserRepository} from '@domain/user';
+import {AppStackParamList} from '@navigation/RouteParams';
+import {RouteProp} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {Dimensions} from '@theme/Dimensions';
+import {
+    InitAppStatus,
+    useInitApp,
+} from 'app/presentation/hooks/general/useInitApp';
+import {
+    AuthNavigator,
+    MainUserNavigator,
+} from 'app/presentation/navigation/helper/shortcut';
+import {theme} from 'app/presentation/theme';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {ActivityIndicator, Alert, Image, Linking, Platform, StyleSheet, View} from 'react-native';
 import CodePush from 'react-native-code-push';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
 
 interface IProps {
@@ -21,11 +28,17 @@ interface IProps {
 }
 
 export const StartScreen = React.memo((props: IProps) => {
-    const { navigation } = props;
+    const {navigation} = props;
     const userRepositoryRef = useRef<IUserRepository>(new UserRepository());
     const [tryAgainTimestamp, setTryAgainTimestamp] = useState<number>();
-    const { status: initAppStatus, updateProgressText, updateProgress, syncStatus } = useInitApp(userRepositoryRef.current, tryAgainTimestamp);
+    const {
+        status: initAppStatus,
+        updateProgressText,
+        updateProgress,
+        syncStatus,
+    } = useInitApp(userRepositoryRef.current, tryAgainTimestamp);
     const insets = useSafeAreaInsets();
+    const {t} = useTranslation();
 
     const _openUserHomeScreen = useCallback(() => {
         navigation.dispatch(MainUserNavigator);
@@ -36,22 +49,42 @@ export const StartScreen = React.memo((props: IProps) => {
     }, [navigation]);
 
     const _showVersionUpgradePopup = useCallback(() => {
-
-    }, []);
+        Alert.alert(
+            t('newVersionTitle'),
+            t('newVersionDesc'),
+            [
+                {
+                    text: t('update'),
+                    onPress: () => {
+                        Linking.openURL(
+                            Platform.OS === 'ios'
+                                ? 'https://apps.apple.com/app/ibom-bot/id6474765435'
+                                : 'https://play.google.com/store/apps/details?id=com.isoftco.ibomgpt',
+                        );
+                    },
+                },
+            ],
+            {
+                cancelable: false,
+            },
+        );
+    }, [t]);
 
     const _showTryAgainPopup = useCallback(() => {
-        Alert.alert('Error!!!', 'Something went wrong.',
+        Alert.alert(
+            'Error!!!',
+            'Something went wrong.',
             [
                 {
                     text: 'Try again',
                     onPress: () => {
-                        setTryAgainTimestamp((new Date()).getTime());
-                    }
-                }
+                        setTryAgainTimestamp(new Date().getTime());
+                    },
+                },
             ],
             {
                 cancelable: false,
-            }
+            },
         );
     }, []);
 
@@ -74,7 +107,13 @@ export const StartScreen = React.memo((props: IProps) => {
                 _showTryAgainPopup();
                 break;
         }
-    }, [initAppStatus, _showVersionUpgradePopup, _openUserHomeScreen, _openSignInScreen, _showTryAgainPopup]);
+    }, [
+        initAppStatus,
+        _showVersionUpgradePopup,
+        _openUserHomeScreen,
+        _openSignInScreen,
+        _showTryAgainPopup,
+    ]);
 
     let updatingTextWithPercent = `${updateProgressText}`;
     if (syncStatus === CodePush.SyncStatus.DOWNLOADING_PACKAGE) {
@@ -88,18 +127,27 @@ export const StartScreen = React.memo((props: IProps) => {
                 resizeMode={'contain'}
                 source={GeneratedImages.logo_ibom}
             />
-            {initAppStatus === InitAppStatus.loading && <View style={[styles.loadingContainer, {
-                bottom: insets.bottom + theme.spacing.medium,
-            }]}>
-                <ActivityIndicator
-                    animating
-                    color={theme.color.textColor}
-                />
-                <TextPrimary style={{
-                    ...theme.textVariants.body2,
-                    marginLeft: theme.spacing.small,
-                }}>{updatingTextWithPercent}</TextPrimary>
-            </View>}
+            {initAppStatus === InitAppStatus.loading && (
+                <View
+                    style={[
+                        styles.loadingContainer,
+                        {
+                            bottom: insets.bottom + theme.spacing.medium,
+                        },
+                    ]}>
+                    <ActivityIndicator
+                        animating
+                        color={theme.color.textColor}
+                    />
+                    <TextPrimary
+                        style={{
+                            ...theme.textVariants.body2,
+                            marginLeft: theme.spacing.small,
+                        }}>
+                        {updatingTextWithPercent}
+                    </TextPrimary>
+                </View>
+            )}
         </View>
     );
 });
@@ -134,5 +182,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-    }
+    },
 });

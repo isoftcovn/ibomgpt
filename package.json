@@ -98,7 +98,7 @@
         "react-native-modal": "^13.0.1",
         "react-native-modal-datetime-picker": "^17.1.0",
         "react-native-network-logger": "^1.15.0",
-        "react-native-onesignal": "^5.1.0",
+        "react-native-onesignal": "^5.2.3",
         "react-native-paper": "^5.12.3",
         "react-native-pdf": "^6.7.4",
         "react-native-pell-rich-editor": "^1.9.0",

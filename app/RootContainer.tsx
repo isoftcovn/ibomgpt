@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 import Config from 'react-native-config';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {OneSignal, PushSubscriptionChangedState} from 'react-native-onesignal';
+import {LogLevel, OneSignal, PushSubscriptionChangedState} from 'react-native-onesignal';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import RNShake from 'react-native-shake';
 import DeeplinkHandler from './presentation/managers/DeeplinkHandler';
@@ -242,6 +242,7 @@ const RootContainer = React.memo((props: Props) => {
 
     // Subscribe to events
     useEffect(() => {
+        // OneSignal.Debug.setLogLevel(LogLevel.Verbose);
         OneSignal.Notifications.addEventListener('click', event => {
             console.info('OneSignal: notification clicked:', event);
             NotificationHelper.notificationHandler.onNotificationOpened?.(

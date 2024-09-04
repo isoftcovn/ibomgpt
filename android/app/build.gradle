@@ -112,10 +112,6 @@ android {
         manifestPlaceholders = [applinksHost: "ibomgpt.onelink.me"]
     }
 
-    configurations.all {
-         resolutionStrategy.force 'androidx.work:work-runtime:2.7.1' //<-- this came from the notifee library having a dependency on androidx.work:work-runtime:2.8.0' and OneSignal having a dependency on androidx:work:work-runtime:2.7.1
-    }
-
     productFlavors {
         dev {
             dimension "app"

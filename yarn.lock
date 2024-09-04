@@ -7347,10 +7347,10 @@ react-native-network-logger@^1.15.0:
   resolved "https://registry.yarnpkg.com/react-native-network-logger/-/react-native-network-logger-1.15.0.tgz#e333ac57f19875a5d4d797498b144a42b37e8a1e"
   integrity sha512-/nxAC6iCWf7dwD4LB6hTV64P/wnMj75oSDxgKKSJXDO1m0yGiZwMQzC9fcAydMM9lqKWRS5T4jPUPinZNu7VOQ==
 
-react-native-onesignal@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-onesignal/-/react-native-onesignal-5.1.0.tgz#c3023cf27e3fbadb0d49f5c1971eb879d79c63c7"
-  integrity sha512-iKCJ9ZdM9Qsxch6iycrwsiFKow931iCzuqLPtql1fEwwyrn02+pXpUS8zxub0244Loxb7BaHbzgvafKR5Voyjg==
+react-native-onesignal@^5.2.3:
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/react-native-onesignal/-/react-native-onesignal-5.2.3.tgz#45006729b713e7bbc8cbb93f32545c333b7c9d78"
+  integrity sha512-0DFUHI1gnYYWTHq9jgW+JKXJ897gjXhfePlGQhoTq/m3Cnv3SqyiyIMXVfeIhGQtOfz1uFDrryd4E11S186/dw==
   dependencies:
     invariant "^2.2.2"
 

@@ -66,9 +66,13 @@ export const ChatListItem = React.memo((props: IProps) => {
         if (latestMessageContent) {
             lastCommentContent = latestMessageContent;
         }
-        const lastSenderName = data.lastSenderName ?? '';
+        let lastSenderName = data.lastSenderName ?? '';
+
+        if (latestMessage?.user?.name) {
+            lastSenderName = latestMessage.user.name;
+        }
         return `${lastSenderName}: ${lastCommentContent}`;
-    }, [data.lastCommentContent, data.lastSenderName, latestMessageContent]);
+    }, [data.lastCommentContent, data.lastSenderName, latestMessageContent, latestMessage]);
 
     const isRead = data.isRead;
 

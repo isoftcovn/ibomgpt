@@ -1,10 +1,21 @@
-import { IDeleteMessagePayload, IEditMessagesPayload, IUpdateLocalMessageIdsPayload, deleteMessageActionTypes, deleteMessageRealtimeActionTypes, editMessagesActionTypes, getMessagesActionTypes, getMessagesType, receiveNewMessagesActionTypes, sendMessagesActionTypes, updateLocalMessageIdsActionTypes } from '@redux/actions/conversation';
-import { IAction, IActionParams, IReducer } from 'app/presentation/redux';
-import { logoutActionTypes } from '../../../actions/auth';
-import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
+import {
+    IDeleteMessagePayload,
+    IEditMessagesPayload,
+    IUpdateLocalMessageIdsPayload,
+    deleteMessageActionTypes,
+    deleteMessageRealtimeActionTypes,
+    editMessagesActionTypes,
+    getMessagesActionTypes,
+    getMessagesType,
+    sendMessagesActionTypes,
+    updateLocalMessageIdsActionTypes,
+} from '@redux/actions/conversation';
+import {MessageHelper} from '@shared/helper/MessageHelper';
+import {IAppChatMessage} from 'app/presentation/models/chat';
+import {IAction, IActionParams, IReducer} from 'app/presentation/redux';
 import produce from 'immer';
-import { IAppChatMessage } from 'app/presentation/models/chat';
-import { MessageHelper } from '@shared/helper/MessageHelper';
+import {logoutActionTypes} from '../../../actions/auth';
+import BaseSectionListReducer from '../../handlers/BaseSectionListReducer';
 
 const reducerHandler = new BaseSectionListReducer<any, any>(getMessagesType);
 
@@ -83,8 +94,14 @@ export default function (state = initialState, action: IAction<any>) {
                     // Mean that in redux already has data before. then user comebacks to this screen, API is called to sync latest chat
                     // In order not to lose all previous data, we only deduplicate new data with old data.
                     if (currentData.length > 0) {
-                        returnData = removeAllLocalMessageInTheRange(currentData, data.length);
-                        returnData = deduplicateListDataFromStart(returnData, data);
+                        returnData = removeAllLocalMessageInTheRange(
+                            currentData,
+                            data.length,
+                        );
+                        returnData = deduplicateListDataFromStart(
+                            returnData,
+                            data,
+                        );
                         console.info('Deduplicate messages');
                     } else {
                         returnData = data;
@@ -113,15 +130,26 @@ export default function (state = initialState, action: IAction<any>) {
             draft.data[sectionId] = [...data, ...currentData];
         });
     }
-    if (actionType === deleteMessageActionTypes.start || actionType === deleteMessageRealtimeActionTypes.start) {
-        let { messageId, objectId, objectInstanceId } = action.payload! as IDeleteMessagePayload;
+    if (
+        actionType === deleteMessageActionTypes.start ||
+        actionType === deleteMessageRealtimeActionTypes.start
+    ) {
+        let {messageId, objectId, objectInstanceId} =
+            action.payload! as IDeleteMessagePayload;
         messageId = `${messageId}`;
         return produce(state, draft => {
             const sectionId = `${objectId}-${objectInstanceId}`;
             let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
-            const realMessageId = MessageHelper.shared.extractRealMessageId(messageId);
-            const deletedIds = currentData.filter(item => parseInt(`${item._id}`, 10) === realMessageId ||
-                (item.parentMessageId && item.parentMessageId == realMessageId)).map(item => item._id);
+            const realMessageId =
+                MessageHelper.shared.extractRealMessageId(messageId);
+            const deletedIds = currentData
+                .filter(
+                    item =>
+                        parseInt(`${item._id}`, 10) === realMessageId ||
+                        (item.parentMessageId &&
+                            item.parentMessageId == realMessageId),
+                )
+                .map(item => item._id);
             if (deletedIds.length > 0) {
                 currentData = [...currentData];
                 for (const id of deletedIds) {
@@ -135,12 +163,15 @@ export default function (state = initialState, action: IAction<any>) {
         });
     }
     if (actionType === editMessagesActionTypes.start) {
-        const { messages, objectId, objectInstanceId } = action.payload! as IEditMessagesPayload;
+        const {messages, objectId, objectInstanceId} =
+            action.payload! as IEditMessagesPayload;
         return produce(state, draft => {
             const sectionId = `${objectId}-${objectInstanceId}`;
             let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
             for (const editMessagge of messages) {
-                const message = currentData.find(item => editMessagge._id == item._id);
+                const message = currentData.find(
+                    item => editMessagge._id == item._id,
+                );
                 if (message) {
                     message.text = editMessagge.text;
                 }
@@ -149,7 +180,8 @@ export default function (state = initialState, action: IAction<any>) {
         });
     }
     if (actionType === updateLocalMessageIdsActionTypes.start) {
-        const { messageIdsToReplace, objectId, objectInstanceId } = action.payload! as IUpdateLocalMessageIdsPayload;
+        const {messageIdsToReplace, objectId, objectInstanceId} =
+            action.payload! as IUpdateLocalMessageIdsPayload;
         return produce(state, draft => {
             const sectionId = `${objectId}-${objectInstanceId}`;
             let currentData: IAppChatMessage[] = draft.data?.[sectionId] ?? [];
@@ -158,10 +190,17 @@ export default function (state = initialState, action: IAction<any>) {
                 for (const item of currentData) {
                     if (`${item._id}`.includes(localMessageId)) {
                         didStartReplacing = true;
-                        console.log(`replacing local message: ${item._id} with ${messageIdsToReplace[localMessageId]}`);
-                        item._id = `${item._id}`.replace(localMessageId, messageIdsToReplace[localMessageId]);
+                        console.log(
+                            `replacing local message: ${item._id} with ${messageIdsToReplace[localMessageId]}`,
+                        );
+                        item._id = `${item._id}`.replace(
+                            localMessageId,
+                            messageIdsToReplace[localMessageId],
+                        );
                     } else if (didStartReplacing) {
-                        console.log(`did end replacing local message: ${localMessageId}`);
+                        console.log(
+                            `did end replacing local message: ${localMessageId}`,
+                        );
                         break;
                     }
                 }
@@ -173,19 +212,31 @@ export default function (state = initialState, action: IAction<any>) {
     return state;
 }
 
-const removeAllLocalMessageInTheRange = (currentData: IAppChatMessage[], length: number): IAppChatMessage[] => {
+const removeAllLocalMessageInTheRange = (
+    currentData: IAppChatMessage[],
+    length: number,
+): IAppChatMessage[] => {
     // Current cache data has the same size with new incoming data --> replace all
-    console.info(`Removing all local message for: Current length: ${currentData.length}.. length: ${length}`);
+    console.info(
+        `Removing all local message for: Current length: ${currentData.length}.. length: ${length}`,
+    );
     if (currentData.length <= length) {
-        return currentData.filter(item => !item._id.toString().startsWith('local_message'));
+        return currentData.filter(
+            item => !item._id.toString().startsWith('local_message'),
+        );
     } else {
         const slideLength = Math.min(length, currentData.length);
-        const removedLocalDataMessages = currentData.slice(0, slideLength).filter(item => !item._id.toString().startsWith('local_message'));
+        const removedLocalDataMessages = currentData
+            .slice(0, slideLength)
+            .filter(item => !item._id.toString().startsWith('local_message'));
         return [...removedLocalDataMessages, ...currentData.slice(slideLength)];
     }
 };
 
-const deduplicateListDataFromStart = (currentData: IAppChatMessage[], newData: IAppChatMessage[]): IAppChatMessage[] => {
+const deduplicateListDataFromStart = (
+    currentData: IAppChatMessage[],
+    newData: IAppChatMessage[],
+): IAppChatMessage[] => {
     const result: IAppChatMessage[] = [];
     const allData = [...newData, ...currentData];
     const allDataMap: Record<string, IAppChatMessage> = {};

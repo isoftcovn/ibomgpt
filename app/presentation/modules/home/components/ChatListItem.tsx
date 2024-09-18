@@ -63,7 +63,13 @@ export const ChatListItem = React.memo((props: IProps) => {
 
     const lastComment = useMemo(() => {
         let lastCommentContent = data.lastCommentContent ?? '';
-        if (latestMessageContent) {
+        const latestMessageInStoreCreatedDate = latestMessage?.createdAt ? dayjs(latestMessage?.createdAt) : undefined;
+        const latestMessageInListItem = data.lastCommentUpdatedDate;
+        let isMessageInStoreNewer = true;
+        if (latestMessageInListItem && latestMessageInStoreCreatedDate && latestMessageInStoreCreatedDate.isBefore(latestMessageInListItem)) {
+            isMessageInStoreNewer = false;
+        }
+        if (latestMessageContent && isMessageInStoreNewer) {
             lastCommentContent = latestMessageContent;
         }
         let lastSenderName = data.lastSenderName ?? '';
@@ -72,7 +78,7 @@ export const ChatListItem = React.memo((props: IProps) => {
             lastSenderName = latestMessage.user.name;
         }
         return `${lastSenderName}: ${lastCommentContent}`;
-    }, [data.lastCommentContent, data.lastSenderName, latestMessageContent, latestMessage]);
+    }, [data, latestMessageContent, latestMessage]);
 
     const isRead = data.isRead;
 

@@ -240,6 +240,10 @@ const ConversationContent = React.memo((props: IProps) => {
         navigation.setOptions({
             title:
                 name || `${t('detail')}:${route.params?.objectInstanceId ?? 0}`,
+            headerTitleContainerStyle: {
+                maxWidth: '70%',
+                marginRight: 32,
+            },
             headerRight: props => (
                 <ConversationHeaderMenu
                     navigation={navigation}

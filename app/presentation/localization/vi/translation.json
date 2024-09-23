@@ -106,6 +106,8 @@
     "warning": "Waring",
     "warn_empty": "Không thể bỏ trống",
 
+    "typeSomething": "Hãy viết gì đó..",
+
     "404": "Content not found.",
     "400": "Client error.",
     "401": "Unauthorized",

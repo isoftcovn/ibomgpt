@@ -41,6 +41,7 @@ export const TimeText = (props: TimeProps<IAppChatMessage>) => {
     return (
         <Time
             {...props}
+            timeFormat={'hh:mmA'}
             timeTextStyle={{
                 left: styles.left.timeText,
                 right: styles.right.timeText,

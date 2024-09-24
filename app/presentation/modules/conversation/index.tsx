@@ -422,6 +422,20 @@ const ConversationContent = React.memo((props: IProps) => {
                 listViewProps={{
                     onEndReached: loadEalierMessages,
                     onEndReachedThreshold: 0.5,
+                    ListFooterComponent:
+                        isFetching && messages.length > 0 ? (
+                            <View
+                                style={{
+                                    alignItems: 'center',
+                                    padding: theme.spacing.medium,
+                                }}>
+                                <ActivityIndicator
+                                    color={theme.color.colorPrimary}
+                                    size={'large'}
+                                    animating
+                                />
+                            </View>
+                        ) : null,
                 }}
                 lightboxProps={{
                     onLongPress: undefined,

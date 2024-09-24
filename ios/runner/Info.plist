@@ -60,13 +60,13 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera for capturing images for chat</string>
+	<string>$(APP_DISPLAY_NAME) would like to use your camera for capturing images in chat</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to access your location</string>
+	<string>$(APP_DISPLAY_NAME) would like to access your location to share location with friends in chat</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your microphone for capturing videos for chat</string>
+	<string>$(APP_DISPLAY_NAME) would like to use your microphone for capturing videos in chat</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like access to your photo gallery for chat</string>
+	<string>$(APP_DISPLAY_NAME) would like access to your photo gallery to upload images in chat</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>OpenSans-Bold.ttf</string>

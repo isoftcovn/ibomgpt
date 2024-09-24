@@ -9,6 +9,8 @@ export enum FileType {
     video,
     audio,
     pdf,
+    docx,
+    xlsx,
     others
 }
 
@@ -33,6 +35,12 @@ export class FileHelper {
         }
         if (contentType === 'application/pdf') {
             return FileType.pdf;
+        }
+        if (contentType === mime.types.doc || contentType === mime.types.docx) {
+            return FileType.docx;
+        }
+        if (contentType === mime.types.xls || contentType === mime.types.xlsx || contentType === mime.types.xlsm) {
+            return FileType.xlsx;
         }
         return FileType.others;
     };

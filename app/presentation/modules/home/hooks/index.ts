@@ -17,13 +17,13 @@ export const useConversations = (conversations: ChatItemResponse[]) => {
             if (aLatestMessage) {
                 aTimestamp = (aLatestMessage.createdAt as Date).getTime();
             } else {
-                aTimestamp = a.lastCommentUpdatedDate?.unix() ?? 0;
+                aTimestamp = (a.lastCommentUpdatedDate?.unix() ?? 0) * 1000;
             }
 
             if (bLatestMessage) {
                 bTimestamp = (bLatestMessage.createdAt as Date).getTime();
             } else {
-                bTimestamp = b.lastCommentUpdatedDate?.unix() ?? 0;
+                bTimestamp = (b.lastCommentUpdatedDate?.unix() ?? 0) * 1000;
             }
 
             return bTimestamp - aTimestamp;

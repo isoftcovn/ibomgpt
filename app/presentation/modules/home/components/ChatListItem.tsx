@@ -1,9 +1,11 @@
 import {Box} from '@components/globals/view/Box';
 import {TextPrimary} from '@components/index';
 import {ChatItemResponse} from '@models/chat/response/ChatItemResponse';
+import UserModel from '@models/user/response/UserModel';
 import {selectLatestMessageByKey} from '@redux/selectors/conversation';
+import {selectProfile, selectUserId} from '@redux/selectors/user';
 import {Dimensions} from '@theme/Dimensions';
-import { FontNames } from '@theme/ThemeDefault';
+import {FontNames} from '@theme/ThemeDefault';
 import {theme} from '@theme/index';
 import {useLatestMessageContent} from 'app/presentation/hooks/conversation/ConversationCommonHooks';
 import dayjs from 'dayjs';
@@ -29,6 +31,7 @@ export const ChatListItem = React.memo((props: IProps) => {
         selectLatestMessageByKey(state, key),
     );
     const latestMessageContent = useLatestMessageContent(latestMessage);
+    const profile: UserModel | undefined = useSelector(selectProfile).data;
 
     const _onPress = useCallback(() => {
         onPress(data);
@@ -62,23 +65,32 @@ export const ChatListItem = React.memo((props: IProps) => {
     ]);
 
     const lastComment = useMemo(() => {
+        const displayName = profile?.fullname ?? '';
         let lastCommentContent = data.lastCommentContent ?? '';
-        const latestMessageInStoreCreatedDate = latestMessage?.createdAt ? dayjs(latestMessage?.createdAt) : undefined;
+        const latestMessageInStoreCreatedDate = latestMessage?.createdAt
+            ? dayjs(latestMessage?.createdAt)
+            : undefined;
         const latestMessageInListItem = data.lastCommentUpdatedDate;
         let isMessageInStoreNewer = true;
-        if (latestMessageInListItem && latestMessageInStoreCreatedDate && latestMessageInStoreCreatedDate.isBefore(latestMessageInListItem)) {
+        let isMe = displayName === data.lastSenderName;
+        if (
+            latestMessageInListItem &&
+            latestMessageInStoreCreatedDate &&
+            latestMessageInStoreCreatedDate.isBefore(latestMessageInListItem)
+        ) {
             isMessageInStoreNewer = false;
         }
         if (latestMessageContent && isMessageInStoreNewer) {
             lastCommentContent = latestMessageContent;
+            isMe = latestMessage?.user._id == profile?.id;
         }
         let lastSenderName = data.lastSenderName ?? '';
 
-        if (latestMessage?.user?.name) {
+        if (latestMessage?.user?.name && isMessageInStoreNewer) {
             lastSenderName = latestMessage.user.name;
         }
-        return `${lastSenderName}: ${lastCommentContent}`;
-    }, [data, latestMessageContent, latestMessage]);
+        return `${isMe ? t('you') : lastSenderName}: ${lastCommentContent}`;
+    }, [data, latestMessageContent, latestMessage, profile, t]);
 
     const isRead = data.isRead;
 
@@ -105,10 +117,15 @@ export const ChatListItem = React.memo((props: IProps) => {
                     size={Dimensions.moderateScale(32)}
                     title={avatarTitle}
                 />
-                <TextPrimary style={[styles.lastComment, !isRead && {
-                    fontFamily: FontNames.SemiBold,
-                    fontWeight: '700',
-                }]} numberOfLines={5}>
+                <TextPrimary
+                    style={[
+                        styles.lastComment,
+                        !isRead && {
+                            fontFamily: FontNames.SemiBold,
+                            fontWeight: '700',
+                        },
+                    ]}
+                    numberOfLines={5}>
                     {lastComment}
                 </TextPrimary>
             </Box>

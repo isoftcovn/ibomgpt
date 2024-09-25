@@ -1,11 +1,17 @@
 import * as signalR from '@microsoft/signalr';
-import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
-import { MessageHelper } from '@shared/helper/MessageHelper';
-import { IChatMessage } from 'react-native-gifted-chat';
-import { Subject } from 'rxjs';
+import {ChatMessageResponse} from '@models/chat/response/ChatMessageResponse';
+import {MessageHelper} from '@shared/helper/MessageHelper';
+import {IChatMessage} from 'react-native-gifted-chat';
+import {Subject} from 'rxjs';
 import DeviceInfo from 'react-native-device-info';
-import { ISignalRData, IUsersTypingPayload, IDeleteMessageSignalRPayload, IEditMessageSignalRPayload, TypingState } from './ChatManager.interfaces';
-import { IAppChatMessage } from '../models/chat';
+import {
+    DeleteMessageSignalRPayload,
+    EditMessageSignalRPayload,
+    ISignalRData,
+    TypingState,
+    UsersTypingPayload,
+} from './ChatManager.interfaces';
+import {IAppChatMessage} from '../models/chat';
 
 export class ChatManager {
     static shared = new ChatManager();
@@ -15,24 +21,24 @@ export class ChatManager {
 
     currentConversationInfo = {
         objectId: 0,
-        objectInstanceId: 0
+        objectInstanceId: 0,
     };
 
     channelTypingState: Record<string, TypingState>;
 
     connection?: signalR.HubConnection;
     receiveMessageEvent: Subject<IChatMessage[]>;
-    userTypingEvent: Subject<IUsersTypingPayload>;
-    editMessageEvent: Subject<IEditMessageSignalRPayload>;
-    deleteMessageEvent: Subject<IDeleteMessageSignalRPayload>;
+    userTypingEvent: Subject<UsersTypingPayload>;
+    editMessageEvent: Subject<EditMessageSignalRPayload>;
+    deleteMessageEvent: Subject<DeleteMessageSignalRPayload>;
 
     messageSentEvent: Subject<IAppChatMessage[]>;
 
     private constructor() {
         this.receiveMessageEvent = new Subject<IChatMessage[]>();
-        this.userTypingEvent = new Subject<IUsersTypingPayload>();
-        this.editMessageEvent = new Subject<IEditMessageSignalRPayload>();
-        this.deleteMessageEvent = new Subject<IDeleteMessageSignalRPayload>();
+        this.userTypingEvent = new Subject<UsersTypingPayload>();
+        this.editMessageEvent = new Subject<EditMessageSignalRPayload>();
+        this.deleteMessageEvent = new Subject<DeleteMessageSignalRPayload>();
         this.channelTypingState = {};
         this.messageSentEvent = new Subject<IAppChatMessage[]>();
 
@@ -55,17 +61,41 @@ export class ChatManager {
                 if (isRawPayload) {
                     message = ChatMessageResponse.parseFromJson(payload);
                 }
-                const isValidMessagePayload = message && message.id && message.objectId && message.objectInstanceId;
+                const isValidMessagePayload =
+                    message &&
+                    message.id &&
+                    message.objectId &&
+                    message.objectInstanceId;
                 return isValidMessagePayload && !isSentByThisDevice;
             case 'user-typing':
-                const typingData = data.payload as IUsersTypingPayload | undefined;
-                return typingData && typingData.userName && typingData.typingState && !isSentByThisDevice;
+                const typingData = data.payload
+                    ? UsersTypingPayload.parseData(data.payload)
+                    : undefined;
+                return (
+                    typingData &&
+                    typingData.userName &&
+                    typingData.typingState &&
+                    !isSentByThisDevice
+                );
             case 'edit-message':
-                const editEventData = data.payload as IEditMessageSignalRPayload | undefined;
-                return editEventData && editEventData.messageId && !isSentByThisDevice;
+                const editEventData = data.payload
+                    ? EditMessageSignalRPayload.parseData(data.payload)
+                    : undefined;
+                return (
+                    editEventData &&
+                    editEventData.messageId &&
+                    !isSentByThisDevice
+                );
             case 'delete-message':
-                const deleteEventData = data.payload as IDeleteMessageSignalRPayload | undefined;
-                return deleteEventData && deleteEventData.messageId && !isSentByThisDevice;
+                const deleteEventData = data.payload
+                    ? DeleteMessageSignalRPayload.parseData(data.payload)
+                    : undefined;
+                console.log('deleteEventData: ', deleteEventData);
+                return (
+                    deleteEventData &&
+                    deleteEventData.messageId &&
+                    !isSentByThisDevice
+                );
         }
         return false;
     };
@@ -83,35 +113,53 @@ export class ChatManager {
                     if (isRawPayload) {
                         payload = ChatMessageResponse.parseFromJson(payload);
                     }
-                    messages = MessageHelper.shared.convertMessageResponseToChatMessage(payload);
+                    messages =
+                        MessageHelper.shared.convertMessageResponseToChatMessage(
+                            payload,
+                        );
                     console.log('receive converted messages: ', messages);
                     this.receiveMessageEvent.next(messages);
                     break;
                 case 'user-typing':
-                    const typingData = data.payload as IUsersTypingPayload;
+                    const typingData = data.payload
+                        ? UsersTypingPayload.parseData(data.payload)
+                        : undefined;
                     console.log('receive user typing: ', typingData);
-                    this.userTypingEvent.next(typingData);
+                    if (typingData) {
+                        this.userTypingEvent.next(typingData);
+                    }
                     break;
                 case 'edit-message':
-                    const editMessagegData = data.payload as IEditMessageSignalRPayload;
-                    console.log('edit mmessage event: ', editMessagegData);
-                    this.editMessageEvent.next(editMessagegData);
+                    const editEventData = data.payload
+                        ? EditMessageSignalRPayload.parseData(data.payload)
+                        : undefined;
+                    console.log('edit mmessage event: ', editEventData);
+                    if (editEventData) {
+                        this.editMessageEvent.next(editEventData);
+                    }
                     break;
                 case 'delete-message':
-                    const deleteMessagegData = data.payload as IDeleteMessageSignalRPayload;
-                    console.log('delete mmessage event: ', deleteMessagegData);
-                    this.deleteMessageEvent.next(deleteMessagegData);
+                    const deleteEventData = data.payload
+                        ? DeleteMessageSignalRPayload.parseData(data.payload)
+                        : undefined;
+                    console.log('delete mmessage event: ', deleteEventData);
+                    if (deleteEventData) {
+                        this.deleteMessageEvent.next(deleteEventData);
+                    }
                     break;
             }
         }
     };
 
     sendMessageToUsers = (userIds: string[], payload: ISignalRData) => {
-        this.connection?.invoke('SendMessageToUsers', userIds, JSON.stringify(payload)).then(() => {
-            console.log('Invoke send messages done');
-        }).catch(error => {
-            console.error('Invoke send messages error: ', error);
-        });
+        this.connection
+            ?.invoke('SendMessageToUsers', userIds, JSON.stringify(payload))
+            .then(() => {
+                console.log('Invoke send messages done');
+            })
+            .catch(error => {
+                console.error('Invoke send messages error: ', error);
+            });
     };
 
     startConnection = (userId: string) => {
@@ -128,7 +176,7 @@ export class ChatManager {
             .build();
         this.connection = connection;
 
-        connection.onclose((error) => {
+        connection.onclose(error => {
             if (error) {
                 console.error('SignalR close with error: ', error);
             } else {
@@ -136,7 +184,7 @@ export class ChatManager {
             }
         });
 
-        connection.onreconnecting((error) => {
+        connection.onreconnecting(error => {
             if (error) {
                 console.error('SignalR is reconnecting with error: ', error);
             } else {
@@ -144,7 +192,7 @@ export class ChatManager {
             }
         });
 
-        connection.onreconnected((error) => {
+        connection.onreconnected(error => {
             if (error) {
                 console.error('SignalR is reconnected with error: ', error);
             } else {
@@ -154,11 +202,14 @@ export class ChatManager {
 
         connection.on('ReceiveMessage', this._onReceivedMessage);
 
-        connection.start().then(() => {
-            console.info('SignalR connected');
-        }).catch(error => {
-            console.warn('Connect to signalr failed: ', error);
-        });
+        connection
+            .start()
+            .then(() => {
+                console.info('SignalR connected');
+            })
+            .catch(error => {
+                console.warn('Connect to signalr failed: ', error);
+            });
     };
 
     stopConnection = () => {

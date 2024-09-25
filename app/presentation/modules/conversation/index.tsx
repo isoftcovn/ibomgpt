@@ -84,6 +84,7 @@ import {ChatManager} from 'app/presentation/managers/ChatManager';
 import {ConversationHeaderMenu} from './components/HeaderMenu';
 import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
 import {ChatRepository} from '@data/repository/chat';
+import {MessageHelper} from '@shared/helper/MessageHelper';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -357,8 +358,13 @@ const ConversationContent = React.memo((props: IProps) => {
                 objectInstanceId,
                 1,
             );
-            request.last_id = Number(lastMessage._id);
-            dispatch(getMessagesActionTypes.startAction(request));
+            const lastId = MessageHelper.shared.extractRealMessageId(
+                `${lastMessage._id}`,
+            );
+            if (!isNaN(lastId)) {
+                request.last_id = lastId;
+                dispatch(getMessagesActionTypes.startAction(request));
+            }
         }
     }, [
         canLoadMore,
@@ -421,7 +427,7 @@ const ConversationContent = React.memo((props: IProps) => {
                 })}
                 listViewProps={{
                     onEndReached: loadEalierMessages,
-                    onEndReachedThreshold: 0.5,
+                    onEndReachedThreshold: 0.8,
                     ListFooterComponent:
                         isFetching && messages.length > 0 ? (
                             <View

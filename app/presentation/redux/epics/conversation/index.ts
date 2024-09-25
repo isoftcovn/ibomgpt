@@ -20,6 +20,7 @@ import { StateObservable, combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
+import { PageSize } from '@shared/constants';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -43,7 +44,7 @@ export const getMessagesEpic = (action$: any, state$: any) =>
                                     sectionId: sectionId,
                                     isAppend:
                                         (action.payload!.last_id ?? 0) > 0,
-                                    canLoadMore: messages.length > 0,
+                                    canLoadMore: messages.length === PageSize.Default,
                                     roomName,
                                 }),
                             );

@@ -102,7 +102,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode code
-        versionName "1.1.2"
+        versionName "1.2.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         resConfigs "en"

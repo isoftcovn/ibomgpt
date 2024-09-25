@@ -1,17 +1,18 @@
 import ImageResizer from '@bam.tech/react-native-image-resizer';
-import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
-import { AppStackParamList } from '@navigation/RouteParams';
-import { FileHelper, FileType } from '@shared/helper/FileHelper';
-import { IAppChatMessage } from 'app/presentation/models/chat';
-import { useCallback, useState } from 'react';
-import { DocumentPickerResponse, pick } from 'react-native-document-picker';
-import { StackNavigationProp } from '@react-navigation/stack';
+import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
+import {AppStackParamList} from '@navigation/RouteParams';
+import {FileHelper, FileType} from '@shared/helper/FileHelper';
+import {IAppChatMessage} from 'app/presentation/models/chat';
+import {useCallback, useState} from 'react';
+import {DocumentPickerResponse, pick} from 'react-native-document-picker';
+import {StackNavigationProp} from '@react-navigation/stack';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import { DownloadManager } from '@shared/managers/DownloadManager';
+import {DownloadManager} from '@shared/managers/DownloadManager';
 import DropDownHolder from '@shared/helper/DropdownHolder';
-import { useActionSheet } from '@expo/react-native-action-sheet';
-import { useTranslation } from 'react-i18next';
-import { theme } from '@theme/index';
+import {useActionSheet} from '@expo/react-native-action-sheet';
+import {useTranslation} from 'react-i18next';
+import {theme} from '@theme/index';
+import FileViewer from 'react-native-file-viewer';
 
 export interface IPickerAsset {
     uri: string;
@@ -30,18 +31,20 @@ interface IPickDocumentsResult {
 }
 
 export const usePickMediaAssets = (): IPickMediaResult => {
-    const { showActionSheetWithOptions } = useActionSheet();
-    const { t } = useTranslation();
+    const {showActionSheetWithOptions} = useActionSheet();
+    const {t} = useTranslation();
 
     const processMedia = useCallback(async (responses: ImageOrVideo[]) => {
         const images = responses.filter(item => item.mime.startsWith('image'));
-        const videos: IPickerAsset[] = responses.filter(item => item.mime.startsWith('video')).map(item => ({
-            name: item.filename ?? 'video',
-            uri: item.path,
-            path: item.path,
-            size: item.size,
-            mime: item.mime,
-        }));
+        const videos: IPickerAsset[] = responses
+            .filter(item => item.mime.startsWith('video'))
+            .map(item => ({
+                name: item.filename ?? 'video',
+                uri: item.path,
+                path: item.path,
+                size: item.size,
+                mime: item.mime,
+            }));
         const resizePromises = images.map(item => {
             return ImageResizer.createResizedImage(
                 item.path,
@@ -104,28 +107,31 @@ export const usePickMediaAssets = (): IPickMediaResult => {
                 const options = [
                     t('useCamera'),
                     t('getFromlibrary'),
-                    t('close')
+                    t('close'),
                 ];
                 const cancelButtonIndex = options.length - 1;
 
-                showActionSheetWithOptions({
-                    options,
-                    cancelButtonIndex,
-                    cancelButtonTintColor: theme.color.colorAccent,
-                }, async (selectedIndex) => {
-                    switch (selectedIndex) {
-                        case 0:
-                            // Open camera
-                            resolve(await openCamera());
-                            break;
-                        case 1:
-                            // Open library
-                            resolve(await openLibrary());
-                            break;
-                        default: break;
-                    }
-                });
-
+                showActionSheetWithOptions(
+                    {
+                        options,
+                        cancelButtonIndex,
+                        cancelButtonTintColor: theme.color.colorAccent,
+                    },
+                    async selectedIndex => {
+                        switch (selectedIndex) {
+                            case 0:
+                                // Open camera
+                                resolve(await openCamera());
+                                break;
+                            case 1:
+                                // Open library
+                                resolve(await openLibrary());
+                                break;
+                            default:
+                                break;
+                        }
+                    },
+                );
             } catch (error) {
                 console.warn('Picker assets error: ', error);
             }
@@ -133,14 +139,14 @@ export const usePickMediaAssets = (): IPickMediaResult => {
     }, [showActionSheetWithOptions, t, openLibrary, openCamera]);
 
     return {
-        openPicker
+        openPicker,
     };
 };
 
 export const usePickDocuments = (): IPickDocumentsResult => {
     const openDocumentsPicker = useCallback(() => {
         return pick({
-            allowMultiSelection: true
+            allowMultiSelection: true,
         });
     }, []);
 
@@ -149,55 +155,77 @@ export const usePickDocuments = (): IPickDocumentsResult => {
     };
 };
 
-export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackParamList, 'Conversation'>) => {
+export const useOnMessagePressed = (
+    navigation: StackNavigationProp<AppStackParamList, 'Conversation'>,
+) => {
     const [isVideoModalVisible, setVideoModalVisible] = useState(false);
     const [isAudioModalVisible, setAudioModalVisible] = useState(false);
     const [videoUri, setVideoUri] = useState<string>();
     const [audioUri, setAudioUri] = useState<string>();
 
-    const downloadFile = useCallback(async (message: IAppChatMessage) => {
-        try {
-            const appFolderPath = await FileHelper.shared.createAppFolderIfNeeded();
-            const fileUrl = message.fileUrl ?? '';
-            const fileName = fileUrl.split('/').pop();
-            if (fileUrl && fileName) {
-                const filePath = `${appFolderPath}/${fileName}`;
-                const existed = await ReactNativeBlobUtil.fs.exists(filePath);
-                if (existed) { return; }
-                DownloadManager.shared.downloadNotificationSubject.next({
-                    status: 'processing',
-                    url: fileUrl,
-                });
-                await ReactNativeBlobUtil
-                    .config({
-                        path: filePath,
-                    })
-                    .fetch('GET', fileUrl);
-                DownloadManager.shared.downloadNotificationSubject.next({
-                    status: 'done',
-                    url: fileUrl,
-                });
-                DropDownHolder.showInfoAlert('Saved to path: ' + filePath);
-            }
-        } catch (error) {
-            console.warn('download file error: ', error);
-        }
+    const openFile = useCallback((filePath: string) => {
+        FileViewer.open(filePath, {
+            showAppsSuggestions: true,
+            showOpenWithDialog: true,
+        });
     }, []);
 
-    const onFileMessagePressed = useCallback((message: IAppChatMessage) => {
-        const fileType = message.fileType;
-        if (!fileType) { return; }
-        switch (fileType) {
-            case FileType.pdf:
-                navigation.navigate('PdfViewer', {
-                    url: message.fileUrl ?? ''
-                });
-                break;
-            default:
-                downloadFile(message);
-                break;
-        }
-    }, [navigation, downloadFile]);
+    const downloadFile = useCallback(
+        async (message: IAppChatMessage) => {
+            try {
+                const appFolderPath =
+                    await FileHelper.shared.createAppFolderIfNeeded();
+                const fileUrl = message.fileUrl ?? '';
+                const fileName = fileUrl.split('/').pop();
+                if (fileUrl && fileName) {
+                    const filePath = `${appFolderPath}/${fileName}`;
+                    const existed = await ReactNativeBlobUtil.fs.exists(
+                        filePath,
+                    );
+                    if (existed) {
+                        openFile(filePath);
+                        return;
+                    }
+                    DownloadManager.shared.downloadNotificationSubject.next({
+                        status: 'processing',
+                        url: fileUrl,
+                    });
+                    await ReactNativeBlobUtil.config({
+                        fileCache: true,
+                        path: filePath,
+                    }).fetch('GET', fileUrl);
+                    DownloadManager.shared.downloadNotificationSubject.next({
+                        status: 'done',
+                        url: fileUrl,
+                    });
+                    openFile(filePath);
+                }
+            } catch (error) {
+                console.warn('download file error: ', error);
+            }
+        },
+        [openFile],
+    );
+
+    const onFileMessagePressed = useCallback(
+        (message: IAppChatMessage) => {
+            const fileType = message.fileType;
+            if (!fileType) {
+                return;
+            }
+            switch (fileType) {
+                case FileType.pdf:
+                    navigation.navigate('PdfViewer', {
+                        url: message.fileUrl ?? '',
+                    });
+                    break;
+                default:
+                    downloadFile(message);
+                    break;
+            }
+        },
+        [navigation, downloadFile],
+    );
 
     const onVideoMessagePressed = useCallback((message: IAppChatMessage) => {
         setVideoUri(message.video ?? '');
@@ -209,21 +237,24 @@ export const useOnMessagePressed = (navigation: StackNavigationProp<AppStackPara
         setAudioModalVisible(true);
     }, []);
 
-    const onMessagePressed = useCallback((message: IAppChatMessage) => {
-        const isFileMessage = (message.fileUrl?.length ?? 0) > 0;
-        if (isFileMessage) {
-            onFileMessagePressed(message);
-            return;
-        }
-        if (message.video) {
-            onVideoMessagePressed(message);
-            return;
-        }
-        if (message.audio) {
-            onAudioMessagePressed(message);
-            return;
-        }
-    }, [onFileMessagePressed, onVideoMessagePressed, onAudioMessagePressed]);
+    const onMessagePressed = useCallback(
+        (message: IAppChatMessage) => {
+            const isFileMessage = (message.fileUrl?.length ?? 0) > 0;
+            if (isFileMessage) {
+                onFileMessagePressed(message);
+                return;
+            }
+            if (message.video) {
+                onVideoMessagePressed(message);
+                return;
+            }
+            if (message.audio) {
+                onAudioMessagePressed(message);
+                return;
+            }
+        },
+        [onFileMessagePressed, onVideoMessagePressed, onAudioMessagePressed],
+    );
 
     return {
         onMessagePressed,

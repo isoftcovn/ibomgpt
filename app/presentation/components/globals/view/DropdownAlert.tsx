@@ -49,6 +49,7 @@ class DropdownAlertComp extends React.Component<IProps, IState> {
                 useNativeDriver={true}
                 translucent={false}
                 updateStatusBar={false}
+                closeInterval={5000}
                 ref={(ref: DropdownAlert) => DropdownHolder.setDropDown(ref)} />
         );
     }

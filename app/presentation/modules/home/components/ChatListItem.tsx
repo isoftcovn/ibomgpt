@@ -1,19 +1,19 @@
-import {Box} from '@components/globals/view/Box';
-import {TextPrimary} from '@components/index';
-import {ChatItemResponse} from '@models/chat/response/ChatItemResponse';
+import { Box } from '@components/globals/view/Box';
+import { TextPrimary } from '@components/index';
+import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import UserModel from '@models/user/response/UserModel';
-import {selectLatestMessageByKey} from '@redux/selectors/conversation';
-import {selectProfile, selectUserId} from '@redux/selectors/user';
-import {Dimensions} from '@theme/Dimensions';
-import {FontNames} from '@theme/ThemeDefault';
-import {theme} from '@theme/index';
-import {useLatestMessageContent} from 'app/presentation/hooks/conversation/ConversationCommonHooks';
+import { selectLatestMessageByKey } from '@redux/selectors/conversation';
+import { selectProfile } from '@redux/selectors/user';
+import { Dimensions } from '@theme/Dimensions';
+import { FontNames } from '@theme/ThemeDefault';
+import { theme } from '@theme/index';
+import { useLatestMessageContent } from 'app/presentation/hooks/conversation/ConversationCommonHooks';
 import dayjs from 'dayjs';
-import React, {useCallback, useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
-import {StyleSheet, TouchableOpacity} from 'react-native';
-import {Avatar} from 'react-native-elements';
-import {useSelector} from 'react-redux';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Avatar } from 'react-native-elements';
+import { useSelector } from 'react-redux';
 
 interface IProps {
     data: ChatItemResponse;
@@ -67,6 +67,7 @@ export const ChatListItem = React.memo((props: IProps) => {
     const lastComment = useMemo(() => {
         const displayName = profile?.fullname ?? '';
         let lastCommentContent = data.lastCommentContent ?? '';
+        let avatarUrl = data.avatar;
         const latestMessageInStoreCreatedDate = latestMessage?.createdAt
             ? dayjs(latestMessage?.createdAt)
             : undefined;
@@ -82,6 +83,7 @@ export const ChatListItem = React.memo((props: IProps) => {
         }
         if (latestMessageContent && isMessageInStoreNewer) {
             lastCommentContent = latestMessageContent;
+            avatarUrl = latestMessage?.user.avatar;
             isMe = latestMessage?.user._id == profile?.id;
         }
         let lastSenderName = data.lastSenderName ?? '';
@@ -89,7 +91,10 @@ export const ChatListItem = React.memo((props: IProps) => {
         if (latestMessage?.user?.name && isMessageInStoreNewer) {
             lastSenderName = latestMessage.user.name;
         }
-        return `${isMe ? t('you') : lastSenderName}: ${lastCommentContent}`;
+        return {
+            avatarUrl: avatarUrl,
+            content: `${isMe ? t('you') : lastSenderName}: ${lastCommentContent}`
+        };
     }, [data, latestMessageContent, latestMessage, profile, t]);
 
     const isRead = data.isRead;
@@ -111,7 +116,7 @@ export const ChatListItem = React.memo((props: IProps) => {
                 <Avatar
                     rounded
                     source={{
-                        uri: data.avatar,
+                        uri: lastComment.avatarUrl ?? '',
                     }}
                     activeOpacity={1}
                     size={Dimensions.moderateScale(32)}
@@ -126,7 +131,7 @@ export const ChatListItem = React.memo((props: IProps) => {
                         },
                     ]}
                     numberOfLines={5}>
-                    {lastComment}
+                    {lastComment.content}
                 </TextPrimary>
             </Box>
             <TextPrimary style={styles.lastCommentSentDate} numberOfLines={2}>

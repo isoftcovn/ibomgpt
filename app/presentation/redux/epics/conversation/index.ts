@@ -51,9 +51,9 @@ export const getMessagesEpic = (action$: any, state$: any) =>
                             obs.complete();
                         })
                         .catch(error => {
-                            obs.next(
-                                getMessagesActionTypes.failedAction({error}),
-                            );
+                            // obs.next(
+                            //     getMessagesActionTypes.failedAction({error}),
+                            // );
                             obs.complete();
                         });
                 }),
@@ -98,9 +98,9 @@ export const deleteMessageEpic = (action$: any, state$: any) =>
                             obs.complete();
                         })
                         .catch(error => {
-                            obs.next(
-                                deleteMessageActionTypes.failedAction({error}),
-                            );
+                            // obs.next(
+                            //     deleteMessageActionTypes.failedAction({error}),
+                            // );
                             obs.complete();
                         });
                 }),

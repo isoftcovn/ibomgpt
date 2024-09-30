@@ -1,18 +1,17 @@
 import ImageResizer from '@bam.tech/react-native-image-resizer';
-import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
-import {AppStackParamList} from '@navigation/RouteParams';
-import {FileHelper, FileType} from '@shared/helper/FileHelper';
-import {IAppChatMessage} from 'app/presentation/models/chat';
-import {useCallback, useState} from 'react';
-import {DocumentPickerResponse, pick} from 'react-native-document-picker';
-import {StackNavigationProp} from '@react-navigation/stack';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { AppStackParamList } from '@navigation/RouteParams';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { FileHelper, FileType } from '@shared/helper/FileHelper';
+import { DownloadManager } from '@shared/managers/DownloadManager';
+import { theme } from '@theme/index';
+import { IAppChatMessage } from 'app/presentation/models/chat';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import {DownloadManager} from '@shared/managers/DownloadManager';
-import DropDownHolder from '@shared/helper/DropdownHolder';
-import {useActionSheet} from '@expo/react-native-action-sheet';
-import {useTranslation} from 'react-i18next';
-import {theme} from '@theme/index';
+import { DocumentPickerResponse, pick } from 'react-native-document-picker';
 import FileViewer from 'react-native-file-viewer';
+import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
 
 export interface IPickerAsset {
     uri: string;

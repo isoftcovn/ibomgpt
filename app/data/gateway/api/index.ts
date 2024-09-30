@@ -46,7 +46,7 @@ class ApiGateway {
             resource,
             headers,
             interceptors,
-            timeout = 30 * 1000,
+            timeout = 60 * 1000,
             method,
             body,
             params,

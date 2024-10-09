@@ -1,9 +1,13 @@
-import {AudioPlayerModal} from '@components/globals/modal/AudioPlayerModal';
-import {VideoPlayerModal} from '@components/globals/modal/VideoPlayerModal';
+import { AudioPlayerModal } from '@components/globals/modal/AudioPlayerModal';
+import { VideoPlayerModal } from '@components/globals/modal/VideoPlayerModal';
+import { ChatRepository } from '@data/repository/chat';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
+import { ChatRoomsOptions } from '@models/chat/response/ChatRoomOptions';
 import UserModel from '@models/user/response/UserModel';
-import {AppStackParamList} from '@navigation/RouteParams';
-import {RouteProp} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
+import { AppStackParamList } from '@navigation/RouteParams';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import {
     getMessagesActionTypes,
     updateConversationParticipantsActionTypes,
@@ -12,12 +16,14 @@ import {
     selectMessagesByKey,
     selectMessagesCanLoadMoreByKey,
     selectMessagesFetchingState,
-    selectParticipantsByKey,
-    selectRoomNameByKey,
+    selectParticipantsByKey
 } from '@redux/selectors/conversation';
-import {selectDisplayName, selectProfile} from '@redux/selectors/user';
-import {IAppChatMessage} from 'app/presentation/models/chat';
-import {theme} from 'app/presentation/theme';
+import { selectDisplayName, selectProfile } from '@redux/selectors/user';
+import { MessageHelper } from '@shared/helper/MessageHelper';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
+import { IAppChatMessage } from 'app/presentation/models/chat';
+import { theme } from 'app/presentation/theme';
 import React, {
     createRef,
     useCallback,
@@ -27,27 +33,30 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
     ActivityIndicator,
     InteractionManager,
+    Keyboard,
     Platform,
     StyleSheet,
     TextInput,
     View,
-    Keyboard,
 } from 'react-native';
-import {GiftedChat, IMessage} from 'react-native-gifted-chat';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useDispatch, useSelector} from 'react-redux';
-import {MyAudioMessage} from './components/AudioMessage';
-import {RenderImageMessage} from './components/ImageMessage';
+import { GiftedChat, IMessage } from 'react-native-gifted-chat';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
+import { MyAudioMessage } from './components/AudioMessage';
+import ContextMenuModal from './components/ContextMenuModal';
+import { ConversationHeaderMenu } from './components/HeaderMenu';
+import { RenderImageMessage } from './components/ImageMessage';
 import {
     IMyComposerProps,
     MyComposer,
     MyInputToolbar,
     MySend,
 } from './components/InputToolbar';
+import ListReactPeopleSheet from './components/ListReactPeopleSheet';
 import {
     MyAvatar,
     MyBubble,
@@ -58,7 +67,8 @@ import {
     RenderMessage,
     renderScrollToBottom,
 } from './components/MessageComponents';
-import {MyVideoMessage} from './components/VideoMessage';
+import { TypingAnimation } from './components/TypingAninimation';
+import { MyVideoMessage } from './components/VideoMessage';
 import {
     ConversationContext,
     ConversationInputContext,
@@ -77,14 +87,6 @@ import {
     useSendMediaMessage,
     useSendTextMessage,
 } from './hooks/SubmitMessageHooks';
-import {ChatMessagesRequestModel} from '@models/chat/request/ChatMessagesRequestModel';
-import {TypingAnimation} from './components/TypingAninimation';
-import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
-import {ChatManager} from 'app/presentation/managers/ChatManager';
-import {ConversationHeaderMenu} from './components/HeaderMenu';
-import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
-import {ChatRepository} from '@data/repository/chat';
-import {MessageHelper} from '@shared/helper/MessageHelper';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -94,9 +96,12 @@ interface IProps {
 export const ConversationScreen = (props: IProps) => {
     const {route} = props;
     const [editMessage, setEditMessage] = useState<IAppChatMessage>();
+    const [selectedMessageForReaction, setSelectedMessageForReaction] =
+        useState<IAppChatMessage>();
     const [text, setText] = useState('');
     const [options, setOptions] = useState<ChatRoomsOptions>();
     const textInputRef = createRef<TextInput>();
+    const sheetRef = useRef<BottomSheet | null>();
     const objectId = useMemo(() => {
         return route.params.objectId;
     }, [route.params]);
@@ -143,6 +148,15 @@ export const ConversationScreen = (props: IProps) => {
             objectInstanceId,
             options,
             setOptions,
+            selectedMessageForReaction,
+            showReactionsSheet: (message: IAppChatMessage) => {
+                console.info('Show reactions sheet: ', sheetRef.current);
+                setSelectedMessageForReaction(message);
+                sheetRef.current?.snapToIndex(1);
+            },
+            setBottomSheetRef: (ref: BottomSheet | null) => {
+                sheetRef.current = ref;
+            }
         }),
         [
             enterEditMode,
@@ -151,6 +165,7 @@ export const ConversationScreen = (props: IProps) => {
             objectId,
             objectInstanceId,
             options,
+            selectedMessageForReaction,
         ],
     );
 
@@ -177,7 +192,7 @@ const ConversationContent = React.memo((props: IProps) => {
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
     const [keyboardShown, setKeyboardShown] = useState(false);
-    const {textInputRef, editMessage, options} =
+    const {textInputRef, editMessage, options, showReactionsSheet} =
         useContext(ConversationContext);
     const {setText} = useContext(ConversationInputContext);
     const {t} = useTranslation();
@@ -450,9 +465,12 @@ const ConversationContent = React.memo((props: IProps) => {
                     paddingBottom: keyboardShown ? 0 : theme.spacing.medium,
                 }}
                 onPress={(context, message) => {
-                    onMessagePressed(message);
+                    onMessagePressed(message as IAppChatMessage);
                 }}
                 onLongPress={onMessageLongPress}
+                onReactionsPress={(message: IAppChatMessage) => {
+                    showReactionsSheet(message);
+                }}
                 keyboardShouldPersistTaps={'never'}
                 onInputTextChanged={text => (messageContentRef.current = text)}
                 renderInputToolbar={MyInputToolbar}
@@ -493,6 +511,8 @@ const ConversationContent = React.memo((props: IProps) => {
                     onClose={() => setAudioModalVisible(false)}
                 />
             )}
+            <ContextMenuModal />
+            <ListReactPeopleSheet />
         </View>
     );
 });

@@ -2,6 +2,7 @@ import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
 import {IAppChatMessage} from 'app/presentation/models/chat';
 import React from 'react';
 import {TextInput} from 'react-native';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 export interface IConversationContext {
     editMessage?: IAppChatMessage;
@@ -11,6 +12,9 @@ export interface IConversationContext {
     objectInstanceId: number;
     options?: ChatRoomsOptions;
     setOptions: (options: ChatRoomsOptions) => void;
+    showReactionsSheet: (message: IAppChatMessage) => void;
+    setBottomSheetRef: (ref: BottomSheet | null) => void;
+    selectedMessageForReaction?: IAppChatMessage;
 }
 
 export interface IConversationInputContext {
@@ -26,6 +30,8 @@ export const ConversationContext = React.createContext<IConversationContext>({
     objectInstanceId: 0,
     options: undefined,
     setOptions: () => {},
+    showReactionsSheet: () => {},
+    setBottomSheetRef: () => {},
 });
 
 export const ConversationInputContext =

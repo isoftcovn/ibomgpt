@@ -90,7 +90,7 @@ export class ChatManager {
                 const deleteEventData = data.payload
                     ? DeleteMessageSignalRPayload.parseData(data.payload)
                     : undefined;
-                console.log('deleteEventData: ', deleteEventData);
+                console.info('deleteEventData: ', deleteEventData);
                 return (
                     deleteEventData &&
                     deleteEventData.messageId &&
@@ -101,7 +101,6 @@ export class ChatManager {
     };
 
     _onReceivedMessage = (user: string, dataString: string) => {
-        console.log('receive raw data: ', user, dataString);
         const data = JSON.parse(dataString) as ISignalRData;
         if (this._isValidMessage(data)) {
             const event = data.event;
@@ -117,14 +116,14 @@ export class ChatManager {
                         MessageHelper.shared.convertMessageResponseToChatMessage(
                             payload,
                         );
-                    console.log('receive converted messages: ', messages);
+                    console.info('receive converted messages: ', messages);
                     this.receiveMessageEvent.next(messages);
                     break;
                 case 'user-typing':
                     const typingData = data.payload
                         ? UsersTypingPayload.parseData(data.payload)
                         : undefined;
-                    console.log('receive user typing: ', typingData);
+                    console.info('receive user typing: ', typingData);
                     if (typingData) {
                         this.userTypingEvent.next(typingData);
                     }
@@ -133,7 +132,7 @@ export class ChatManager {
                     const editEventData = data.payload
                         ? EditMessageSignalRPayload.parseData(data.payload)
                         : undefined;
-                    console.log('edit mmessage event: ', editEventData);
+                    console.info('edit mmessage event: ', editEventData);
                     if (editEventData) {
                         this.editMessageEvent.next(editEventData);
                     }
@@ -142,7 +141,7 @@ export class ChatManager {
                     const deleteEventData = data.payload
                         ? DeleteMessageSignalRPayload.parseData(data.payload)
                         : undefined;
-                    console.log('delete mmessage event: ', deleteEventData);
+                    console.info('delete mmessage event: ', deleteEventData);
                     if (deleteEventData) {
                         this.deleteMessageEvent.next(deleteEventData);
                     }
@@ -154,9 +153,6 @@ export class ChatManager {
     sendMessageToUsers = (userIds: string[], payload: ISignalRData) => {
         this.connection
             ?.invoke('SendMessageToUsers', userIds, JSON.stringify(payload))
-            .then(() => {
-                console.log('Invoke send messages done');
-            })
             .catch(error => {
                 console.error('Invoke send messages error: ', error);
             });

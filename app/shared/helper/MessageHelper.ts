@@ -1,20 +1,27 @@
-import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
-import { IAppChatMessage } from 'app/presentation/models/chat';
+import {ChatMessageResponse} from '@models/chat/response/ChatMessageResponse';
+import {IAppChatMessage} from 'app/presentation/models/chat';
 import dayjs from 'dayjs';
-import { FileHelper, FileType } from './FileHelper';
-import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import {FileHelper, FileType} from './FileHelper';
+import {SubmitMessageRequestModel} from '@models/chat/request/SubmitMessageRequestModel';
 import UserModel from '@models/user/response/UserModel';
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 
 export class MessageHelper {
     static shared = new MessageHelper();
 
-    private constructor() { }
+    private constructor() {}
 
-    convertMessageResponseToChatMessage = (data: ChatMessageResponse): IAppChatMessage[] => {
+    convertMessageResponseToChatMessage = (
+        data: ChatMessageResponse,
+    ): IAppChatMessage[] => {
         const messages: IAppChatMessage[] = [];
         const dateFormat = 'DD/MM/YYYY h:mmA';
-        const createdDateDisplay = data.sentDateDisplay.trim().split(' ').filter(item => item.trim().length > 0).join(' ').toUpperCase();
+        const createdDateDisplay = data.sentDateDisplay
+            .trim()
+            .split(' ')
+            .filter(item => item.trim().length > 0)
+            .join(' ')
+            .toUpperCase();
         const createdDate = dayjs(createdDateDisplay, dateFormat);
         if (data.content && data.content.trim().length > 0) {
             messages.push({
@@ -31,11 +38,31 @@ export class MessageHelper {
                 conversationName: data.conversationName,
                 allowDelete: data.allowDelete,
                 allowEdit: data.allowEdit,
+                reactions: !__DEV__
+                    ? []
+                    : [
+                          {
+                              reactionId: 'emoji:heart',
+                              userId: '1',
+                              username: 'User 1',
+                              userAvatarUrl:
+                                  'https://randomuser.me/api/portraits/women/38.jpg',
+                          },
+                          {
+                              reactionId: 'emoji:laugh',
+                              userId: '2',
+                              username: 'User 2',
+                              userAvatarUrl:
+                                  'https://randomuser.me/api/portraits/men/74.jpg',
+                          },
+                      ],
             });
         }
         if (data.fileList.length > 0) {
             for (let fileItem of data.fileList) {
-                const fileType = FileHelper.shared.getFileTypeFromExtensions(fileItem.extension ?? 'others');
+                const fileType = FileHelper.shared.getFileTypeFromExtensions(
+                    fileItem.extension ?? 'others',
+                );
                 const fileUrl = fileItem.fileUrl;
                 const chatMessage: IAppChatMessage = {
                     _id: this.getMediaMessageId(`${data.id}`, `${fileItem.id}`),
@@ -80,7 +107,10 @@ export class MessageHelper {
         return `local_message_${v4()}`;
     };
 
-    convertSentMessageToChatMessage = (request: SubmitMessageRequestModel, user: UserModel): IAppChatMessage[] => {
+    convertSentMessageToChatMessage = (
+        request: SubmitMessageRequestModel,
+        user: UserModel,
+    ): IAppChatMessage[] => {
         const messages: IAppChatMessage[] = [];
         const parentMessage: IAppChatMessage = {
             _id: this.generateMessageLocalId(),
@@ -101,10 +131,14 @@ export class MessageHelper {
             for (const fileItem of request.FileUpload!) {
                 const extension = fileItem.uri.split('.').pop();
                 if (extension) {
-                    const fileType = FileHelper.shared.getFileTypeFromExtensions(extension);
+                    const fileType =
+                        FileHelper.shared.getFileTypeFromExtensions(extension);
                     const fileUrl = fileItem.uri;
                     const chatMessage: IAppChatMessage = {
-                        _id: this.getMediaMessageId(`${parentMessage._id}`, fileItem.name),
+                        _id: this.getMediaMessageId(
+                            `${parentMessage._id}`,
+                            fileItem.name,
+                        ),
                         parentMessageId: parentMessage._id,
                         text: '',
                         createdAt: new Date(),

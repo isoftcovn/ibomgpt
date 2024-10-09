@@ -1,7 +1,7 @@
 import {Dimensions} from '@theme/Dimensions';
 import {theme} from '@theme/index';
 import {IAppChatMessage} from 'app/presentation/models/chat';
-import React from 'react';
+import React, {useContext} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {
     Avatar,
@@ -24,6 +24,8 @@ import {FileMessage} from './FileMessage';
 import {TextPrimary} from '@components/index';
 import {MyMessage} from './Message';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import CustomBubble from './CustomBubble';
+import {ConversationContext} from '../context/ConversationContext';
 
 export const MyAvatar = (props: AvatarProps<IAppChatMessage>) => {
     return (
@@ -58,29 +60,31 @@ export const UserNameText = (user: User) => {
     );
 };
 
-export const MyBubble = (props: BubbleProps<IAppChatMessage>) => (
-    <Bubble
-        {...props}
-        renderTime={TimeText}
-        renderUsernameOnMessage={false}
-        containerToNextStyle={{
-            right: styles.right.containerToNext,
-            left: styles.left.containerToNext,
-        }}
-        containerToPreviousStyle={{
-            right: styles.right.containerToPrevious,
-            left: styles.left.containerToPrevious,
-        }}
-        wrapperStyle={{
-            left: styles.left.bubbleContainer,
-            right: styles.right.bubbleContainer,
-        }}
-        textStyle={{
-            left: styles.left.textMessage,
-            right: styles.right.textMessage,
-        }}
-    />
-);
+export const MyBubble = (props: BubbleProps<IAppChatMessage>) => {
+    return (
+        <CustomBubble
+            {...props}
+            renderTime={TimeText}
+            renderUsernameOnMessage={false}
+            containerToNextStyle={{
+                right: styles.right.containerToNext,
+                left: styles.left.containerToNext,
+            }}
+            containerToPreviousStyle={{
+                right: styles.right.containerToPrevious,
+                left: styles.left.containerToPrevious,
+            }}
+            wrapperStyle={{
+                left: styles.left.bubbleContainer,
+                right: styles.right.bubbleContainer,
+            }}
+            textStyle={{
+                left: styles.left.textMessage,
+                right: styles.right.textMessage,
+            }}
+        />
+    );
+};
 
 export const RenderMessage = (props: MessageProps<IAppChatMessage>) => (
     <MyMessage
@@ -103,18 +107,17 @@ export const MyTextMessage = (props: MessageTextProps<IAppChatMessage>) => (
 );
 
 export const MySystemMessage = (props: SystemMessageProps<IAppChatMessage>) => {
-    return <SystemMessage
-        {...props}
-        textStyle={styles.left.systemMessage}
-    />;
+    return <SystemMessage {...props} textStyle={styles.left.systemMessage} />;
 };
 
 export const MyDayMessage = (props: DayProps<IAppChatMessage>) => {
-    return <Day
-        {...props}
-        textStyle={styles.left.systemMessage}
-        dateFormat={'DD/MM/YYYY'}
-    />;
+    return (
+        <Day
+            {...props}
+            textStyle={styles.left.systemMessage}
+            dateFormat={'DD/MM/YYYY'}
+        />
+    );
 };
 
 export const MyCustomMessage = (props: BubbleProps<IAppChatMessage>) => {

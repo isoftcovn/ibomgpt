@@ -8,6 +8,7 @@ import {
     Avatar, AvatarProps, Bubble, Day, DayProps, IMessage, LeftRightStyle,
     StylePropType, SystemMessage, SystemMessageProps, User, isSameDay, isSameUser,
 } from 'react-native-gifted-chat';
+import CustomBubble from './CustomBubble';
 
 const styles = {
     left: StyleSheet.create({
@@ -149,7 +150,7 @@ export class MyMessage<
             return this.props.renderBubble(props);
         }
         // @ts-ignore
-        return <Bubble {...props} />;
+        return <CustomBubble {...props} />;
     }
 
     renderSystemMessage() {

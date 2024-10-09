@@ -79,6 +79,8 @@
 
     "required": "Không thể bỏ trống",
     "reset": "Cài đặt lại",
+    "reply": "Trả lời",
+    "reactions": "Biểu tượng cảm xúc",
 
     "signup": "Đăng ký",
     "submit": "Submit",
@@ -109,6 +111,7 @@
     "you": "Bạn",
 
     "typeSomething": "Hãy viết gì đó..",
+    "tapToRemove": "Chạm để xoá",
 
     "404": "Content not found.",
     "400": "Client error.",

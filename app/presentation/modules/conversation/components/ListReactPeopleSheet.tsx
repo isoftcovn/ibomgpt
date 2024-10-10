@@ -1,31 +1,44 @@
+import { ImageRenderer, TextPrimary } from '@components/index';
 import BottomSheet, {
     BottomSheetFlatList,
     BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import {UserReactionResponse} from '@models/chat/response/UserReactionResponse';
-import {theme} from '@theme/index';
-import React, {useCallback, useContext, useRef} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {ConversationContext} from '../context/ConversationContext';
-import {ImageRenderer, TextPrimary} from '@components/index';
-import {useTranslation} from 'react-i18next';
-import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
-import {useSelector} from 'react-redux';
-import {selectUserId} from '@redux/selectors/user';
+import { UserReactionResponse } from '@models/chat/response/UserReactionResponse';
+import { selectUserId } from '@redux/selectors/user';
+import { theme } from '@theme/index';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
+import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { ConversationContext } from '../context/ConversationContext';
+import { useContextMenuUndoReactionPressed } from './ContextMMenuModal.hooks';
 
 interface ListReactPeopleSheetProps {}
 
 const ListReactPeopleSheet: React.FC<ListReactPeopleSheetProps> = React.memo(
     () => {
         const sheetRef = useRef<BottomSheet | null>(null);
+        const [reactions, setReactions] = React.useState<
+            UserReactionResponse[]
+        >([]);
         const [snapPoints, setSnapPoints] = React.useState<any[]>(['50%']);
         const {selectedMessageForReaction, setBottomSheetRef} =
             useContext(ConversationContext);
-        const people = selectedMessageForReaction?.reactions || [];
         const {t} = useTranslation();
         const userId = useSelector(selectUserId);
+        const onRemoveReaction = useContextMenuUndoReactionPressed(
+            selectedMessageForReaction,
+        );
 
-        const onRemoveReaction = useCallback(() => {}, []);
+        useEffect(() => {
+            setReactions(selectedMessageForReaction?.reactions ?? []);
+        }, [selectedMessageForReaction]);
+
+        const _onRemoveReaction = useCallback(() => {
+            onRemoveReaction();
+            setReactions(reactions.filter(item => item.userId !== userId));
+        }, [onRemoveReaction, reactions, userId]);
 
         const renderItem = useCallback(
             ({item, index}: {item: UserReactionResponse; index: number}) => {
@@ -40,7 +53,7 @@ const ListReactPeopleSheet: React.FC<ListReactPeopleSheetProps> = React.memo(
                             },
                         ]}
                         activeOpacity={0.8}
-                        onPress={isMe ? onRemoveReaction : undefined}>
+                        onPress={isMe ? _onRemoveReaction : undefined}>
                         <ImageRenderer
                             style={styles.avatar}
                             resizeMode="cover"
@@ -64,7 +77,7 @@ const ListReactPeopleSheet: React.FC<ListReactPeopleSheetProps> = React.memo(
                     </TouchableOpacity>
                 );
             },
-            [userId, t, onRemoveReaction],
+            [userId, _onRemoveReaction, t],
         );
 
         return (
@@ -81,7 +94,7 @@ const ListReactPeopleSheet: React.FC<ListReactPeopleSheetProps> = React.memo(
                         {t('reactions')}
                     </TextPrimary>
                     <BottomSheetFlatList
-                        data={people}
+                        data={reactions}
                         keyExtractor={item => `${item.userId}`}
                         renderItem={renderItem}
                         contentContainerStyle={styles.contentContainer}

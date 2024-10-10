@@ -1,6 +1,8 @@
 import { ChatListRequestModel } from '@models/chat/request/ChatListRequestModel';
 import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
+import { ReactionRequestModel } from '@models/chat/request/ReactionRequestModel';
 import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
+import { UndoReactionRequestModel } from '@models/chat/request/UndoReactionRequestModel';
 import { ChatItemResponse } from '@models/chat/response/ChatItemResponse';
 import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { ChatRoomsOptions } from '@models/chat/response/ChatRoomOptions';
@@ -18,4 +20,6 @@ export interface IChatRepository {
     getObjectList: (refAPI: string, body: BaseQueryModel) => Promise<PaginationModel<ObjectItemResponse>>;
     getChatRoomOptions: (objectId: number, objectInstanceId: number) => Promise<ChatRoomsOptions>;
     markAsReadConversation: (objectId: number, objectInstanceId: number) => Promise<boolean>;
+    reactToMessage: (body: ReactionRequestModel) => Promise<boolean>;
+    removeReaction: (body: UndoReactionRequestModel) => Promise<boolean>;
 }

@@ -1,3 +1,5 @@
+import {UserReactionResponse} from './UserReactionResponse';
+
 export class ChatMessageFileResponse {
     id: number;
     fileUrl: string;
@@ -9,7 +11,7 @@ export class ChatMessageFileResponse {
     }
 
     static parseFromJson = (data: any): ChatMessageFileResponse => {
-        const { file_id, file_path, extension } = data;
+        const {file_id, file_path, extension} = data;
         const obj = new ChatMessageFileResponse();
         obj.id = file_id ?? 0;
         obj.fileUrl = file_path ?? '';
@@ -17,7 +19,6 @@ export class ChatMessageFileResponse {
         return obj;
     };
 }
-
 
 export class ChatMessageResponse {
     senderId: number;
@@ -33,6 +34,7 @@ export class ChatMessageResponse {
     conversationName: string;
     allowEdit?: boolean;
     allowDelete?: boolean;
+    reaction?: UserReactionResponse[];
     rawData?: any;
 
     constructor() {
@@ -47,8 +49,22 @@ export class ChatMessageResponse {
     }
 
     static parseFromJson = (data: any): ChatMessageResponse => {
-        const { created_by, comment_content, comment_id, user_created_name, updated_date_view,
-            object_id, created_date_view, object_instance_id, fileList, avatar, OBJECT_INSTANCE_NAME, allow_del, allow_edit } = data;
+        const {
+            created_by,
+            comment_content,
+            comment_id,
+            user_created_name,
+            updated_date_view,
+            object_id,
+            created_date_view,
+            object_instance_id,
+            fileList,
+            avatar,
+            OBJECT_INSTANCE_NAME,
+            allow_del,
+            allow_edit,
+            reaction,
+        } = data;
         const obj = new ChatMessageResponse();
         obj.id = comment_id ?? 0;
         obj.senderId = created_by ?? 0;
@@ -63,7 +79,15 @@ export class ChatMessageResponse {
         obj.allowEdit = Boolean(allow_edit);
         obj.allowDelete = Boolean(allow_del);
         if (fileList && Array.isArray(fileList)) {
-            obj.fileList = fileList.map((item: any) => ChatMessageFileResponse.parseFromJson(item));
+            obj.fileList = fileList.map((item: any) =>
+                ChatMessageFileResponse.parseFromJson(item),
+            );
+        }
+        if (reaction) {
+            const arrayReaction = JSON.parse(reaction);
+            obj.reaction = arrayReaction.map((item: any) =>
+                UserReactionResponse.parseFromResponse(item),
+            );
         }
         obj.rawData = data;
         return obj;

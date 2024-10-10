@@ -38,24 +38,7 @@ export class MessageHelper {
                 conversationName: data.conversationName,
                 allowDelete: data.allowDelete,
                 allowEdit: data.allowEdit,
-                reactions: !__DEV__
-                    ? []
-                    : [
-                          {
-                              reactionId: 'emoji:heart',
-                              userId: '1',
-                              username: 'User 1',
-                              userAvatarUrl:
-                                  'https://randomuser.me/api/portraits/women/38.jpg',
-                          },
-                          {
-                              reactionId: 'emoji:laugh',
-                              userId: '2',
-                              username: 'User 2',
-                              userAvatarUrl:
-                                  'https://randomuser.me/api/portraits/men/74.jpg',
-                          },
-                      ],
+                reactions: data.reaction ?? [],
             });
         }
         if (data.fileList.length > 0) {

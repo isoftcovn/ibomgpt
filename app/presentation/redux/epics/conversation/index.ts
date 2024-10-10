@@ -7,12 +7,13 @@ import {
     deleteMessageActionTypes,
     getMessagesActionTypes,
     receiveNewMessagesActionTypes,
-    updateUnreadConversationActionTypes
+    updateUnreadConversationActionTypes,
 } from '@redux/actions/conversation';
 import {
     selectMessagesByKey,
     selectParticipantsByKey,
 } from '@redux/selectors/conversation';
+import { PageSize } from '@shared/constants';
 import { MessageHelper } from '@shared/helper/MessageHelper';
 import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
 import { IAppChatMessage } from 'app/presentation/models/chat';
@@ -20,7 +21,6 @@ import { StateObservable, combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
 import { mergeMap, switchMap } from 'rxjs/operators';
 import { IAction } from '../..';
-import { PageSize } from '@shared/constants';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -44,7 +44,8 @@ export const getMessagesEpic = (action$: any, state$: any) =>
                                     sectionId: sectionId,
                                     isAppend:
                                         (action.payload!.last_id ?? 0) > 0,
-                                    canLoadMore: messages.length === PageSize.Default,
+                                    canLoadMore:
+                                        messages.length === PageSize.Default,
                                     roomName,
                                 }),
                             );

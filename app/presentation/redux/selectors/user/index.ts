@@ -11,6 +11,11 @@ export const selectProfile = createSelector(
     user => user.profile
 );
 
+export const selectProfileData = createSelector(
+    (state: any) => selectProfile(state),
+    (profile: IReducer<UserModel | undefined>) => profile?.data
+);
+
 export const selectUserId = createSelector(
     (state: any) => selectProfile(state),
     (profile: IReducer<UserModel | undefined>) => profile?.data?.id

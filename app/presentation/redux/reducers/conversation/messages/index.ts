@@ -2,6 +2,7 @@ import {
     IDeleteMessagePayload,
     IEditMessagesPayload,
     IUpdateLocalMessageIdsPayload,
+    IUpdateMessageReactionPayload,
     deleteMessageActionTypes,
     deleteMessageRealtimeActionTypes,
     editMessagesActionTypes,
@@ -9,6 +10,7 @@ import {
     getMessagesType,
     sendMessagesActionTypes,
     updateLocalMessageIdsActionTypes,
+    updateMessageReactionActionTypes,
 } from '@redux/actions/conversation';
 import {MessageHelper} from '@shared/helper/MessageHelper';
 import {IAppChatMessage} from 'app/presentation/models/chat';
@@ -206,6 +208,52 @@ export default function (state = initialState, action: IAction<any>) {
                 }
             });
             draft.data[sectionId] = currentData;
+        });
+    }
+
+    if (actionType === updateMessageReactionActionTypes.start) {
+        const {reactionData, user, actType} =
+            action.payload! as IUpdateMessageReactionPayload;
+        const objectId = reactionData.objectId;
+        const objectInstanceId = reactionData.objectInstanceId;
+        const sectionId = `${objectId}-${objectInstanceId}`;
+        return produce(state, draft => {
+            const currentData: IAppChatMessage[] = [
+                ...(draft.data?.[sectionId] ?? []),
+            ];
+            const index = currentData.findIndex(
+                item => item._id == reactionData.messageId,
+            );
+            if (index !== -1) {
+                const message = {
+                    ...currentData[index]!,
+                };
+                message.reactions = [...(message.reactions ?? [])];
+                if (actType === 'add') {
+                    const index = message.reactions.findIndex(
+                        item => item.userId == user.id,
+                    );
+                    if (index !== -1) {
+                        message.reactions.splice(index, 1);
+                    }
+                    message.reactions.push({
+                        reactionId: reactionData.reaction,
+                        userId: user.id,
+                        username: user.fullname ?? '',
+                        userAvatarUrl: user.avatar ?? '',
+                    });
+                } else {
+                    const reactionIndex = message.reactions.findIndex(
+                        item => item.userId == user.id,
+                    );
+                    if (reactionIndex !== -1) {
+                        message.reactions.splice(reactionIndex, 1);
+                    }
+                }
+                console.log('message.reactions: ', message.reactions);
+                currentData[index] = message;
+                draft.data[sectionId] = currentData;
+            }
         });
     }
 

@@ -1,14 +1,26 @@
-import { TextPrimary } from '@components/index';
-import { theme } from '@theme/index';
+import {TextPrimary} from '@components/index';
+import {theme} from '@theme/index';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { LayoutChangeEvent, StyleSheet, View, ViewStyle } from 'react-native';
+import {LayoutChangeEvent, StyleSheet, View, ViewStyle} from 'react-native';
 
 import {
-    Avatar, AvatarProps, Bubble, Day, DayProps, IMessage, LeftRightStyle,
-    StylePropType, SystemMessage, SystemMessageProps, User, isSameDay, isSameUser,
+    Avatar,
+    AvatarProps,
+    Bubble,
+    Day,
+    DayProps,
+    IMessage,
+    LeftRightStyle,
+    StylePropType,
+    SystemMessage,
+    SystemMessageProps,
+    User,
+    isSameDay,
+    isSameUser,
 } from 'react-native-gifted-chat';
 import CustomBubble from './CustomBubble';
+import {IAppChatMessage} from 'app/presentation/models/chat';
 
 const styles = {
     left: StyleSheet.create({
@@ -46,28 +58,28 @@ const styles = {
 };
 
 export interface MessageProps<TMessage extends IMessage> {
-    key: any
-    showUserAvatar?: boolean
-    position: 'left' | 'right'
-    currentMessage?: TMessage
-    nextMessage?: TMessage
-    previousMessage?: TMessage
-    user: User
-    inverted?: boolean
-    containerStyle?: LeftRightStyle<ViewStyle>
-    renderBubble?(props: Bubble['props']): React.ReactNode
-    renderDay?(props: DayProps<TMessage>): React.ReactNode
-    renderSystemMessage?(props: SystemMessageProps<TMessage>): React.ReactNode
-    renderAvatar?(props: AvatarProps<TMessage>): React.ReactNode
+    key: any;
+    showUserAvatar?: boolean;
+    position: 'left' | 'right';
+    currentMessage?: TMessage;
+    nextMessage?: TMessage;
+    previousMessage?: TMessage;
+    user: User;
+    inverted?: boolean;
+    containerStyle?: LeftRightStyle<ViewStyle>;
+    renderBubble?(props: Bubble['props']): React.ReactNode;
+    renderDay?(props: DayProps<TMessage>): React.ReactNode;
+    renderSystemMessage?(props: SystemMessageProps<TMessage>): React.ReactNode;
+    renderAvatar?(props: AvatarProps<TMessage>): React.ReactNode;
     shouldUpdateMessage?(
-        props: MessageProps<IMessage>,
-        nextProps: MessageProps<IMessage>,
-    ): boolean
-    onMessageLayout?(event: LayoutChangeEvent): void
+        props: MessageProps<IAppChatMessage>,
+        nextProps: MessageProps<IAppChatMessage>,
+    ): boolean;
+    onMessageLayout?(event: LayoutChangeEvent): void;
 }
 
 export class MyMessage<
-    TMessage extends IMessage = IMessage
+    TMessage extends IAppChatMessage,
 > extends React.Component<MessageProps<TMessage>> {
     static defaultProps = {
         renderAvatar: undefined,
@@ -109,7 +121,7 @@ export class MyMessage<
     shouldComponentUpdate(nextProps: MessageProps<TMessage>) {
         const next = nextProps.currentMessage!;
         const current = this.props.currentMessage!;
-        const { previousMessage, nextMessage } = this.props;
+        const {previousMessage, nextMessage} = this.props;
         const nextPropsMessage = nextProps.nextMessage;
         const nextPropsPreviousMessage = nextProps.previousMessage;
 
@@ -127,6 +139,7 @@ export class MyMessage<
             next.image !== current.image ||
             next.video !== current.video ||
             next.audio !== current.audio ||
+            next.reactions !== current.reactions ||
             previousMessage !== nextPropsPreviousMessage ||
             nextMessage !== nextPropsMessage ||
             shouldUpdate
@@ -135,7 +148,7 @@ export class MyMessage<
 
     renderDay() {
         if (this.props.currentMessage && this.props.currentMessage.createdAt) {
-            const { containerStyle, onMessageLayout, ...props } = this.props;
+            const {containerStyle, onMessageLayout, ...props} = this.props;
             if (this.props.renderDay) {
                 return this.props.renderDay(props);
             }
@@ -145,7 +158,7 @@ export class MyMessage<
     }
 
     renderBubble() {
-        const { containerStyle, onMessageLayout, ...props } = this.props;
+        const {containerStyle, onMessageLayout, ...props} = this.props;
         if (this.props.renderBubble) {
             return this.props.renderBubble(props);
         }
@@ -154,7 +167,7 @@ export class MyMessage<
     }
 
     renderSystemMessage() {
-        const { containerStyle, onMessageLayout, ...props } = this.props;
+        const {containerStyle, onMessageLayout, ...props} = this.props;
 
         if (this.props.renderSystemMessage) {
             return this.props.renderSystemMessage(props);
@@ -163,7 +176,7 @@ export class MyMessage<
     }
 
     renderAvatar() {
-        const { user, currentMessage, showUserAvatar } = this.props;
+        const {user, currentMessage, showUserAvatar} = this.props;
 
         if (
             user &&
@@ -184,13 +197,15 @@ export class MyMessage<
             return null;
         }
 
-        const { containerStyle, onMessageLayout, ...props } = this.props;
+        const {containerStyle, onMessageLayout, ...props} = this.props;
         return <Avatar {...props} />;
     }
 
     renderUsername() {
-        const { currentMessage, user, previousMessage } = this.props;
-        const shouldShowUserName = currentMessage && previousMessage &&
+        const {currentMessage, user, previousMessage} = this.props;
+        const shouldShowUserName =
+            currentMessage &&
+            previousMessage &&
             (!isSameUser(currentMessage, previousMessage) ||
                 !isSameDay(currentMessage, previousMessage));
         if (currentMessage && shouldShowUserName) {
@@ -199,9 +214,7 @@ export class MyMessage<
             }
             return (
                 <View style={styles.content.usernameView}>
-                    <TextPrimary
-                        style={styles.content.username}
-                    >
+                    <TextPrimary style={styles.content.username}>
                         {currentMessage.user.name}
                     </TextPrimary>
                 </View>
@@ -230,17 +243,20 @@ export class MyMessage<
                             <View
                                 style={[
                                     styles[position].container,
-                                    { marginBottom: sameUser ? 2 : 10 },
-                                    !this.props.inverted && { marginBottom: 2 },
+                                    {marginBottom: sameUser ? 2 : 10},
+                                    !this.props.inverted && {marginBottom: 2},
                                     containerStyle && containerStyle[position],
-                                ]}
-                            >
-                                {this.props.position === 'left' ? this.renderAvatar() : null}
+                                ]}>
+                                {this.props.position === 'left'
+                                    ? this.renderAvatar()
+                                    : null}
                                 <View>
                                     {this.renderUsername()}
                                     {this.renderBubble()}
                                 </View>
-                                {this.props.position === 'right' ? this.renderAvatar() : null}
+                                {this.props.position === 'right'
+                                    ? this.renderAvatar()
+                                    : null}
                             </View>
                         </View>
                     )}

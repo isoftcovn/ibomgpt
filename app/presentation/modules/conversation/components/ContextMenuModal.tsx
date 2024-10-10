@@ -9,6 +9,7 @@ import ContextMenuModalHelper from '../helper/ContextMenuModalHelper';
 import {
     useContextMenuActionButtonPressed,
     useContextMenuActionButtons,
+    useContextMenuReactionPressed,
 } from './ContextMMenuModal.hooks';
 import {ContextMenuActionButtonModel} from './ContextMenuModal.model';
 import {MeasureOnSuccessCallback} from './CustomBubble.model';
@@ -30,6 +31,7 @@ const ContextMenuModal: React.FC<IProps> = React.memo(({}) => {
 
     const actionButtons = useContextMenuActionButtons(message);
     const onActionButtonPress = useContextMenuActionButtonPressed(message);
+    const onReactionPress = useContextMenuReactionPressed(message);
 
     useEffect(() => {
         const subscription = ContextMenuModalHelper.showModalUpdater.subscribe(
@@ -52,8 +54,9 @@ const ContextMenuModal: React.FC<IProps> = React.memo(({}) => {
     const onEmojiButtonPress = useCallback(
         (item: ReactionModel) => {
             onClose();
+            onReactionPress(item);
         },
-        [onClose],
+        [onClose, onReactionPress],
     );
 
     const _onActionButtonPress = useCallback(

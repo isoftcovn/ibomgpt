@@ -1,14 +1,21 @@
 import GeneratedImages from '@assets/GeneratedImages';
-import {selectUserId} from '@redux/selectors/user';
+import {ChatRepository} from '@data/repository/chat';
+import {ReactionRequestModel} from '@models/chat/request/ReactionRequestModel';
+import {UndoReactionRequestModel} from '@models/chat/request/UndoReactionRequestModel';
+import Clipboard from '@react-native-clipboard/clipboard';
+import {
+    deleteMessageActionTypes,
+    updateMessageReactionActionTypes,
+} from '@redux/actions/conversation';
+import {selectProfileData, selectUserId} from '@redux/selectors/user';
 import {theme} from '@theme/index';
+import {ReactionModel} from 'app/presentation/models/ReactionModel';
 import {IAppChatMessage} from 'app/presentation/models/chat';
+import {useCallback, useContext, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
-import {ContextMenuActionButtonModel} from './ContextMenuModal.model';
-import {useCallback, useContext, useMemo} from 'react';
-import Clipboard from '@react-native-clipboard/clipboard';
 import {ConversationContext} from '../context/ConversationContext';
-import {deleteMessageActionTypes} from '@redux/actions/conversation';
+import {ContextMenuActionButtonModel} from './ContextMenuModal.model';
 
 export const useContextMenuActionButtons = (
     currentMessage?: IAppChatMessage,
@@ -120,4 +127,92 @@ export const useContextMenuActionButtonPressed = (
         },
         [currentMessage, dispatch, setEditMessage, userId],
     );
+};
+
+export const useContextMenuReactionPressed = (
+    currentMessage?: IAppChatMessage,
+) => {
+    const user = useSelector(selectProfileData);
+    const dispatch = useDispatch();
+    return useCallback(
+        (reaction: ReactionModel) => {
+            if (!currentMessage || !user) {
+                return;
+            }
+            const repo = new ChatRepository();
+            const request = new ReactionRequestModel(
+                reaction.id,
+                currentMessage._id,
+                currentMessage.objectId!,
+                currentMessage.objectInstanceId!,
+            );
+
+            repo.reactToMessage(request)
+                .then(() => {
+                    console.info('Reaction added');
+                })
+                .catch(error => {
+                    console.error('Error adding reaction', error);
+                });
+            dispatch(
+                updateMessageReactionActionTypes.startAction({
+                    reactionData: {
+                        messageId: currentMessage._id,
+                        reaction: reaction.id,
+                        objectId: currentMessage.objectId!,
+                        objectInstanceId: currentMessage.objectInstanceId!,
+                    },
+                    user: {
+                        id: user.id,
+                        avatar: user.avatar,
+                        fullname: user.fullname,
+                    },
+                    actType: 'add',
+                }),
+            );
+        },
+        [currentMessage, user, dispatch],
+    );
+};
+
+export const useContextMenuUndoReactionPressed = (
+    currentMessage?: IAppChatMessage,
+) => {
+    const user = useSelector(selectProfileData);
+    const dispatch = useDispatch();
+    return useCallback(() => {
+        if (!currentMessage || !user) {
+            return;
+        }
+        const repo = new ChatRepository();
+        const request = new UndoReactionRequestModel(
+            currentMessage._id,
+            currentMessage.objectId!,
+            currentMessage.objectInstanceId!,
+        );
+
+        repo.removeReaction(request)
+            .then(() => {
+                console.info('Reaction removed');
+            })
+            .catch(error => {
+                console.error('Error removing reaction', error);
+            });
+        dispatch(
+            updateMessageReactionActionTypes.startAction({
+                reactionData: {
+                    messageId: currentMessage._id,
+                    reaction: '',
+                    objectId: currentMessage.objectId!,
+                    objectInstanceId: currentMessage.objectInstanceId!,
+                },
+                user: {
+                    id: user.id,
+                    avatar: user.avatar,
+                    fullname: user.fullname,
+                },
+                actType: 'remove',
+            }),
+        );
+    }, [dispatch, user, currentMessage]);
 };

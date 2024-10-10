@@ -16,8 +16,14 @@ const ReadConversation = (): IResource => ({
     Path: `${getApiController()}comment/read.do`,
 });
 
+const Reaction = (): IResource => ({
+    Type: ApiType.Customer,
+    Path: `${getApiController()}comment/reaction.do`,
+});
+
 export default {
     ChatList,
     ChatSearchForm,
     ReadConversation,
+    Reaction,
 };

@@ -13,9 +13,9 @@ export class UserReactionResponse {
 
     static parseFromResponse(response: any): UserReactionResponse {
         return new UserReactionResponse(
-            response.reaction_id,
-            response.user_id,
-            response.username,
+            response.react,
+            response.user_sent_id,
+            response.user_sent_name,
             response.user_avatar_url
         );
     }

@@ -4,7 +4,9 @@ import {ApiType} from '@data/gateway/api/type';
 import {IChatRepository} from '@domain/chat';
 import {ChatListRequestModel} from '@models/chat/request/ChatListRequestModel';
 import {ChatMessagesRequestModel} from '@models/chat/request/ChatMessagesRequestModel';
+import { ReactionRequestModel } from '@models/chat/request/ReactionRequestModel';
 import {SubmitMessageRequestModel} from '@models/chat/request/SubmitMessageRequestModel';
+import { UndoReactionRequestModel } from '@models/chat/request/UndoReactionRequestModel';
 import {ChatItemResponse} from '@models/chat/response/ChatItemResponse';
 import {ChatMessageResponse} from '@models/chat/response/ChatMessageResponse';
 import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
@@ -15,6 +17,40 @@ import {PaginationModel} from '@models/general/response/PaginationModel';
 import UserModel from '@models/user/response/UserModel';
 
 export class ChatRepository implements IChatRepository {
+    reactToMessage =  async (body: ReactionRequestModel): Promise<boolean> => {
+        const resource = AppResource.Chat.Reaction();
+        const formData = new FormData();
+        Object.entries(body).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        const apiGateway = new ApiGateway({
+            method: 'POST',
+            resource: resource,
+            body: formData,
+        });
+
+        await apiGateway.execute();
+
+        return true;
+    };
+
+    removeReaction = async (body: UndoReactionRequestModel): Promise<boolean> => {
+        const resource = AppResource.Chat.Reaction();
+        const formData = new FormData();
+        Object.entries(body).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        const apiGateway = new ApiGateway({
+            method: 'POST',
+            resource: resource,
+            body: formData,
+        });
+
+        await apiGateway.execute();
+
+        return true;
+    };
+
     markAsReadConversation = async (
         objectId: number,
         objectInstanceId: number,

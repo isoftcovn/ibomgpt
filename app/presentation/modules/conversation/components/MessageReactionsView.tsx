@@ -14,6 +14,7 @@ interface MessageReactionsViewProps {
 const MessageReactionsView: React.FC<MessageReactionsViewProps> = React.memo(
     ({currentMessage, position, onPress}) => {
         const reactions = currentMessage.reactions ?? [];
+        console.log('reactions', reactions);
         const renderedReacttions = reactions.slice(0, 2);
         if (reactions.length === 0) {
             return null;

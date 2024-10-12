@@ -12,6 +12,8 @@ import {
     UsersTypingPayload,
 } from './ChatManager.interfaces';
 import {IAppChatMessage} from '../models/chat';
+import {UserReactionResponse} from '@models/chat/response/UserReactionResponse';
+import {IUpdateMessageReactionPayload} from '@redux/actions/conversation';
 
 export class ChatManager {
     static shared = new ChatManager();
@@ -31,6 +33,7 @@ export class ChatManager {
     userTypingEvent: Subject<UsersTypingPayload>;
     editMessageEvent: Subject<EditMessageSignalRPayload>;
     deleteMessageEvent: Subject<DeleteMessageSignalRPayload>;
+    reactionEvent: Subject<IUpdateMessageReactionPayload>;
 
     messageSentEvent: Subject<IAppChatMessage[]>;
 
@@ -39,6 +42,7 @@ export class ChatManager {
         this.userTypingEvent = new Subject<UsersTypingPayload>();
         this.editMessageEvent = new Subject<EditMessageSignalRPayload>();
         this.deleteMessageEvent = new Subject<DeleteMessageSignalRPayload>();
+        this.reactionEvent = new Subject<IUpdateMessageReactionPayload>();
         this.channelTypingState = {};
         this.messageSentEvent = new Subject<IAppChatMessage[]>();
 
@@ -96,6 +100,11 @@ export class ChatManager {
                     deleteEventData.messageId &&
                     !isSentByThisDevice
                 );
+            case 'reaction':
+                const reactionData = data.payload as
+                    | IUpdateMessageReactionPayload
+                    | undefined;
+                return reactionData?.reactionData && !isSentByThisDevice;
         }
         return false;
     };
@@ -144,6 +153,15 @@ export class ChatManager {
                     console.info('delete mmessage event: ', deleteEventData);
                     if (deleteEventData) {
                         this.deleteMessageEvent.next(deleteEventData);
+                    }
+                    break;
+                case 'reaction':
+                    const reactionData = data.payload as
+                        | IUpdateMessageReactionPayload
+                        | undefined;
+                    if (reactionData) {
+                        console.info('receive reaction: ', reactionData);
+                        this.reactionEvent.next(reactionData);
                     }
                     break;
             }

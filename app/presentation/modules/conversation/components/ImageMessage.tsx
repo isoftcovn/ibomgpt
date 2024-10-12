@@ -1,7 +1,7 @@
 import {Dimensions} from '@theme/Dimensions';
 import {theme} from '@theme/index';
 import {IAppChatMessage} from 'app/presentation/models/chat';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -19,6 +19,7 @@ const ImageMessage = React.memo((props: MessageImageProps<IAppChatMessage>) => {
     const [visible, setIsVisible] = useState(false);
     const [imageWidth, setImageWidth] = useState<number>();
     const [imageHeight, setImageHeight] = useState<number>();
+    const containerTouchable = useRef<TouchableOpacity>(null);
     const imageUrl = useMemo(() => currentMessage?.image, [currentMessage]);
     const imageRatio = useMemo(() => {
         if (imageWidth && imageHeight) {
@@ -27,8 +28,6 @@ const ImageMessage = React.memo((props: MessageImageProps<IAppChatMessage>) => {
 
         return undefined;
     }, [imageWidth, imageHeight]);
-
-    console.log('imageRatio: ', imageRatio);
 
     const context = useChatContext();
 
@@ -61,10 +60,25 @@ const ImageMessage = React.memo((props: MessageImageProps<IAppChatMessage>) => {
 
     return (
         <TouchableOpacity
+            ref={containerTouchable}
             activeOpacity={0.8}
             onPress={() => setIsVisible(true)}
-            onLongPress={() => {
-                onLongPress(context, currentMessage);
+            onLongPress={(evt) => {
+                containerTouchable.current?.measure(
+                    (x, y, width, height, pageX, pageY) => {
+                        if (onLongPress) {
+                            onLongPress(context, currentMessage, evt, {
+                                x,
+                                y,
+                                width,
+                                height,
+                                pageX,
+                                pageY,
+                            });
+                            return;
+                        }
+                    },
+                );
             }}>
             {imageRatio ? (
                 <FastImage

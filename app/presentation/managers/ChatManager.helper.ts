@@ -3,7 +3,7 @@ import { ChatMessageResponse } from '@models/chat/response/ChatMessageResponse';
 import { ReactionModel } from 'app/presentation/models/ReactionModel';
 import { ContextMenuActionButtonModel } from '@modules/conversation/components/ContextMenuModal.model';
 import { theme } from '@theme/index';
-import { TFunction } from 'i18next';
+import { TFunction, use } from 'i18next';
 import { ChatManager } from './ChatManager';
 import {
     DeleteMessageSignalRPayload,
@@ -11,6 +11,7 @@ import {
     UsersTypingPayload,
 } from './ChatManager.interfaces';
 import EmojiManager from './EmojiManager';
+import { IUpdateMessageReactionPayload } from '@redux/actions/conversation';
 
 export class ChatHelper {
     static shared = new ChatHelper();
@@ -60,6 +61,14 @@ export class ChatHelper {
     ) => {
         ChatManager.shared.sendMessageToUsers(userIds, {
             event: 'delete-message',
+            payload,
+            sentDeviceUID: ChatManager.shared._deviceUID,
+        });
+    };
+
+    sendReactionEvent = (userIds: string[], payload: IUpdateMessageReactionPayload) => {
+        ChatManager.shared.sendMessageToUsers(userIds, {
+            event: 'reaction',
             payload,
             sentDeviceUID: ChatManager.shared._deviceUID,
         });

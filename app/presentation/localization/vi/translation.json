@@ -44,6 +44,7 @@
     "helpCenter": "Trung tâm trợ giúp",
 
     "info": "Thông báo",
+    "info2": "Thông tin",
     "invalidEmail": "Email không hợp lệ",
 
     "korean": "Korean",
@@ -65,6 +66,8 @@
 
     "name": "Tên",
     "next": "Next",
+    "newVersionTitle": "Phiên bản mới",
+    "newVersionDesc": "Hãy cập nhật phiên bản mới để tiếp tục sử dụng.",
 
     "password": "Mật khẩu",
     "phoneNumber": "Phone number",
@@ -94,6 +97,7 @@
 
     "used": "Used",
     "useCamera": "Sử dụng máy ảnh",
+    "update": "Cập nhật",
 
     "objectType": "Loại đối tượng",
     "objectName": "Tên đối tượng",
@@ -101,6 +105,10 @@
 
     "warning": "Waring",
     "warn_empty": "Không thể bỏ trống",
+
+    "you": "Bạn",
+
+    "typeSomething": "Hãy viết gì đó..",
 
     "404": "Content not found.",
     "400": "Client error.",

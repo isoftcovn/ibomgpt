@@ -1,26 +1,26 @@
-import {ChatRepository} from '@data/repository/chat';
-import {GetChatMessagesUseCase} from '@domain/chat/GetChatMessagesUseCase';
-import {ChatMessagesRequestModel} from '@models/chat/request/ChatMessagesRequestModel';
-import {SubmitMessageRequestModel} from '@models/chat/request/SubmitMessageRequestModel';
+import { ChatRepository } from '@data/repository/chat';
+import { GetChatMessagesUseCase } from '@domain/chat/GetChatMessagesUseCase';
+import { ChatMessagesRequestModel } from '@models/chat/request/ChatMessagesRequestModel';
+import { SubmitMessageRequestModel } from '@models/chat/request/SubmitMessageRequestModel';
 import {
     IDeleteMessagePayload,
     deleteMessageActionTypes,
     getMessagesActionTypes,
     receiveNewMessagesActionTypes,
-    updateConversationParticipantsActionTypes,
-    updateUnreadConversationActionTypes,
+    updateUnreadConversationActionTypes
 } from '@redux/actions/conversation';
 import {
     selectMessagesByKey,
     selectParticipantsByKey,
 } from '@redux/selectors/conversation';
-import {MessageHelper} from '@shared/helper/MessageHelper';
-import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
-import {IAppChatMessage} from 'app/presentation/models/chat';
-import {StateObservable, combineEpics, ofType} from 'redux-observable';
-import {Observable} from 'rxjs';
-import {mergeMap, switchMap} from 'rxjs/operators';
-import {IAction} from '../..';
+import { MessageHelper } from '@shared/helper/MessageHelper';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
+import { IAppChatMessage } from 'app/presentation/models/chat';
+import { StateObservable, combineEpics, ofType } from 'redux-observable';
+import { Observable } from 'rxjs';
+import { mergeMap, switchMap } from 'rxjs/operators';
+import { IAction } from '../..';
+import { PageSize } from '@shared/constants';
 
 export const getMessagesEpic = (action$: any, state$: any) =>
     action$.pipe(
@@ -35,7 +35,7 @@ export const getMessagesEpic = (action$: any, state$: any) =>
                     usecase
                         .execute()
                         .then(response => {
-                            const [messages, users, roomName] = response;
+                            const [messages, , roomName] = response;
                             const sectionId = `${action.payload!.object_id}-${
                                 action.payload!.object_instance_id
                             }`;
@@ -44,24 +44,16 @@ export const getMessagesEpic = (action$: any, state$: any) =>
                                     sectionId: sectionId,
                                     isAppend:
                                         (action.payload!.last_id ?? 0) > 0,
-                                    canLoadMore: messages.length > 0,
+                                    canLoadMore: messages.length === PageSize.Default,
                                     roomName,
                                 }),
-                            );
-                            obs.next(
-                                updateConversationParticipantsActionTypes.startAction(
-                                    users,
-                                    {
-                                        sectionId,
-                                    },
-                                ),
                             );
                             obs.complete();
                         })
                         .catch(error => {
-                            obs.next(
-                                getMessagesActionTypes.failedAction({error}),
-                            );
+                            // obs.next(
+                            //     getMessagesActionTypes.failedAction({error}),
+                            // );
                             obs.complete();
                         });
                 }),
@@ -106,9 +98,9 @@ export const deleteMessageEpic = (action$: any, state$: any) =>
                             obs.complete();
                         })
                         .catch(error => {
-                            obs.next(
-                                deleteMessageActionTypes.failedAction({error}),
-                            );
+                            // obs.next(
+                            //     deleteMessageActionTypes.failedAction({error}),
+                            // );
                             obs.complete();
                         });
                 }),

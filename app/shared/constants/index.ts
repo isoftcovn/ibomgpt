@@ -46,6 +46,12 @@ export const CreditCardTypes = {
 };
 
 export const NOTIFICATION_CHANNEL = 'app_notification';
+
+export const DEEPLINK_OBJECT_TYPE = {
+    TASK_DETAIL: 1,
+    DOC_DETAIL: 2,
+    COMMENT: 3,
+};
 /**
  * ===================================================SHARED SECTION======================================================
  */
@@ -98,7 +104,7 @@ export const RouteAuthenticationRequires: Record<
     PdfViewer: true,
     ParticipantList: true,
     ConversationInfo: true,
-    CommonFilter: true
+    CommonFilter: true,
 };
 
 export const Links = {

@@ -4,7 +4,10 @@ import UserModel from '@models/user/response/UserModel';
 import {AppStackParamList} from '@navigation/RouteParams';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {getMessagesActionTypes} from '@redux/actions/conversation';
+import {
+    getMessagesActionTypes,
+    updateConversationParticipantsActionTypes,
+} from '@redux/actions/conversation';
 import {
     selectMessagesByKey,
     selectMessagesCanLoadMoreByKey,
@@ -49,6 +52,7 @@ import {
     MyAvatar,
     MyBubble,
     MyCustomMessage,
+    MyDayMessage,
     MySystemMessage,
     MyTextMessage,
     RenderMessage,
@@ -80,6 +84,7 @@ import {ChatManager} from 'app/presentation/managers/ChatManager';
 import {ConversationHeaderMenu} from './components/HeaderMenu';
 import {ChatRoomsOptions} from '@models/chat/response/ChatRoomOptions';
 import {ChatRepository} from '@data/repository/chat';
+import {MessageHelper} from '@shared/helper/MessageHelper';
 
 interface IProps {
     navigation: StackNavigationProp<AppStackParamList, 'Conversation'>;
@@ -98,15 +103,29 @@ export const ConversationScreen = (props: IProps) => {
     const objectInstanceId = useMemo(() => {
         return route.params.objectInstanceId;
     }, [route.params]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const repo = new ChatRepository();
         repo.getChatRoomOptions(objectId, objectInstanceId)
-            .then(setOptions)
+            .then(options => {
+                setOptions(options);
+                const key = `${objectId}-${objectInstanceId}`;
+                if (options.participants) {
+                    dispatch(
+                        updateConversationParticipantsActionTypes.startAction(
+                            options.participants,
+                            {
+                                sectionId: key,
+                            },
+                        ),
+                    );
+                }
+            })
             .catch(error => {
                 //
             });
-    }, [objectId, objectInstanceId]);
+    }, [objectId, objectInstanceId, dispatch]);
 
     const enterEditMode = useCallback((message?: IAppChatMessage) => {
         console.info(
@@ -158,7 +177,8 @@ const ConversationContent = React.memo((props: IProps) => {
     const messageContentRef = useRef<string>();
     const didmountRef = useRef(false);
     const [keyboardShown, setKeyboardShown] = useState(false);
-    const {textInputRef, editMessage} = useContext(ConversationContext);
+    const {textInputRef, editMessage, options} =
+        useContext(ConversationContext);
     const {setText} = useContext(ConversationInputContext);
     const {t} = useTranslation();
     const dispatch = useDispatch();
@@ -195,7 +215,7 @@ const ConversationContent = React.memo((props: IProps) => {
         [participants],
     );
     const messages = useSelector(state => selectMessagesByKey(state, key));
-    const roomName = useSelector(state => selectRoomNameByKey(state, key));
+    const roomName = useMemo(() => options?.name ?? '', [options]);
     const canLoadMore = useSelector(state =>
         selectMessagesCanLoadMoreByKey(state, key),
     );
@@ -218,23 +238,25 @@ const ConversationContent = React.memo((props: IProps) => {
         if (roomName) {
             name = roomName;
         }
-        if (!conversationName.current || conversationName.current !== name) {
-            navigation.setOptions({
-                title:
-                    name ||
-                    `${t('detail')}:${route.params?.objectInstanceId ?? 0}`,
-                headerRight: props => (
-                    <ConversationHeaderMenu
-                        navigation={navigation}
-                        route={route}
-                        tintColor={props.tintColor}
-                    />
-                ),
-            });
+        navigation.setOptions({
+            title:
+                name || `${t('detail')}:${route.params?.objectInstanceId ?? 0}`,
+            headerTitleContainerStyle: {
+                maxWidth: '70%',
+                marginRight: 32,
+            },
+            headerRight: props => (
+                <ConversationHeaderMenu
+                    navigation={navigation}
+                    route={route}
+                    tintColor={props.tintColor}
+                    options={options}
+                />
+            ),
+        });
 
-            conversationName.current = name;
-        }
-    }, [route.params, navigation, route, t, roomName]);
+        conversationName.current = name;
+    }, [route.params, navigation, route, t, roomName, options]);
 
     useEffect(() => {
         const keyboardWillShowListener = Keyboard.addListener(
@@ -336,8 +358,13 @@ const ConversationContent = React.memo((props: IProps) => {
                 objectInstanceId,
                 1,
             );
-            request.last_id = Number(lastMessage._id);
-            dispatch(getMessagesActionTypes.startAction(request));
+            const lastId = MessageHelper.shared.extractRealMessageId(
+                `${lastMessage._id}`,
+            );
+            if (!isNaN(lastId)) {
+                request.last_id = lastId;
+                dispatch(getMessagesActionTypes.startAction(request));
+            }
         }
     }, [
         canLoadMore,
@@ -400,7 +427,21 @@ const ConversationContent = React.memo((props: IProps) => {
                 })}
                 listViewProps={{
                     onEndReached: loadEalierMessages,
-                    onEndReachedThreshold: 0.5,
+                    onEndReachedThreshold: 0.8,
+                    ListFooterComponent:
+                        isFetching && messages.length > 0 ? (
+                            <View
+                                style={{
+                                    alignItems: 'center',
+                                    padding: theme.spacing.medium,
+                                }}>
+                                <ActivityIndicator
+                                    color={theme.color.colorPrimary}
+                                    size={'large'}
+                                    animating
+                                />
+                            </View>
+                        ) : null,
                 }}
                 lightboxProps={{
                     onLongPress: undefined,
@@ -425,6 +466,7 @@ const ConversationContent = React.memo((props: IProps) => {
                 renderMessageAudio={MyAudioMessage}
                 renderMessageImage={RenderImageMessage}
                 renderSystemMessage={MySystemMessage}
+                renderDay={MyDayMessage}
                 renderCustomView={MyCustomMessage}
                 scrollToBottomComponent={renderScrollToBottom}
                 renderFooter={renderFooter}

@@ -18,7 +18,7 @@ const AudioMessage = React.memo((props: MessageAudioProps<IAppChatMessage>) => {
         return <View style={[styles.left.videoContainer]}>
             <Ionicons
                 name={'play-outline'}
-                size={Dimensions.moderateScale(16)}
+                size={Dimensions.moderateScale(24)}
                 color={theme.color.textColor}
             />
             <View style={{ marginLeft: theme.spacing.small }} />

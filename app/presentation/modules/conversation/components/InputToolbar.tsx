@@ -19,6 +19,7 @@ import {selectParticipantsByKey} from '@redux/selectors/conversation';
 import {useSelector} from 'react-redux';
 import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
 import {selectDisplayName} from '@redux/selectors/user';
+import {useTranslation} from 'react-i18next';
 
 export interface IMyComposerProps extends ComposerProps {
     onSelectFilePressed: () => void;
@@ -90,6 +91,7 @@ const MyInput = React.memo((props: IMyComposerProps) => {
         [participants],
     );
     const displayName = useSelector(selectDisplayName);
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (editMessage && editMessage.text) {
@@ -121,6 +123,7 @@ const MyInput = React.memo((props: IMyComposerProps) => {
             textInputStyle={styles.textInput}
             onTextChanged={setText}
             text={text}
+            placeholder={t('typeSomething')}
         />
     );
 });

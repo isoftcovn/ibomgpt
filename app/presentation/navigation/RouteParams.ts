@@ -1,5 +1,6 @@
 import { IFieldValues } from '@components/FormGenerator/model';
 import {IPickerItemModel} from '../models/general';
+import { ChatRoomsOptions } from '@models/chat/response/ChatRoomOptions';
 
 export interface IRichTextEditorNavigationParams {
     html?: string;
@@ -39,6 +40,7 @@ export type AppStackParamList = {
     ParticipantList: {
         objectId: number;
         objectInstanceId: number;
+        info?: ChatRoomsOptions;
     };
     ConversationInfo: {
         objectId: number;

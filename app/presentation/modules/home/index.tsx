@@ -184,12 +184,6 @@ const HomeScreen = (props: IProps) => {
                     isAppend: true,
                 }),
             );
-            // setConversations(prevState => {
-            //     return [
-            //         ...prevState,
-            //         ...items
-            //     ];
-            // });
         } catch (error) {
             console.info('Load conversations error: ', error);
         } finally {

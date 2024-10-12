@@ -103,23 +103,42 @@ export default class LinkingHelper {
         );
     };
 
-    // static openIBomProApp = () => {
-    //     const env = Config.ENV;
-    //     let url = '';
-    //     switch (env) {
-    //         case 'uat':
-    //             url = 'https://ibom-dev.onelink.me/yMRF/jj53rm1h';
-    //             break;
-    //         case 'production':
-    //             url = 'https://ibom.onelink.me/Ydm1/3lety9nj';
-    //             break;
-    //         case 'dev':
-    //             url = 'https://ibom-dev.onelink.me/yMRF/jj53rm1h';
-    //             break;
-    //     }
-
-    //     Linking.openURL(url).catch(error => {
-    //         console.info('Error: ', error);
-    //     });
-    // };
+    static openIBomProAppDetailObject = async (
+        userRepository: IUserRepository,
+        objectId: number,
+        objectInstanceId: number,
+    ) => {
+        const userCreds = await userRepository.getUserCreds();
+        let _u = '';
+        let _p = '';
+        if (userCreds && userCreds.length >= 2) {
+            const [username, password] = userCreds;
+            _u = username;
+            _p = password;
+        }
+        Appsflyer.generateInviteLink(
+            {
+                channel: 'app2app',
+                userParams: {
+                    deep_link_value: 'object_detail',
+                    deep_link_sub1: JSON.stringify({
+                        objectId,
+                        objectInstanceId,
+                    }),
+                    deep_link_sub2: JSON.stringify({
+                        _u,
+                        _p,
+                    }),
+                },
+            },
+            result => {
+                console.info('Deeplink: ', result);
+                const link = result as string;
+                Linking.openURL(link);
+            },
+            error => {
+                console.warn('Generate deeplink error: ', error);
+            },
+        );
+    };
 }

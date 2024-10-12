@@ -1,42 +1,61 @@
-import { Dimensions } from '@theme/Dimensions';
-import { theme } from '@theme/index';
-import { IAppChatMessage } from 'app/presentation/models/chat';
+import {Dimensions} from '@theme/Dimensions';
+import {theme} from '@theme/index';
+import {IAppChatMessage} from 'app/presentation/models/chat';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {
-    Avatar, AvatarProps, Bubble, BubbleProps, Message, MessageProps, MessageText, MessageTextProps,
-    SystemMessage, SystemMessageProps,
-    Time, TimeProps, User,
+    Avatar,
+    AvatarProps,
+    Bubble,
+    BubbleProps,
+    Day,
+    DayProps,
+    Message,
+    MessageProps,
+    MessageText,
+    MessageTextProps,
+    SystemMessage,
+    SystemMessageProps,
+    Time,
+    TimeProps,
+    User,
 } from 'react-native-gifted-chat';
-import { FileMessage } from './FileMessage';
-import { TextPrimary } from '@components/index';
-import { MyMessage } from './Message';
+import {FileMessage} from './FileMessage';
+import {TextPrimary} from '@components/index';
+import {MyMessage} from './Message';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const MyAvatar = (props: AvatarProps<IAppChatMessage>) => {
-    return <Avatar
-        {...props}
-        containerStyle={{
-            left: styles.left.avatarContainer,
-            right: styles.right.avatarContainer
-        }}
-    />;
+    return (
+        <Avatar
+            {...props}
+            containerStyle={{
+                left: styles.left.avatarContainer,
+                right: styles.right.avatarContainer,
+            }}
+        />
+    );
 };
 
 export const TimeText = (props: TimeProps<IAppChatMessage>) => {
-    return <Time
-        {...props}
-        timeTextStyle={{
-            left: styles.left.timeText,
-            right: styles.right.timeText,
-        }}
-    />;
+    return (
+        <Time
+            {...props}
+            timeFormat={'hh:mmA'}
+            timeTextStyle={{
+                left: styles.left.timeText,
+                right: styles.right.timeText,
+            }}
+        />
+    );
 };
 
 export const UserNameText = (user: User) => {
-    return <TextPrimary style={styles.left.username}>
-        {user.name ?? ''}
-    </TextPrimary>;
+    return (
+        <TextPrimary style={styles.left.username}>
+            {user.name ?? ''}
+        </TextPrimary>
+    );
 };
 
 export const MyBubble = (props: BubbleProps<IAppChatMessage>) => (
@@ -90,8 +109,16 @@ export const MySystemMessage = (props: SystemMessageProps<IAppChatMessage>) => {
     />;
 };
 
+export const MyDayMessage = (props: DayProps<IAppChatMessage>) => {
+    return <Day
+        {...props}
+        textStyle={styles.left.systemMessage}
+        dateFormat={'DD/MM/YYYY'}
+    />;
+};
+
 export const MyCustomMessage = (props: BubbleProps<IAppChatMessage>) => {
-    const { currentMessage } = props;
+    const {currentMessage} = props;
     if ((currentMessage?.fileUrl ?? '').length > 0) {
         return <FileMessage {...props} />;
     }
@@ -99,21 +126,22 @@ export const MyCustomMessage = (props: BubbleProps<IAppChatMessage>) => {
 };
 
 export const renderScrollToBottom = () => {
-    return <Ionicons
-        name={'chevron-down-outline'}
-        size={Dimensions.moderateScale(24)}
-        color={theme.color.textColor}
-    />;
+    return (
+        <Ionicons
+            name={'chevron-down-outline'}
+            size={Dimensions.moderateScale(24)}
+            color={theme.color.textColor}
+        />
+    );
 };
 
 const styles = {
     left: StyleSheet.create({
         avatarContainer: {
             marginRight: 0,
-            paddingRight: 0
+            paddingRight: 0,
         },
-        avatar: {
-        },
+        avatar: {},
         bubbleContainer: {
             borderWidth: 1,
             borderColor: theme.color.colorPrimary,
@@ -149,12 +177,19 @@ const styles = {
         messageContainer: {
             marginBottom: theme.spacing.tiny,
         },
+        systemMessageContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 10,
+            marginBottom: 5,
+        },
         systemMessage: {
             ...theme.textVariants.label1,
             color: theme.color.labelColor,
         },
         fileNameMessage: {
-            maxWidth: Dimensions.screenWidth() / 3 * 2,
+            maxWidth: (Dimensions.screenWidth() / 3) * 2,
             ...theme.textVariants.body1,
             color: theme.color.textColor,
             fontWeight: '400',
@@ -162,20 +197,19 @@ const styles = {
         fileContainer: {
             padding: theme.spacing.small,
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
         },
         username: {
             ...theme.textVariants.label1,
             color: theme.color.labelColor,
-        }
+        },
     }),
     right: StyleSheet.create({
         avatarContainer: {
             marginLeft: 0,
-            paddingLeft: 0
+            paddingLeft: 0,
         },
-        avatar: {
-        },
+        avatar: {},
         bubbleContainer: {
             borderWidth: 1,
             borderColor: '#b9cdd8',
@@ -207,5 +241,5 @@ const styles = {
         messageContainer: {
             marginBottom: theme.spacing.tiny,
         },
-    })
+    }),
 };

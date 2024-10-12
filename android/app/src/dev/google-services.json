@@ -1,45 +1,151 @@
 {
   "project_info": {
-    "project_number": "491911612374",
-    "project_id": "ibomgpt",
-    "storage_bucket": "ibomgpt.appspot.com"
+    "project_number": "158559196141",
+    "project_id": "ibom-6a52d",
+    "storage_bucket": "ibom-6a52d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:491911612374:android:fcbffdc8f052d87c034677",
+        "mobilesdk_app_id": "1:158559196141:android:b006c646df6d03bf66cde4",
         "android_client_info": {
-          "package_name": "com.isoftco.ibomgpt"
+          "package_name": "com.isoftco.ibom"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD_T8uJRStRroNSdLatfS6kfh38ygN67S0"
+          "current_key": "AIzaSyAGgkBYmYGamr7my3xMJMPUy2onj8BL0xY"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "158559196141-tlvrvqcq97jtmnn1gq4bh79hv719iu2h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.isoftco.ibompro"
+              }
+            }
+          ]
         }
       }
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:491911612374:android:0954d5b00097146b034677",
+        "mobilesdk_app_id": "1:158559196141:android:4f987817e96b21af66cde4",
         "android_client_info": {
-          "package_name": "com.isoftco.ibomgpt.dev"
+          "package_name": "com.isoftco.ibom.dev"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyD_T8uJRStRroNSdLatfS6kfh38ygN67S0"
+          "current_key": "AIzaSyAGgkBYmYGamr7my3xMJMPUy2onj8BL0xY"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "158559196141-tlvrvqcq97jtmnn1gq4bh79hv719iu2h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.isoftco.ibompro"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158559196141:android:e4c1d0a3c4039ef466cde4",
+        "android_client_info": {
+          "package_name": "com.isoftco.ibomgpt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGgkBYmYGamr7my3xMJMPUy2onj8BL0xY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "158559196141-tlvrvqcq97jtmnn1gq4bh79hv719iu2h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.isoftco.ibompro"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158559196141:android:1ace913f716b537066cde4",
+        "android_client_info": {
+          "package_name": "com.isoftco.ibomgpt.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGgkBYmYGamr7my3xMJMPUy2onj8BL0xY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "158559196141-5tttbsbpjb8dkmtc9i7c6rq7vuk1h9mf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "158559196141-tlvrvqcq97jtmnn1gq4bh79hv719iu2h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.isoftco.ibompro"
+              }
+            }
+          ]
         }
       }
     }

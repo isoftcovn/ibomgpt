@@ -250,7 +250,6 @@ export default function (state = initialState, action: IAction<any>) {
                         message.reactions.splice(reactionIndex, 1);
                     }
                 }
-                console.log('message.reactions: ', message.reactions);
                 currentData[index] = message;
                 draft.data[sectionId] = currentData;
             }

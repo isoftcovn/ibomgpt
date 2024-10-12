@@ -4,6 +4,7 @@ import {ReactionRequestModel} from '@models/chat/request/ReactionRequestModel';
 import {UndoReactionRequestModel} from '@models/chat/request/UndoReactionRequestModel';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
+    IUpdateMessageReactionPayload,
     deleteMessageActionTypes,
     updateMessageReactionActionTypes,
 } from '@redux/actions/conversation';
@@ -16,6 +17,8 @@ import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {ConversationContext} from '../context/ConversationContext';
 import {ContextMenuActionButtonModel} from './ContextMenuModal.model';
+import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
+import {selectParticipantsByKey} from '@redux/selectors/conversation';
 
 export const useContextMenuActionButtons = (
     currentMessage?: IAppChatMessage,
@@ -132,7 +135,14 @@ export const useContextMenuActionButtonPressed = (
 export const useContextMenuReactionPressed = (
     currentMessage?: IAppChatMessage,
 ) => {
+    const key = useMemo(
+        () => `${currentMessage?.objectId}-${currentMessage?.objectInstanceId}`,
+        [currentMessage],
+    );
     const user = useSelector(selectProfileData);
+    const participants = useSelector(state =>
+        selectParticipantsByKey(state, key),
+    );
     const dispatch = useDispatch();
     return useCallback(
         (reaction: ReactionModel) => {
@@ -154,24 +164,25 @@ export const useContextMenuReactionPressed = (
                 .catch(error => {
                     console.error('Error adding reaction', error);
                 });
-            dispatch(
-                updateMessageReactionActionTypes.startAction({
-                    reactionData: {
-                        messageId: currentMessage._id,
-                        reaction: reaction.id,
-                        objectId: currentMessage.objectId!,
-                        objectInstanceId: currentMessage.objectInstanceId!,
-                    },
-                    user: {
-                        id: user.id,
-                        avatar: user.avatar,
-                        fullname: user.fullname,
-                    },
-                    actType: 'add',
-                }),
-            );
+            const userIds = participants.map(item => `${item.id}`);
+            const payload: IUpdateMessageReactionPayload = {
+                reactionData: {
+                    messageId: currentMessage._id,
+                    reaction: reaction.id,
+                    objectId: currentMessage.objectId!,
+                    objectInstanceId: currentMessage.objectInstanceId!,
+                },
+                user: {
+                    id: user.id,
+                    avatar: user.avatar,
+                    fullname: user.fullname,
+                },
+                actType: 'add',
+            };
+            dispatch(updateMessageReactionActionTypes.startAction(payload));
+            ChatHelper.shared.sendReactionEvent(userIds, payload);
         },
-        [currentMessage, user, dispatch],
+        [currentMessage, user, dispatch, participants],
     );
 };
 
@@ -179,6 +190,13 @@ export const useContextMenuUndoReactionPressed = (
     currentMessage?: IAppChatMessage,
 ) => {
     const user = useSelector(selectProfileData);
+    const key = useMemo(
+        () => `${currentMessage?.objectId}-${currentMessage?.objectInstanceId}`,
+        [currentMessage],
+    );
+    const participants = useSelector(state =>
+        selectParticipantsByKey(state, key),
+    );
     const dispatch = useDispatch();
     return useCallback(() => {
         if (!currentMessage || !user) {
@@ -198,21 +216,22 @@ export const useContextMenuUndoReactionPressed = (
             .catch(error => {
                 console.error('Error removing reaction', error);
             });
-        dispatch(
-            updateMessageReactionActionTypes.startAction({
-                reactionData: {
-                    messageId: currentMessage._id,
-                    reaction: '',
-                    objectId: currentMessage.objectId!,
-                    objectInstanceId: currentMessage.objectInstanceId!,
-                },
-                user: {
-                    id: user.id,
-                    avatar: user.avatar,
-                    fullname: user.fullname,
-                },
-                actType: 'remove',
-            }),
-        );
-    }, [dispatch, user, currentMessage]);
+        const userIds = participants.map(item => `${item.id}`);
+        const payload: IUpdateMessageReactionPayload = {
+            reactionData: {
+                messageId: currentMessage._id,
+                reaction: '',
+                objectId: currentMessage.objectId!,
+                objectInstanceId: currentMessage.objectInstanceId!,
+            },
+            user: {
+                id: user.id,
+                avatar: user.avatar,
+                fullname: user.fullname,
+            },
+            actType: 'remove',
+        };
+        dispatch(updateMessageReactionActionTypes.startAction(payload));
+        ChatHelper.shared.sendReactionEvent(userIds, payload);
+    }, [dispatch, user, currentMessage, participants]);
 };

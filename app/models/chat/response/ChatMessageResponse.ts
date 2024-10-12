@@ -84,8 +84,7 @@ export class ChatMessageResponse {
             );
         }
         if (reaction) {
-            const arrayReaction = JSON.parse(reaction);
-            obj.reaction = arrayReaction.map((item: any) =>
+            obj.reaction = reaction.map((item: any) =>
                 UserReactionResponse.parseFromResponse(item),
             );
         }

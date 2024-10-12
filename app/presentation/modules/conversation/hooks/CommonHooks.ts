@@ -1,18 +1,17 @@
-import {ChatRepository} from '@data/repository/chat';
+import { ChatRepository } from '@data/repository/chat';
 import {
     deleteMessageRealtimeActionTypes,
     editMessagesActionTypes,
     receiveNewMessagesActionTypes,
+    updateMessageReactionActionTypes,
     updateReadConversationActionTypes,
 } from '@redux/actions/conversation';
-import {selectUserId} from '@redux/selectors/user';
-import {ChatManager} from 'app/presentation/managers/ChatManager';
-import {IAppChatMessage} from 'app/presentation/models/chat';
-import {useCallback, useContext, useEffect, useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
-import {GestureResponderEvent} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {MeasureOnSuccessCallback} from '../components/CustomBubble.model';
+import { ChatManager } from 'app/presentation/managers/ChatManager';
+import { IAppChatMessage } from 'app/presentation/models/chat';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { GestureResponderEvent } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { MeasureOnSuccessCallback } from '../components/CustomBubble.model';
 import {
     ConversationContext,
     ConversationInputContext,
@@ -108,10 +107,17 @@ export const useRealtimeMessage = () => {
                 );
             });
 
+        const reactionSubscription = ChatManager.shared.reactionEvent.subscribe(
+            event => {
+                dispatch(updateMessageReactionActionTypes.startAction(event));
+            },
+        );
+
         return () => {
             receiveMessageSubcription.unsubscribe();
             editMessageSubscription.unsubscribe();
             deleteMessageSubscription.unsubscribe();
+            reactionSubscription.unsubscribe();
         };
     }, [dispatch]);
 };

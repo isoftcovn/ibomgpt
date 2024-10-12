@@ -8,7 +8,8 @@ export type SignalREvent =
     | 'new-messages'
     | 'user-typing'
     | 'edit-message'
-    | 'delete-message';
+    | 'delete-message'
+    | 'reaction';
 
 export type TypingState = 'typing' | 'ended';
 

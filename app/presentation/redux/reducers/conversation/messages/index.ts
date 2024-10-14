@@ -222,7 +222,10 @@ export default function (state = initialState, action: IAction<any>) {
                 ...(draft.data?.[sectionId] ?? []),
             ];
             const index = currentData.findIndex(
-                item => item._id == reactionData.messageId,
+                item =>
+                    MessageHelper.shared.extractRealMessageId(
+                        item._id.toString(),
+                    ) == reactionData.messageId,
             );
             if (index !== -1) {
                 const message = {

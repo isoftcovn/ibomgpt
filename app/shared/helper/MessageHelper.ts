@@ -62,12 +62,11 @@ export class MessageHelper {
                     conversationName: data.conversationName,
                     allowDelete: data.allowDelete,
                     allowEdit: data.allowEdit,
+                    reactions: data.reaction ?? [],
                 };
                 switch (fileType) {
                     case FileType.image:
                         chatMessage.image = fileUrl;
-                        // chatMessage.audio = 'https://download.samplelib.com/mp3/sample-15s.mp3';
-                        // chatMessage.video = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
                         break;
                     case FileType.audio:
                         chatMessage.audio = fileUrl;

@@ -17,8 +17,9 @@ import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {ConversationContext} from '../context/ConversationContext';
 import {ContextMenuActionButtonModel} from './ContextMenuModal.model';
-import {ChatHelper} from 'app/presentation/managers/ChatManager.helper';
 import {selectParticipantsByKey} from '@redux/selectors/conversation';
+import {MessageHelper} from '@shared/helper/MessageHelper';
+import { ChatHelper } from 'app/presentation/managers/ChatManager.helper';
 
 export const useContextMenuActionButtons = (
     currentMessage?: IAppChatMessage,
@@ -149,10 +150,11 @@ export const useContextMenuReactionPressed = (
             if (!currentMessage || !user) {
                 return;
             }
+            const messageId = MessageHelper.shared.extractRealMessageId(currentMessage._id.toString());
             const repo = new ChatRepository();
             const request = new ReactionRequestModel(
                 reaction.id,
-                currentMessage._id,
+                messageId,
                 currentMessage.objectId!,
                 currentMessage.objectInstanceId!,
             );
@@ -167,7 +169,7 @@ export const useContextMenuReactionPressed = (
             const userIds = participants.map(item => `${item.id}`);
             const payload: IUpdateMessageReactionPayload = {
                 reactionData: {
-                    messageId: currentMessage._id,
+                    messageId: messageId,
                     reaction: reaction.id,
                     objectId: currentMessage.objectId!,
                     objectInstanceId: currentMessage.objectInstanceId!,
